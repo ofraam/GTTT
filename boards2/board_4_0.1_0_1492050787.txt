@@ -1,0 +1,30 @@
+winning move = 12
+_	_	_	_	_	
+_	X	O	X	_	
+_	_	O	O	_	
+_	O	X	_	_	
+_	X	_	_	_	
+winning move = 2
+X	_	_	_	_	
+_	X	O	X	_	
+_	O	O	O	_	
+_	O	X	_	_	
+_	X	_	_	_	
+winning move = 4
+X	O	X	_	_	
+_	X	O	X	_	
+_	O	O	O	_	
+_	O	X	_	_	
+_	X	_	_	_	
+winning move = 6
+X	O	X	O	X	
+_	X	O	X	_	
+_	O	O	O	_	
+_	O	X	_	_	
+_	X	_	_	_	
+winning move = 11
+X	O	X	O	X	
+O	X	O	X	X	
+_	O	O	O	_	
+_	O	X	_	_	
+_	X	_	_	_	

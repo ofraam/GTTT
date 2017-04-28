@@ -1,0 +1,275 @@
+/System/Library/Frameworks/Python.framework/Versions/2.6/bin/python2.6 /Users/ofraamir/PycharmProjects/GTTT/gentictactoe.py
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+Your turn
+_	O	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+COMPUTER's turn
+_	O	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	X
+_	_	_	_	_	_
+Your turn
+_	O	_	_	_	_
+_	O	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	X
+_	_	_	_	_	_
+COMPUTER's turn
+_	O	_	_	_	_
+_	O	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	X	X
+_	_	_	_	_	_
+Your turn
+_	O	_	_	_	_
+_	O	_	_	_	_
+_	_	_	_	_	_
+_	_	_	O	_	_
+_	_	_	_	X	X
+_	_	_	_	_	_
+COMPUTER's turn
+_	O	_	_	_	_
+X	O	_	_	_	_
+_	_	_	_	_	_
+_	_	_	O	_	_
+_	_	_	_	X	X
+_	_	_	_	_	_
+Your turn
+_	O	_	_	_	_
+X	O	_	_	_	_
+_	_	_	_	_	_
+_	_	_	O	_	_
+_	O	_	_	X	X
+_	_	_	_	_	_
+COMPUTER's turn
+_	O	_	_	_	_
+X	O	_	_	_	_
+_	_	_	_	_	_
+_	_	_	O	_	_
+_	O	_	_	X	X
+_	_	_	X	_	_
+Your turn
+_	O	_	_	_	_
+X	O	_	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	_
+_	O	_	_	X	X
+_	_	_	X	_	_
+random
+COMPUTER's turn
+_	O	_	_	_	_
+X	O	_	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+_	_	_	X	_	_
+in check win score = 10000
+Your turn
+O	O	_	_	_	_
+X	O	_	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+_	_	_	X	_	_
+COMPUTER's turn
+O	O	X	_	_	_
+X	O	_	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+_	_	_	X	_	_
+in check win score = 10000
+Your turn
+O	O	X	_	_	_
+X	O	O	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+_	_	_	X	_	_
+COMPUTER's turn
+O	O	X	X	_	_
+X	O	O	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+_	_	_	X	_	_
+random
+Your turn
+O	O	X	X	_	_
+X	O	O	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+O	_	_	X	_	_
+COMPUTER's turn
+O	O	X	X	X	_
+X	O	O	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+O	_	_	X	_	_
+in check win score = 10000
+Your turn
+O	O	X	X	X	O
+X	O	O	_	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+O	_	_	X	_	_
+COMPUTER's turn
+O	O	X	X	X	O
+X	O	O	X	O	_
+_	_	_	_	_	_
+_	_	_	O	_	X
+_	O	_	_	X	X
+O	_	_	X	_	_
+in check win score = 100000
+boards3/board_8_1.0_0.8_1493052727.txt
+COMPUTER is the winner!
+
+Process finished with exit code 0
+----
+/System/Library/Frameworks/Python.framework/Versions/2.6/bin/python2.6 /Users/ofraamir/PycharmProjects/GTTT/gentictactoe.py
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+Your turn
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	O	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	X	_
+_	_	_	O	_	_
+Your turn
+_	_	_	_	_	_
+_	_	O	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	X	_
+_	_	_	O	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	O	_	_	_
+_	_	_	_	_	_
+_	_	X	_	_	_
+_	_	_	_	X	_
+_	_	_	O	_	_
+Your turn
+_	_	_	_	_	_
+_	_	O	_	_	_
+O	_	_	_	_	_
+_	_	X	_	_	_
+_	_	_	_	X	_
+_	_	_	O	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	O	_	_	_
+O	_	_	_	_	_
+_	_	X	_	_	_
+_	_	_	_	X	_
+X	_	_	O	_	_
+Your turn
+_	_	_	_	_	_
+_	_	O	_	_	_
+O	O	_	_	_	_
+_	_	X	_	_	_
+_	_	_	_	X	_
+X	_	_	O	_	_
+COMPUTER's turn
+_	_	_	X	_	_
+_	_	O	_	_	_
+O	O	_	_	_	_
+_	_	X	_	_	_
+_	_	_	_	X	_
+X	_	_	O	_	_
+Your turn
+_	_	_	X	_	_
+_	_	O	_	_	_
+O	O	_	_	_	_
+_	_	X	_	_	_
+_	O	_	_	X	_
+X	_	_	O	_	_
+random
+COMPUTER's turn
+_	_	_	X	_	_
+_	_	O	_	X	_
+O	O	_	_	_	_
+_	_	X	_	_	_
+_	O	_	_	X	_
+X	_	_	O	_	_
+random
+Your turn
+_	_	O	X	_	_
+_	_	O	_	X	_
+O	O	_	_	_	_
+_	_	X	_	_	_
+_	O	_	_	X	_
+X	_	_	O	_	_
+COMPUTER's turn
+_	_	O	X	_	_
+_	_	O	_	X	_
+O	O	_	_	_	_
+_	_	X	_	_	_
+_	O	X	_	X	_
+X	_	_	O	_	_
+in check win score = 10000
+Your turn
+_	_	O	X	_	_
+_	O	O	_	X	_
+O	O	_	_	_	_
+_	_	X	_	_	_
+_	O	X	_	X	_
+X	_	_	O	_	_
+COMPUTER's turn
+_	_	O	X	_	_
+_	O	O	_	X	_
+O	O	X	_	_	_
+_	_	X	_	_	_
+_	O	X	_	X	_
+X	_	_	O	_	_
+in check win score = 10000
+Your turn
+_	_	O	X	_	_
+_	O	O	_	X	_
+O	O	X	_	_	_
+_	_	X	_	_	_
+_	O	X	_	X	_
+X	_	O	O	_	_
+COMPUTER's turn
+_	X	O	X	_	_
+_	O	O	_	X	_
+O	O	X	_	_	_
+_	_	X	_	_	_
+_	O	X	_	X	_
+X	_	O	O	_	_
+in check win score = 100000
+boards3/board_8_1.0_0.8_1493170198.txt
+COMPUTER is the winner!
+
+Process finished with exit code 0
+

@@ -1,0 +1,6 @@
+winning move = 5
+X	O	X	O	_	
+_	X	_	O	X	
+_	_	O	_	_	
+_	O	_	_	_	
+_	_	_	_	_	

@@ -1,0 +1,54 @@
+winning move = 2
+X	_	_	_	_	
+_	X	_	O	_	
+_	_	O	_	_	
+_	O	_	_	_	
+_	X	_	_	_	
+winning move = 4
+X	O	X	_	_	
+_	X	_	O	_	
+_	_	O	_	_	
+_	O	_	_	_	
+_	X	_	_	_	
+winning move = 14
+X	O	X	O	X	
+_	X	_	O	_	
+_	_	O	_	_	
+_	O	_	_	_	
+_	X	_	_	_	
+winning move = 8
+X	O	X	O	X	
+_	X	_	O	_	
+_	_	O	O	_	
+_	O	_	_	_	
+X	X	_	_	_	
+winning move = 10
+X	O	X	O	X	
+X	X	O	O	_	
+_	_	O	O	_	
+_	O	_	_	_	
+X	X	_	_	_	
+winning move = 11
+X	O	X	O	X	
+X	X	O	O	O	
+_	_	O	O	_	
+_	O	_	_	_	
+X	X	_	_	X	
+winning move = 15
+X	O	X	O	X	
+X	X	O	O	O	
+O	X	O	O	_	
+_	O	_	_	_	
+X	X	_	_	X	
+winning move = 18
+X	O	X	O	X	
+X	X	O	O	O	
+O	X	O	O	O	
+X	O	_	_	_	
+X	X	_	_	X	
+winning move = 20
+X	O	X	O	X	
+X	X	O	O	O	
+O	X	O	O	O	
+X	O	O	X	_	
+X	X	_	_	X	

@@ -1,0 +1,12 @@
+winning move = 18
+_	X	_	_	_	
+_	O	O	X	_	
+_	X	O	O	X	
+_	_	_	X	O	
+_	_	_	_	_	
+winning move = 3
+X	X	_	_	_	
+_	O	O	X	_	
+_	X	O	O	X	
+_	_	O	X	O	
+_	_	_	_	_	

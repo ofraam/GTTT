@@ -1,0 +1,7 @@
+winning move = 15
+O	O	X	X	X	O	
+X	O	O	X	O	_	
+_	_	_	_	_	_	
+_	_	_	O	_	X	
+_	O	_	_	X	X	
+O	_	_	X	_	_	

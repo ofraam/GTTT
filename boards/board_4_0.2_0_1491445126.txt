@@ -1,0 +1,6 @@
+winning move = 12
+_	_	_	_	_	
+_	X	O	X	_	
+_	_	O	O	_	
+_	O	X	_	_	
+_	_	_	_	_	

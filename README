@@ -1,0 +1,69 @@
+DESCRIPTION:
+My program implements a generalized version of Tic-Tac-Toe, using
+the minimax algorithm with alpha-beta pruning. My program also supports
+a depth-limited search, using a heuristic function that evaluates the 
+board at a given state. 
+
+RUN INSTRUCTIONS:
+My code runs from the command line, as follows:
+$ python gentictactoe.py <file_path>
+where file_path is the path to a text file, formatted as indicated
+in the problem statement. 
+
+The program will ask you whether you would like the AI to perform a 
+depth-limited search. If you would like to see depth-limited search,
+enter a positive integer for the depth you would like to see run. If you 
+do not want the AI to perform a depth-limited search, enter 'n'. 
+
+If the number of spaces is in {4, 9, 16, 25, 36}, the program reproduces a 
+visual representation of the board, similar to tic-tac-toe. 
+Blank space: '_'
+Human: 'X'
+Computer: 'O'
+
+Otherwise, you are given a more boring representation that simply lists
+the available spaces, the spaces that you occupy, and the spaces that 
+the computer occupies. 
+
+To play, enter the integer corresponding to the space you would like to move. 
+The spaces are 1-indexed, going across by row. 
+Example, for 3x3 grid:
+1 2 3
+4 5 6
+7 8 9
+
+DISCUSSION:
+My objective function can be computed as follows:
+Let i be the number of spaces the computer has on a winning path that
+is unobstructed by the human. Let j be the number of spaces the human has
+on a winning path that is unobstructed by the computer. Then, each path adds
+10*3^(i-1) - 10*3^(j-1) to the score. A completed winning path for the computer
+is initialized to 10000, and a winning path for the human is -10000.
+
+The motivation behind this is that each additional spot on a winning path
+should be exponentially more valuable than the last -- this is so that
+the computer is encouraged to build up winning paths. A path that is obstructed
+by another player adds nothing to the score, as this path can never be 
+captured. 
+
+---
+
+In my experience with the 3x3 tic-tac-toe grid, the AI will never lose -- only win or tie. 
+However, my AI does not try to minimize the number of turns, resulting
+in abnormal behavior. For example, imagine this the state of the board:
+(Computer is 'O', human is 'X')
+O X X
+O _ _
+_ _ _
+You would expect the AI to place his marker on space 7 to win, but instead
+he/she does this:
+O X X
+O O _
+_ _ _
+This move guarantees that the AI will win, because he can capture either
+one of two paths (1-4-7, 1-5-9). So, even though this move may seem silly,
+the AI does not see a distinction because he is guaranteed to win regardless.
+
+
+
+

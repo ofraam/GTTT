@@ -1,0 +1,7 @@
+winning move = 35
+X	O	X	O	X	O	
+X	O	X	O	X	O	
+X	X	O	X	O	X	
+O	X	O	X	O	X	
+O	X	X	O	X	O	
+X	O	O	O	_	_	

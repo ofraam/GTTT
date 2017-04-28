@@ -1,0 +1,7 @@
+winning move = 6
+X	O	X	O	X	_	
+_	_	X	_	O	_	
+_	X	O	O	_	_	
+_	_	O	X	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
