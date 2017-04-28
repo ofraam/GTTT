@@ -272,4 +272,97 @@ boards3/board_8_1.0_0.8_1493170198.txt
 COMPUTER is the winner!
 
 Process finished with exit code 0
+------------------
+/System/Library/Frameworks/Python.framework/Versions/2.6/bin/python2.6 /Users/ofraamir/PycharmProjects/GTTT/gentictactoe.py
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+Your turn
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	O	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	O	_	_	_
+_	_	_	X	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+Your turn
+_	_	_	_	_	_
+_	_	_	_	_	_
+_	_	O	_	_	_
+_	O	_	X	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	_	X	_	_
+_	_	O	_	_	_
+_	O	_	X	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+Your turn
+_	_	_	_	_	_
+_	_	_	X	_	_
+_	_	O	O	_	_
+_	O	_	X	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	_	X	_	_
+_	X	O	O	_	_
+_	O	_	X	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+Your turn
+_	_	_	_	_	_
+_	_	_	X	_	_
+_	X	O	O	_	_
+_	O	O	X	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	X	X	_	_
+_	X	O	O	_	_
+_	O	O	X	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+Your turn
+_	_	_	_	_	_
+_	_	X	X	_	_
+_	X	O	O	O	_
+_	O	O	X	_	_
+_	_	_	_	_	_
+_	_	_	_	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	_	X	X	_	_
+_	X	O	O	O	_
+_	O	O	X	_	_
+_	_	X	_	_	_
+_	_	_	_	_	_
+Your turn
+_	_	_	_	_	_
+_	O	X	X	_	_
+_	X	O	O	O	_
+_	O	O	X	_	_
+_	_	X	_	_	_
+_	_	_	_	_	_
+COMPUTER's turn
+_	_	_	_	_	_
+_	O	X	X	X	_
+_	X	O	O	O	_
+_	O	O	X	_	_
+_	_	X	_	_	_
+_	_	_	_	_	_
 

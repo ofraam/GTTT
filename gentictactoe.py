@@ -110,8 +110,8 @@ class Game:
     max_depth = 4
 
     if self.whos_turn == c.HUMAN:
-      # if self.num_turns<9:
-      #   return self.get_random_move()
+      if self.num_turns<7:
+        return self.get_random_move()
       self.noise = self.noise/2
       rand = random.random()
       if rand<self.noise: #add some noise so we get more types of games
@@ -120,9 +120,9 @@ class Game:
 
       board_copy = self.board.get_board_copy()
       if max_depth:
-        (score, space) = self.minimax_max_alphabeta_DL(c.NEG_INF, c.POS_INF, board_copy, max_depth)
+        (score, space) = self.minimax_min_alphabeta_DL(c.NEG_INF, c.POS_INF, board_copy, max_depth)
       else:
-        (score, space) = self.minimax_max_alphabeta(c.NEG_INF, c.POS_INF, board_copy)
+        (score, space) = self.minimax_min_alphabeta_DL(c.NEG_INF, c.POS_INF, board_copy)
       # if (c.CHECK_WIN and self.num_turns>c.MIN_MOVES):
       #   self.change_player()
       #   if self.check_win_at_depth(c.WIN_DEPTH):
@@ -130,6 +130,8 @@ class Game:
       #     self.save_board_to_file(space)
       #   self.change_player()
           # max_depth=25
+      print 'score = '+str(score)
+      print 'space = '+str(space)
       return space
 
     ######---------for human input------------------######
@@ -153,8 +155,8 @@ class Game:
         max_depth = 4
       else:
         max_depth = 8
-      # if self.num_turns<9:
-      #   return self.get_random_move()
+      if self.num_turns<7:
+        return self.get_random_move()
       self.noise = self.noise/2
       rand = random.random()
       # if rand<self.noise or self.num_turns==0: #add some noise so we get more types of games
@@ -174,6 +176,8 @@ class Game:
           self.noise=0
           # max_depth = 25
         # self.change_player()
+      print 'score = '+str(score)
+      print 'space = '+str(space)
       return space
 
   def check_win_at_depth(self, depth):
@@ -331,7 +335,7 @@ class Game:
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     if board.is_terminal() or depth <= 0:
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj(),None)  # Terminal (the space will be picked up via recursion)
+      return (board.obj(c.COMPUTER,depth),None)  # Terminal (the space will be picked up via recursion)
     else:
       max_child = (c.NEG_INF, None)
       # print 'depth = '+ str(depth) + ', free =' +str(board.get_free_spaces())
@@ -351,7 +355,7 @@ class Game:
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     if board.is_terminal() or depth <= 0:
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj(),None)
+      return (board.obj(c.HUMAN,depth),None)
     else:
       min_child = (c.POS_INF, None)
       for space in board.get_free_spaces_ranked():

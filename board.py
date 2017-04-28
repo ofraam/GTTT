@@ -144,7 +144,7 @@ class Board:
     return score
 
 
-  def obj(self, turns = 0):
+  def obj(self, player, turns = 0):
     """ Heurisitc function to be used for the minimax search. 
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE. 
@@ -155,17 +155,17 @@ class Board:
     from winning, returns -10*3^i
     """
     score = 0
-      
+    # if player == c.COMPUTER:
     for path in self.winning_paths:
       len_path = len(path)
       c.COMPUTER_count, c.HUMAN_count = 0, 0
-      
+
       for space in path:
         if self.board[space] == c.COMPUTER:
           c.COMPUTER_count += 1
         elif self.board[space] == c.HUMAN:
           c.HUMAN_count += 1
-          
+
       if c.COMPUTER_count == len_path:
         # print path
         # Player wins!
@@ -173,22 +173,53 @@ class Board:
         # print self.last_space
         # print c.WIN_SCORE-turns
 
-        return c.WIN_SCORE-turns
+        return c.WIN_SCORE+turns
       elif c.HUMAN_count == len_path:
         # print path
         # Opponent wins :(
         return c.LOSE_SCORE
       elif c.HUMAN_count == 0:
-        # Opponent not on path, so count number of player's tokens on path  
+        # Opponent not on path, so count number of player's tokens on path
         score += 10*3**(c.COMPUTER_count - 1)
       elif c.COMPUTER_count == 0:
         # Player not on path, so count number of opponent's tokens on path
         score -= 10*3**(c.HUMAN_count - 1)
       else:
         # Path cannot be won, so it has no effect on score
-        pass 
-    if score ==10000:
-      print 'ahm'
+        pass
+    # else:
+    #   for path in self.winning_paths:
+    #     len_path = len(path)
+    #     c.COMPUTER_count, c.HUMAN_count = 0, 0
+    #
+    #     for space in path:
+    #       if self.board[space] == c.COMPUTER:
+    #         c.COMPUTER_count += 1
+    #       elif self.board[space] == c.HUMAN:
+    #         c.HUMAN_count += 1
+    #
+    #     if c.HUMAN_count == len_path:
+    #       # print path
+    #       # Player wins!
+    #       # print turns
+    #       # print self.last_space
+    #       # print c.WIN_SCORE-turns
+    #
+    #       return c.WIN_SCORE - turns
+    #     elif c.COMPUTER_count == len_path:
+    #       # print path
+    #       # Opponent wins :(
+    #       return c.LOSE_SCORE
+    #     elif c.COMPUTER_count == 0:
+    #       # Opponent not on path, so count number of player's tokens on path
+    #       score += 10 * 3 ** (c.HUMAN_count - 1)
+    #     elif c.HUMAN_count == 0:
+    #       # Player not on path, so count number of opponent's tokens on path
+    #       score -= 10 * 3 ** (c.COMPUTER_count - 1)
+    #     else:
+    #       # Path cannot be won, so it has no effect on score
+    #       pass
+
     return score
     
   def is_terminal(self):
