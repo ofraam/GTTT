@@ -1,0 +1,233 @@
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 8
+score = 1
+_	_	_	_	_	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 11
+score = 1
+_	_	_	_	_	_	
+_	O	_	_	X	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 5
+score = 1
+_	_	_	_	O	_	
+_	O	_	_	X	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 35
+score = 1
+_	_	_	_	O	_	
+_	O	_	_	X	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	X	_	
+next move = 6
+score = 1
+_	_	_	_	O	O	
+_	O	_	_	X	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	X	_	
+next move = 10
+score = 1
+_	_	_	_	O	O	
+_	O	_	X	X	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	X	_	
+next move = 14
+score = 1
+_	_	_	_	O	O	
+_	O	_	X	X	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	X	_	
+next move = 19
+score = 1
+_	_	_	_	O	O	
+_	O	_	X	X	_	
+_	O	_	_	_	_	
+X	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	X	_	
+next move = 2
+score = 1
+_	O	_	_	O	O	
+_	O	_	X	X	_	
+_	O	_	_	_	_	
+X	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	X	_	
+next move = 29
+score = 1
+_	O	_	_	O	O	
+_	O	_	X	X	_	
+_	O	_	_	_	_	
+X	_	_	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 21
+score = 1
+_	O	_	_	O	O	
+_	O	_	X	X	_	
+_	O	_	_	_	_	
+X	_	O	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 20
+score = 186.666666667
+_	O	_	_	O	O	
+_	O	_	X	X	_	
+_	O	_	_	_	_	
+X	X	O	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 15
+score = -63.3333333333
+_	O	_	_	O	O	
+_	O	_	X	X	_	
+_	O	O	_	_	_	
+X	X	O	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 9
+score = 153.333333333
+_	O	_	_	O	O	
+_	O	X	X	X	_	
+_	O	O	_	_	_	
+X	X	O	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 12
+score = -60.0
+_	O	_	_	O	O	
+_	O	X	X	X	O	
+_	O	O	_	_	_	
+X	X	O	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 17
+score = 190.0
+_	O	_	_	O	O	
+_	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 23
+score = 10.0
+_	O	_	_	O	O	
+_	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	_	O	_	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 24
+score = 136.666666667
+_	O	_	_	O	O	
+_	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	_	O	X	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 3
+score = 16.6666666667
+_	O	O	_	O	O	
+_	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	_	O	X	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 4
+score = 150
+_	O	O	X	O	O	
+_	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	_	O	X	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 22
+score = 26.6666666667
+_	O	O	X	O	O	
+_	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	O	O	X	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 1
+score = 173.333333333
+X	O	O	X	O	O	
+_	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	O	O	X	
+_	_	_	_	X	_	
+_	_	_	_	X	_	
+next move = 28
+score = 43.3333333333
+X	O	O	X	O	O	
+_	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	O	O	X	
+_	_	_	O	X	_	
+_	_	_	_	X	_	
+next move = 7
+score = 190
+X	O	O	X	O	O	
+X	O	X	X	X	O	
+_	O	O	_	X	_	
+X	X	O	O	O	X	
+_	_	_	O	X	_	
+_	_	_	_	X	_	
+next move = 13
+score = 80
+X	O	O	X	O	O	
+X	O	X	X	X	O	
+O	O	O	_	X	_	
+X	X	O	O	O	X	
+_	_	_	O	X	_	
+_	_	_	_	X	_	
+next move = 16
+score = 100000
+X	O	O	X	O	O	
+X	O	X	X	X	O	
+O	O	O	X	X	_	
+X	X	O	O	O	X	
+_	_	_	O	X	_	
+_	_	_	_	X	_	
+next move = 33
+score = 100000
+X	O	O	X	O	O	
+X	O	X	X	X	O	
+O	O	O	X	X	_	
+X	X	O	O	O	X	
+_	_	_	O	X	_	
+_	_	O	_	X	_	
+next move = 27
+score = 100000
+X	O	O	X	O	O	
+X	O	X	X	X	O	
+O	O	O	X	X	_	
+X	X	O	O	O	X	
+_	_	X	O	X	_	
+_	_	O	_	X	_	
+next move = 18
+score = 100000
+COMPUTER is the winner!

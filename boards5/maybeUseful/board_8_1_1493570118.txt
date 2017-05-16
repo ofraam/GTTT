@@ -1,0 +1,116 @@
+Easy move
+----
+next move = 26
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 21
+score = 160.0
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+next move = 30
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+next move = 15
+score = 43.3333333333
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	O	_	_	_	O	
+_	_	_	_	_	_	
+next move = 27
+score = -160.0
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	X	_	_	_	
+_	O	_	_	_	O	
+_	_	_	_	_	_	
+next move = 9
+score = 26.6666666667
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	X	_	_	_	
+_	O	O	_	_	O	
+_	_	_	_	_	_	
+next move = 3
+score = -180.0
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	X	_	_	_	
+_	_	X	_	_	_	
+_	O	O	_	_	O	
+_	_	_	_	_	_	
+next move = 28
+score = 33.3333333333
+_	_	O	_	_	_	
+_	_	X	_	_	_	
+_	_	X	_	_	_	
+_	_	X	_	_	_	
+_	O	O	_	_	O	
+_	_	_	_	_	_	
+next move = 14
+score = -206.666666667
+this is key move, but easy
+_	_	O	_	_	_	
+_	_	X	_	_	_	
+_	_	X	_	_	_	
+_	_	X	_	_	_	
+_	O	O	X	_	O	
+_	_	_	_	_	_	
+next move = 20
+score = -16.6666666667
+_	_	O	_	_	_	
+_	_	X	_	_	_	
+_	O	X	_	_	_	
+_	_	X	_	_	_	
+_	O	O	X	_	O	
+_	_	_	_	_	_	
+next move = 22
+score = -100000
+_	_	O	_	_	_	
+_	_	X	_	_	_	
+_	O	X	_	_	_	
+_	X	X	_	_	_	
+_	O	O	X	_	O	
+_	_	_	_	_	_	
+next move = 10
+score = -100000
+_	_	O	_	_	_	
+_	_	X	_	_	_	
+_	O	X	_	_	_	
+_	X	X	O	_	_	
+_	O	O	X	_	O	
+_	_	_	_	_	_	
+next move = 16
+score = -100000
+_	_	O	_	_	_	
+_	_	X	X	_	_	
+_	O	X	_	_	_	
+_	X	X	O	_	_	
+_	O	O	X	_	O	
+_	_	_	_	_	_	
+next move = 25
+score = -100000
+_	_	O	_	_	_	
+_	_	X	X	_	_	
+_	O	X	O	_	_	
+_	X	X	O	_	_	
+_	O	O	X	_	O	
+_	_	_	_	_	_	
+HUMAN is the winner!

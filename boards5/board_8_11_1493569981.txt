@@ -1,0 +1,145 @@
+next move = 3
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 9
+score = 1
+_	_	O	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 11
+score = 1
+_	_	O	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 22
+score = 1
+_	_	O	_	_	_	
+_	_	X	_	O	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 26
+score = 1
+_	_	O	_	_	_	
+_	_	X	_	O	_	
+_	_	_	_	_	_	
+_	_	_	X	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 13
+score = 1
+_	_	O	_	_	_	
+_	_	X	_	O	_	
+_	_	_	_	_	_	
+_	_	_	X	_	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+next move = 10
+score = 1
+_	_	O	_	_	_	
+_	_	X	_	O	_	
+X	_	_	_	_	_	
+_	_	_	X	_	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+next move = 32
+score = 1
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	_	_	_	_	_	
+_	_	_	X	_	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+next move = 31
+score = 1
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	_	_	_	_	_	
+_	_	_	X	_	_	
+_	O	_	_	_	_	
+_	X	_	_	_	_	
+next move = 14
+score = 1
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	_	_	_	_	_	
+_	_	_	X	_	_	
+_	O	_	_	_	_	
+O	X	_	_	_	_	
+next move = 24
+score = 1
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	X	_	_	_	_	
+_	_	_	X	_	_	
+_	O	_	_	_	_	
+O	X	_	_	_	_	
+next move = 17
+score = 16.6666666667
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	X	_	_	_	_	
+_	_	_	X	_	O	
+_	O	_	_	_	_	
+O	X	_	_	_	_	
+next move = 27
+score = -256.666666667
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	X	_	_	X	_	
+_	_	_	X	_	O	
+_	O	_	_	_	_	
+O	X	_	_	_	_	
+next move = 28
+score = -26.6666666667
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	X	_	_	X	_	
+_	_	_	X	_	O	
+_	O	O	_	_	_	
+O	X	_	_	_	_	
+next move = 15
+score = -100000
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	X	_	_	X	_	
+_	_	_	X	_	O	
+_	O	O	X	_	_	
+O	X	_	_	_	_	
+next move = 21
+score = -100000
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	X	O	_	X	_	
+_	_	_	X	_	O	
+_	O	O	X	_	_	
+O	X	_	_	_	_	
+next move = 16
+score = -100000
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	X	O	_	X	_	
+_	_	X	X	_	O	
+_	O	O	X	_	_	
+O	X	_	_	_	_	
+next move = 7
+score = -100000
+_	_	O	_	_	_	
+_	_	X	O	O	_	
+X	X	O	O	X	_	
+_	_	X	X	_	O	
+_	O	O	X	_	_	
+O	X	_	_	_	_	
+HUMAN is the winner!

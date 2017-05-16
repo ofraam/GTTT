@@ -1,0 +1,113 @@
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 19
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 12
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	X	
+_	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 13
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	X	
+O	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 3
+score = 1
+_	_	X	_	_	_	
+_	_	_	_	_	X	
+O	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 14
+score = 1
+_	_	X	_	_	_	
+_	_	_	_	_	X	
+O	O	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 22
+score = 1
+_	_	X	_	_	_	
+_	_	_	_	_	X	
+O	O	_	_	_	_	
+O	_	_	X	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 5
+score = 1
+_	_	X	_	O	_	
+_	_	_	_	_	X	
+O	O	_	_	_	_	
+O	_	_	X	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 2
+score = 1
+_	X	X	_	O	_	
+_	_	_	_	_	X	
+O	O	_	_	_	_	
+O	_	_	X	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 23
+score = 1
+_	X	X	_	O	_	
+_	_	_	_	_	X	
+O	O	_	_	_	_	
+O	_	_	X	O	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 15
+score = 1
+_	X	X	_	O	_	
+_	_	_	_	_	X	
+O	O	X	_	_	_	
+O	_	_	X	O	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 28
+score = 1
+_	X	X	_	O	_	
+_	_	_	_	_	X	
+O	O	X	_	_	_	
+O	_	_	X	O	_	
+_	_	_	O	_	_	
+_	_	_	_	_	_	
+next move = 1
+score = 1
+X	X	X	_	O	_	
+_	_	_	_	_	X	
+O	O	X	_	_	_	
+O	_	_	X	O	_	
+_	_	_	O	_	_	
+_	_	_	_	_	_	
+next move = 33
+score = 1
+X	X	X	_	O	_	
+_	_	_	_	_	X	
+O	O	X	_	_	_	
+O	_	_	X	O	_	
+_	_	_	O	_	_	
+_	_	O	_	_	_	
+next move = 8
+score = -100000
+HUMAN is the winner!

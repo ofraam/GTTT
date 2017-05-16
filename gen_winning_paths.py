@@ -1,7 +1,7 @@
 if __name__ == "__main__":
 
-    dimension = 6
-    streak = 4
+    dimension = 10
+    streak = 5
     filename = "examples/board_"+str(dimension)+"_"+str(streak)+".txt"
     row = 1
     col = 1

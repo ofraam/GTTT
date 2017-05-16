@@ -1,0 +1,28 @@
+winning move = 16
+X	_	_	_	_	_	
+O	_	_	_	_	O	
+_	O	_	_	_	_	
+X	O	X	X	O	X	
+_	X	_	_	_	_	
+_	_	_	_	O	_	
+winning move = 8
+X	_	_	_	_	_	
+O	_	_	_	_	O	
+_	O	X	O	_	_	
+X	O	X	X	O	X	
+_	X	_	_	_	_	
+_	_	_	_	O	_	
+winning move = 9
+X	X	_	_	_	_	
+O	O	_	_	_	O	
+_	O	X	O	_	_	
+X	O	X	X	O	X	
+_	X	_	_	_	_	
+_	_	_	_	O	_	
+winning move = 30
+X	X	_	_	_	_	
+O	O	O	X	_	O	
+_	O	X	O	_	_	
+X	O	X	X	O	X	
+_	X	_	_	_	_	
+_	_	_	_	O	_	

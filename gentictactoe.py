@@ -25,6 +25,9 @@ class Game:
     self.other_player = other_player
     self.num_turns = 0
     self.noise = noise
+    self.last_socre = 0
+    self.last_depth = 0
+    self.random_moves = random.randint(6,18)
       
   def make_move(self, space, player):
     """Puts <player>'s token on <space>
@@ -102,21 +105,29 @@ class Game:
     If it is the computer's turn, it performs a minimax search with alpha-beta pruning, 
     with depth-limited search if requested.
     '''
-
-    # if self.num_turns < 5:
-    #   max_depth = 4
-    # else:
-    #   max_depth = 8
-    max_depth = 4
+    if self.last_socre >= 100000 or self.last_socre <= -100000:
+      max_depth = max(self.last_depth - 1, 1)
+      print 'max depth change '+str(max_depth)
+    elif self.num_turns < 5:
+      max_depth = 4
+    else:
+      max_depth = 4
+    # max_depth = 4
 
     if self.whos_turn == c.HUMAN:
-      if self.num_turns<7:
-        return self.get_random_move()
+      if self.num_turns<self.random_moves:
+        space =  self.get_random_move();
+        self.save_board_to_file(space,1)
+        self.last_depth = max_depth
+        return space
       self.noise = self.noise/2
       rand = random.random()
       if rand<self.noise: #add some noise so we get more types of games
         print 'random'
-        return self.get_random_move();
+        space =  self.get_random_move();
+        self.save_board_to_file(space,1)
+        self.last_depth = max_depth
+        return space
 
       board_copy = self.board.get_board_copy()
       if max_depth:
@@ -132,6 +143,9 @@ class Game:
           # max_depth=25
       print 'score = '+str(score)
       print 'space = '+str(space)
+      self.last_socre = score
+      self.last_depth = max_depth
+      self.save_board_to_file(space, score)
       return space
 
     ######---------for human input------------------######
@@ -151,33 +165,41 @@ class Game:
     ######---------for human input------------------######
 
     else:
-      if self.num_turns < 7:
+      if self.last_socre>=100000 or self.last_socre<=-100000:
+        max_depth = max(self.last_depth - 1,1)
+        print 'max depth change ' + str(max_depth)
+      elif self.num_turns < 5:
         max_depth = 4
       else:
-        max_depth = 8
-      if self.num_turns<7:
-        return self.get_random_move()
+        max_depth = 4
+      if self.num_turns<self.random_moves:
+        space =  self.get_random_move();
+        self.save_board_to_file(space,1)
+        self.last_depth = max_depth
+        return space
       self.noise = self.noise/2
       rand = random.random()
       # if rand<self.noise or self.num_turns==0: #add some noise so we get more types of games
       if rand < self.noise:
         print 'random'
-        return self.get_random_move();
+        space = self.get_random_move();
+        self.save_board_to_file(space,1)
+        return space
       board_copy = self.board.get_board_copy()
       if max_depth:
         (score, space) = self.minimax_max_alphabeta_DL(c.NEG_INF, c.POS_INF, board_copy, max_depth)
       else:
         (score, space) = self.minimax_max_alphabeta(c.NEG_INF, c.POS_INF, board_copy)
-      if (c.CHECK_WIN and self.num_turns>c.MIN_MOVES):
-        # self.change_player()
-        if self.check_win_at_depth(c.WIN_DEPTH):
-          # self.make_move(space,self.whos_turn)
-          self.save_board_to_file(space)
-          self.noise=0
+
+      self.save_board_to_file(space, score)
+      self.last_socre = score
+      self.last_depth = max_depth
+
           # max_depth = 25
         # self.change_player()
       print 'score = '+str(score)
       print 'space = '+str(space)
+
       return space
 
   def check_win_at_depth(self, depth):
@@ -197,7 +219,7 @@ class Game:
     is not square, it simply informs you of the available spaces, the spaces you occupy, and
     the spaces your opponent (the computer) occupies. 
     '''
-    if self.num_spaces in [4, 9, 16, 25, 36]: # Reasonable sizes
+    if self.num_spaces in [4, 9, 16, 25, 36,100]: # Reasonable sizes
       self.display_game_square()
     else:
       if self.whos_turn == c.HUMAN:
@@ -229,14 +251,13 @@ class Game:
             row_str += "O\t"
         print row_str
 
-  def save_board_to_file(self, winning_move):
+  def save_board_to_file(self, winning_move, score):
     ''' If the board size is square, creates a visual representation of the board. '''
     # timestamp = str(time.time())
-    filename = c.PATH + "board_" + str(c.WIN_DEPTH) + "_" + str(c.NOISE_HUMAN) + "_" + str(c.NOISE_COMPUTER) + "_" +  c.TIME[:-3] + ".txt"
+    filename = c.PATH + "board_" + str(c.WIN_DEPTH) + "_" + str(game.random_moves) + "_" + c.TIME[:-3] + ".txt"
     print filename
     num_rows = int(math.sqrt(self.num_spaces))
     with open(filename, "a") as text_file:
-      text_file.write('winning move = '+ str(winning_move) + '\n')
       for row in range(num_rows):
         row_str = ""
         for col in range(num_rows):
@@ -256,6 +277,8 @@ class Game:
               row_str += "O\t"
         text_file.write(row_str)
         text_file.write("\n")
+      text_file.write('next move = ' + str(winning_move) + '\n')
+      text_file.write('score = ' + str(score) + '\n')
 
 
 
@@ -458,23 +481,29 @@ if __name__ == "__main__":
 
     # Get file path, and start playing!
     # file_path = sys.argv[1]
-    file_path = "examples/board_6_4.txt"
-    c.TIME = str(time.time())
+    file_path = "examples/board_10_5.txt"
+    for i in range(30):
+      c.TIME = str(time.time())
 
-    game = start_game(file_path)
-    # game.save_board_to_file(1)
+      game = start_game(file_path)
+      # game.save_board_to_file(1)
 
-    winning_player = game.play_game(max_depth)
-    # winning_player = game.play_random_game(9)
+      winning_player = game.play_game(max_depth)
+      # winning_player = game.play_random_game(9)
+
+      filename = c.PATH + "board_" + str(c.WIN_DEPTH) + "_" + str(game.random_moves) + "_" + c.TIME[:-3] + ".txt"
+      with open(filename, "a") as text_file:
+        if winning_player == c.HUMAN:
+          print "HUMAN is the winner!"
+          text_file.write("HUMAN is the winner!")
+        elif winning_player == c.COMPUTER:
+          print "COMPUTER is the winner!"
+          text_file.write("COMPUTER is the winner!")
+        else:
+          print "Tie game!"
+          text_file.write("Tie game!")
 
 
-    if winning_player == c.HUMAN:
-      print "HUMAN is the winner!"
-    elif winning_player == c.COMPUTER:
-      print "COMPUTER is the winner!"
-    else:
-      print "Tie game!"
-  
 
 
   

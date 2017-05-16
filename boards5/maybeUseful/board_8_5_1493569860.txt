@@ -1,0 +1,289 @@
+next move = 7
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 1
+score = 1
+_	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 35
+score = 1
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 30
+score = 1
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	O	_	
+next move = 12
+score = 1
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 22
+score = 113.333333333
+X	_	_	_	_	_	
+O	_	_	_	_	O	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 15
+score = -66.6666666667
+X	_	_	_	_	_	
+O	_	_	_	_	O	
+_	_	_	_	_	_	
+_	_	_	X	_	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 16
+score = 113.333333333
+X	_	_	_	_	_	
+O	_	_	_	_	O	
+_	_	O	_	_	_	
+_	_	_	X	_	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 10
+score = -63.3333333333
+X	_	_	_	_	_	
+O	_	_	_	_	O	
+_	_	O	X	_	_	
+_	_	_	X	_	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 9
+score = 110.0
+X	_	_	_	_	_	
+O	_	_	O	_	O	
+_	_	O	X	_	_	
+_	_	_	X	_	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 23
+score = -43.3333333333
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	_	_	
+_	_	_	X	_	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 20
+score = 93.3333333333
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	_	_	
+_	_	_	X	O	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 21
+score = -80.0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	_	_	
+_	X	_	X	O	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 28
+score = 100.0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	_	_	
+_	X	O	X	O	_	
+_	_	_	_	_	X	
+_	_	_	_	O	_	
+next move = 34
+score = -80.0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	_	_	
+_	X	O	X	O	_	
+_	_	_	X	_	X	
+_	_	_	_	O	_	
+next move = 33
+score = 30.0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	_	_	
+_	X	O	X	O	_	
+_	_	_	X	_	X	
+_	_	_	O	O	_	
+next move = 27
+score = -50.0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	_	_	
+_	X	O	X	O	_	
+_	_	_	X	_	X	
+_	_	X	O	O	_	
+next move = 17
+score = 10.0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	_	_	
+_	X	O	X	O	_	
+_	_	O	X	_	X	
+_	_	X	O	O	_	
+next move = 14
+score = -36.6666666667
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	_	O	X	X	_	
+_	X	O	X	O	_	
+_	_	O	X	_	X	
+_	_	X	O	O	_	
+next move = 19
+score = 10
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	O	O	X	X	_	
+_	X	O	X	O	_	
+_	_	O	X	_	X	
+_	_	X	O	O	_	
+next move = 24
+score = -20
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	O	O	X	X	_	
+X	X	O	X	O	_	
+_	_	O	X	_	X	
+_	_	X	O	O	_	
+next move = 18
+score = 0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	O	O	X	X	_	
+X	X	O	X	O	O	
+_	_	O	X	_	X	
+_	_	X	O	O	_	
+next move = 13
+score = 0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+_	O	O	X	X	X	
+X	X	O	X	O	O	
+_	_	O	X	_	X	
+_	_	X	O	O	_	
+next move = 29
+score = 0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	_	O	X	_	X	
+_	_	X	O	O	_	
+next move = 11
+score = 0
+X	_	_	_	_	_	
+O	_	X	O	_	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	_	O	X	X	X	
+_	_	X	O	O	_	
+next move = 26
+score = 0
+X	_	_	_	_	_	
+O	_	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	_	O	X	X	X	
+_	_	X	O	O	_	
+next move = 8
+score = 0
+X	_	_	_	_	_	
+O	_	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	X	O	X	X	X	
+_	_	X	O	O	_	
+next move = 4
+score = 0
+X	_	_	_	_	_	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	X	O	X	X	X	
+_	_	X	O	O	_	
+next move = 3
+score = 0
+X	_	_	X	_	_	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	X	O	X	X	X	
+_	_	X	O	O	_	
+next move = 5
+score = 0
+X	_	O	X	_	_	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	X	O	X	X	X	
+_	_	X	O	O	_	
+next move = 2
+score = 0
+X	_	O	X	X	_	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	X	O	X	X	X	
+_	_	X	O	O	_	
+next move = 25
+score = 0
+X	O	O	X	X	_	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+_	X	O	X	X	X	
+_	_	X	O	O	_	
+next move = 32
+score = 0
+X	O	O	X	X	_	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+X	X	O	X	X	X	
+_	_	X	O	O	_	
+next move = 6
+score = 0
+X	O	O	X	X	_	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+X	X	O	X	X	X	
+_	O	X	O	O	_	
+next move = 31
+score = 0
+X	O	O	X	X	X	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+X	X	O	X	X	X	
+_	O	X	O	O	_	
+next move = 36
+score = 0
+X	O	O	X	X	X	
+O	O	X	O	O	O	
+O	O	O	X	X	X	
+X	X	O	X	O	O	
+X	X	O	X	X	X	
+O	O	X	O	O	_	
+Tie game!

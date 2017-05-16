@@ -1,0 +1,89 @@
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 29
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	O	_	
+_	_	_	_	_	_	
+next move = 13
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	O	_	
+_	_	_	_	_	_	
+next move = 28
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	O	O	_	
+_	_	_	_	_	_	
+next move = 5
+score = 1
+_	_	_	_	X	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	O	O	_	
+_	_	_	_	_	_	
+next move = 23
+score = 1
+_	_	_	_	X	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+_	_	_	_	O	_	
+_	_	_	O	O	_	
+_	_	_	_	_	_	
+next move = 3
+score = 1
+_	_	X	_	X	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+_	_	_	_	O	_	
+_	_	_	O	O	_	
+_	_	_	_	_	_	
+next move = 19
+score = 1
+_	_	X	_	X	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+O	_	_	_	O	_	
+_	_	_	O	O	_	
+_	_	_	_	_	_	
+next move = 21
+score = 1
+_	_	X	_	X	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+O	_	X	_	O	_	
+_	_	_	O	O	_	
+_	_	_	_	_	_	
+next move = 30
+score = 1
+_	_	X	_	X	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+O	_	X	_	O	_	
+_	_	_	O	O	O	
+_	_	_	_	_	_	
+next move = 34
+score = 1
+_	_	X	_	X	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+O	_	X	_	O	_	
+_	_	_	O	O	O	
+_	_	_	X	_	_	
+next move = 27
+score = 100003
+COMPUTER is the winner!

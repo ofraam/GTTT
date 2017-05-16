@@ -1,0 +1,120 @@
+next move = 7
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 1
+score = 1
+_	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 33
+score = 1
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 36
+score = 1
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	O	_	_	_	
+next move = 28
+score = 1
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	O	_	_	X	
+next move = 17
+score = 1
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	O	_	_	
+_	_	O	_	_	X	
+next move = 32
+score = 1
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	_	_	
+_	_	_	O	_	_	
+_	_	O	_	_	X	
+next move = 34
+score = 253.333333333
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	_	_	
+_	_	_	O	_	_	
+_	O	O	_	_	X	
+next move = 21
+score = 70.0
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	X	_	
+_	_	_	_	_	_	
+_	_	_	O	_	_	
+_	O	O	X	_	X	
+next move = 14
+score = 260.0
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	_	_	_	X	_	
+_	_	O	_	_	_	
+_	_	_	O	_	_	
+_	O	O	X	_	X	
+next move = 23
+score = 70.0
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	X	_	_	X	_	
+_	_	O	_	_	_	
+_	_	_	O	_	_	
+_	O	O	X	_	X	
+next move = 18
+score = 100000
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	X	_	_	X	_	
+_	_	O	_	O	_	
+_	_	_	O	_	_	
+_	O	O	X	_	X	
+next move = 22
+score = 100000
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	X	_	_	X	X	
+_	_	O	_	O	_	
+_	_	_	O	_	_	
+_	O	O	X	_	X	
+next move = 16
+score = 100000
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	X	_	_	X	X	
+_	_	O	O	O	_	
+_	_	_	O	_	_	
+_	O	O	X	_	X	
+next move = 20
+score = 100000
+X	_	_	_	_	_	
+O	_	_	_	_	_	
+_	X	_	X	X	X	
+_	_	O	O	O	_	
+_	_	_	O	_	_	
+_	O	O	X	_	X	

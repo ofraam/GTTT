@@ -1,0 +1,145 @@
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 12
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	O	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 36
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	O	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	X	
+next move = 27
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	O	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	O	_	_	_	
+_	_	_	_	_	X	
+next move = 13
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	O	
+X	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	O	_	_	_	
+_	_	_	_	_	X	
+next move = 33
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	O	
+X	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	O	_	_	_	
+_	_	O	_	_	X	
+next move = 15
+score = 1
+_	_	_	_	_	_	
+_	_	_	_	_	O	
+X	_	X	_	_	_	
+_	_	_	_	_	_	
+_	_	O	_	_	_	
+_	_	O	_	_	X	
+next move = 5
+score = 1
+_	_	_	_	O	_	
+_	_	_	_	_	O	
+X	_	X	_	_	_	
+_	_	_	_	_	_	
+_	_	O	_	_	_	
+_	_	O	_	_	X	
+next move = 25
+score = 1
+_	_	_	_	O	_	
+_	_	_	_	_	O	
+X	_	X	_	_	_	
+_	_	_	_	_	_	
+X	_	O	_	_	_	
+_	_	O	_	_	X	
+next move = 10
+score = 1
+_	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	_	_	_	_	_	
+X	_	O	_	_	_	
+_	_	O	_	_	X	
+next move = 1
+score = 1
+X	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	_	_	_	_	_	
+X	_	O	_	_	_	
+_	_	O	_	_	X	
+next move = 21
+score = 1
+X	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	_	O	_	_	_	
+X	_	O	_	_	_	
+_	_	O	_	_	X	
+next move = 31
+score = 1
+X	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	_	O	_	_	_	
+X	_	O	_	_	_	
+X	_	O	_	_	X	
+next move = 26
+score = 1
+X	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	_	O	_	_	_	
+X	O	O	_	_	_	
+X	_	O	_	_	X	
+next move = 34
+score = 1
+X	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	_	O	_	_	_	
+X	O	O	_	_	_	
+X	_	O	X	_	X	
+next move = 20
+score = -100000
+X	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	O	O	_	_	_	
+X	O	O	_	_	_	
+X	_	O	X	_	X	
+next move = 22
+score = -100000
+X	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	O	O	X	_	_	
+X	O	O	_	_	_	
+X	_	O	X	_	X	
+next move = 28
+score = -100000
+X	_	_	_	O	_	
+_	_	_	O	_	O	
+X	_	X	_	_	_	
+_	O	O	X	_	_	
+X	O	O	O	_	_	
+X	_	O	X	_	X	
+next move = 19
+score = -100000
+HUMAN is the winner!

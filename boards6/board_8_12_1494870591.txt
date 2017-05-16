@@ -1,0 +1,145 @@
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 8
+score = 1
+_	_	_	_	_	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+next move = 27
+score = 1
+_	_	_	_	_	_	
+_	O	_	_	_	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	_	_	
+next move = 11
+score = 1
+_	_	_	_	_	_	
+_	O	_	_	O	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	_	_	
+next move = 3
+score = 1
+_	_	X	_	_	_	
+_	O	_	_	O	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	_	_	
+next move = 35
+score = 1
+_	_	X	_	_	_	
+_	O	_	_	O	_	
+_	_	_	_	_	_	
+_	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	_	
+next move = 19
+score = 1
+_	_	X	_	_	_	
+_	O	_	_	O	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	_	
+next move = 9
+score = 1
+_	_	X	_	_	_	
+_	O	O	_	O	_	
+_	_	_	_	_	_	
+X	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	_	
+next move = 16
+score = 1
+_	_	X	_	_	_	
+_	O	O	_	O	_	
+_	_	_	X	_	_	
+X	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	_	
+next move = 6
+score = 1
+_	_	X	_	_	O	
+_	O	O	_	O	_	
+_	_	_	X	_	_	
+X	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	_	
+next move = 10
+score = 1
+_	_	X	_	_	O	
+_	O	O	X	O	_	
+_	_	_	X	_	_	
+X	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	_	
+next move = 4
+score = 1
+_	_	X	O	_	O	
+_	O	O	X	O	_	
+_	_	_	X	_	_	
+X	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	_	
+next move = 36
+score = 1
+_	_	X	O	_	O	
+_	O	O	X	O	_	
+_	_	_	X	_	_	
+X	_	_	_	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	X	
+next move = 22
+score = 1
+_	_	X	O	_	O	
+_	O	O	X	O	_	
+_	_	_	X	_	_	
+X	_	_	O	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	X	
+next move = 17
+score = -53.3333333333
+_	_	X	O	_	O	
+_	O	O	X	O	_	
+_	_	_	X	X	_	
+X	_	_	O	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	X	
+next move = 20
+score = 1
+_	_	X	O	_	O	
+_	O	O	X	O	_	
+_	_	_	X	X	_	
+X	O	_	O	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	X	
+next move = 15
+score = -100000
+_	_	X	O	_	O	
+_	O	O	X	O	_	
+_	_	X	X	X	_	
+X	O	_	O	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	X	
+next move = 21
+score = -100000
+_	_	X	O	_	O	
+_	O	O	X	O	_	
+_	_	X	X	X	_	
+X	O	O	O	_	_	
+_	_	X	_	_	_	
+_	_	_	_	O	X	
+next move = 14
+score = -100000
+HUMAN is the winner!

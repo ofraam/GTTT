@@ -17,4 +17,4 @@ NEG_INF = -POS_INF
 TERM_SCORE = 100000000
 TIME = '000'
 
-PATH = "boards4/"
+PATH = "boards10/"
