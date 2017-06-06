@@ -6,6 +6,7 @@ import unittest
 import sys
 import random
 import time
+import json
 
 class Game:
   
@@ -27,7 +28,8 @@ class Game:
     self.noise = noise
     self.last_socre = 0
     self.last_depth = 0
-    self.random_moves = random.randint(6,18)
+    # self.random_moves = random.randint(6,18)
+    self.random_moves = 0
       
   def make_move(self, space, player):
     """Puts <player>'s token on <space>
@@ -405,6 +407,32 @@ class Game:
         counts[space] = 1
     return max([(count, space) for space, count in counts.iteritems()])[1]
 
+'''
+Load initial positions from json file
+'''
+def fill_board_from_file(json_file,game):
+  json1_file = open(json_file)
+  json1_str = json1_file.read()
+  json1_data = json.loads(json1_str)
+  board_positions = json1_data['position']
+  game.whos_turn = int(json1_data['turn'])
+  # board_size = len(board_positions)*len(board_positions)
+  space = 1
+  for row in range(len(board_positions)):
+    for col in range(len(board_positions)):
+
+      mark = board_positions[row][col]
+
+      if mark==1:
+        game.board.add_marker(space,c.HUMAN)
+      elif mark==2:
+        game.board.add_marker(space,c.COMPUTER)
+
+      space+=1
+
+  print board_positions
+
+
 def start_game(file_path):
   '''Opens the file, processes the input, and initailizes the Game() object'''
   try:
@@ -417,6 +445,8 @@ def start_game(file_path):
     path = map(int, line.split())
     winning_paths.append(path)
   game = Game(num_spaces, winning_paths)
+
+
   return game
   
 class TicTacToeTest(unittest.TestCase):
@@ -458,6 +488,7 @@ class TicTacToeTest(unittest.TestCase):
   
   
 if __name__ == "__main__":
+
   # if len(sys.argv) != 2:
   #   print "Invalid input. Make sure to include a file path."
   #   print "Example: $ python gentictactoe.py <file_path>"
@@ -481,27 +512,49 @@ if __name__ == "__main__":
 
     # Get file path, and start playing!
     # file_path = sys.argv[1]
-    file_path = "examples/board_10_5.txt"
-    for i in range(30):
-      c.TIME = str(time.time())
+    file_path = "examples/board_6_4.txt"
 
-      game = start_game(file_path)
-      # game.save_board_to_file(1)
+    game = start_game(file_path)
 
-      winning_player = game.play_game(max_depth)
-      # winning_player = game.play_random_game(9)
+    fill_board_from_file("predefinedBoards/6by6.json",game)
 
-      filename = c.PATH + "board_" + str(c.WIN_DEPTH) + "_" + str(game.random_moves) + "_" + c.TIME[:-3] + ".txt"
-      with open(filename, "a") as text_file:
-        if winning_player == c.HUMAN:
-          print "HUMAN is the winner!"
-          text_file.write("HUMAN is the winner!")
-        elif winning_player == c.COMPUTER:
-          print "COMPUTER is the winner!"
-          text_file.write("COMPUTER is the winner!")
-        else:
-          print "Tie game!"
-          text_file.write("Tie game!")
+    winning_player = game.play_game(max_depth)
+    # winning_player = game.play_random_game(9)
+
+    filename = c.PATH + "board_" + str(c.WIN_DEPTH) + "_" + str(game.random_moves) + "_" + c.TIME[:-3] + ".txt"
+    with open(filename, "a") as text_file:
+      if winning_player == c.HUMAN:
+        print "HUMAN is the winner!"
+        text_file.write("HUMAN is the winner!")
+      elif winning_player == c.COMPUTER:
+        print "COMPUTER is the winner!"
+        text_file.write("COMPUTER is the winner!")
+      else:
+        print "Tie game!"
+        text_file.write("Tie game!")
+
+    # for i in range(30):
+    #   c.TIME = str(time.time())
+    #
+    #   game = start_game(file_path)
+    #   # game.save_board_to_file(1)
+    #
+    #
+    #
+    #   winning_player = game.play_game(max_depth)
+    #   # winning_player = game.play_random_game(9)
+    #
+    #   filename = c.PATH + "board_" + str(c.WIN_DEPTH) + "_" + str(game.random_moves) + "_" + c.TIME[:-3] + ".txt"
+    #   with open(filename, "a") as text_file:
+    #     if winning_player == c.HUMAN:
+    #       print "HUMAN is the winner!"
+    #       text_file.write("HUMAN is the winner!")
+    #     elif winning_player == c.COMPUTER:
+    #       print "COMPUTER is the winner!"
+    #       text_file.write("COMPUTER is the winner!")
+    #     else:
+    #       print "Tie game!"
+    #       text_file.write("Tie game!")
 
 
 
