@@ -1,8 +1,11 @@
 import csv
 import re
+import copy
+from user_game import *
 
 LOGFILE = 'logs/pilotTTT6by6full.csv'
-USERID = '1da39a8d'
+USERID = '11e212ff'
+DIMENSION = 6
 
 def replay():
     with open(LOGFILE, 'rb') as csvfile:
@@ -10,16 +13,58 @@ def replay():
         for row in log_reader:
             if row['userid'] == USERID:
                 if row['key'] in ('click','undo','reset'):
-                    drawBoard(row)
+                    draw_board(row)
+
+def run_analysis():
+    with open(LOGFILE, 'rb') as csvfile:
+        log_reader = csv.DictReader(csvfile)
+        all_games = []
+        curr_game = []
+        curr_user = ''
+        for row in log_reader:
+            userid = row['userid']
+            if userid == curr_user:
+                curr_game.append(row)
+            else:
+                all_games.append(gameInstance(copy.deepcopy(curr_game)))
+                curr_game = []
+                curr_game.append(row)
+                curr_user = userid
 
 
-def drawBoard(move):
+    print all_games
+
+
+    filtered_games = []
+    for game in all_games:
+        if (len(game.actions) > 5) & (game.solution != "") & (game.time > 10000):
+            filtered_games.append(game)
+
+
+    print filtered_games
+
+    get_solutions(filtered_games)
+    construct_heat_map(filtered_games)
+
+
+def get_solutions(games):
+    solutions = {}
+    for game in games:
+        if game.solution not in solutions.keys():
+            solutions[game.solution] = 1
+        else:
+            solutions[game.solution] +=1
+    print solutions
+
+def draw_board(move):
     print move['key']
     board = move['value']
-    transformBoard(board)
+    transform_board(board)
+    board_to_matrix(board)
     # print board
 
-def transformBoard(board):
+
+def transform_board(board):
     char = board[0]
     board2 = board[1:len(board)-1]
     b = board2.split(']')
@@ -29,6 +74,9 @@ def transformBoard(board):
         # print row
         row_new = row[1:]
         row_new_final = row_new.replace('[',"")
+        print '-----'
+        print row_new_final
+        print '-----'
         row_ttt = row_new_final.replace('0','_')
         row_ttt = row_ttt.replace('1','X')
         row_ttt = row_ttt.replace('2', 'O')
@@ -49,6 +97,62 @@ def transformBoard(board):
     # # a = p.search(board2)
     # print a.group()
 
+def board_to_matrix(board):
+    positions = []
+    board2 = board[1:len(board)-1]
+    b = board2.split(']')
+    for row in b:
+        position_row = []
+        # print row
+        row_new = row[1:]
+        row_new_final = row_new.replace('[',"")
+        if (len(row))>2:
+            marks = row_new_final.split(',')
+            for mark in marks:
+                position_row.append(int(mark))
+            positions.append(copy.deepcopy(position_row))
+    print positions
+
+
+def construct_heat_map(games, move = 1):
+    move_matrix = []
+    for row in range(DIMENSION):
+        row_positions = []
+        for col in range(DIMENSION):
+            row_positions.append(0)
+        move_matrix.append(copy.deepcopy(row_positions))
+
+
+    for game in games:
+        move = game.get_action_by_index(1)
+        move_matrix[move[0]][move[1]] += 1
+
+    print move_matrix
+
+    initial_position = game.board_positions[0]
+
+    for r in range(DIMENSION):
+        for c in range(DIMENSION):
+            if initial_position[r][c] == 2:
+                initial_position[r][c] = 'O'
+            elif initial_position[r][c] == 1:
+                initial_position[r][c] = 'X'
+            else:
+                if initial_position[r][c] == 0:
+                    initial_position[r][c] = ' '
+
+
+    for row in initial_position:
+        print row
+
+    for row in move_matrix:
+        print row
+
+
+
+
+
 
 if __name__ == "__main__":
-    replay()
+    run_analysis()
+    # replay()

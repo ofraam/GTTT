@@ -110,10 +110,12 @@ class Game:
     if self.last_socre >= 100000 or self.last_socre <= -100000:
       max_depth = max(self.last_depth - 1, 1)
       print 'max depth change '+str(max_depth)
-    elif self.num_turns < 5:
-      max_depth = 4
     else:
       max_depth = 4
+    # elif self.num_turns < 5:
+    #   max_depth = 6
+    # else:
+    #   max_depth = 6
     # max_depth = 4
 
     if self.whos_turn == c.HUMAN:
@@ -512,11 +514,11 @@ if __name__ == "__main__":
 
     # Get file path, and start playing!
     # file_path = sys.argv[1]
-    file_path = "examples/board_6_4.txt"
+    file_path = "examples/board_10_5.txt"
 
     game = start_game(file_path)
 
-    fill_board_from_file("predefinedBoards/6by6.json",game)
+    fill_board_from_file("predefinedBoards/10by10_board4.json",game)
 
     winning_player = game.play_game(max_depth)
     # winning_player = game.play_random_game(9)
