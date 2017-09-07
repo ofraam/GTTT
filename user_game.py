@@ -10,12 +10,14 @@ class gameInstance:
 
     if len(rows)>0:
         self.userid = rows[0]['userid']
-
+    practice_start = False
     for row in rows:
-        # if row['key'] == 'start':
-        #     self.initial_poistion = row['value']
-        #     self.board_positions.append(row['value'])
-        if row['key'] in ('start', 'click', 'undo', 'reset'):
+        if row['key'] == 'start':
+            if (practice_start):
+                self.actions.append((row['key'], row['value']))
+            else:
+                practice_start = True
+        if row['key'] in ('click', 'undo', 'reset'):
             self.actions.append((row['key'], row['value']))
         elif row['key'] == 'timeSolution':
             self.time = row['value']

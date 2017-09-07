@@ -3,9 +3,9 @@ import re
 import copy
 from user_game import *
 
-LOGFILE = 'logs/pilotTTT6by6full.csv'
+LOGFILE = 'logs/board3em5pilot.csv'
 USERID = '11e212ff'
-DIMENSION = 6
+DIMENSION = 10
 
 def replay():
     with open(LOGFILE, 'rb') as csvfile:
@@ -125,7 +125,8 @@ def construct_heat_map(games, move = 1):
 
     for game in games:
         move = game.get_action_by_index(1)
-        move_matrix[move[0]][move[1]] += 1
+        if move is not None:
+            move_matrix[move[0]][move[1]] += 1
 
     print move_matrix
 
