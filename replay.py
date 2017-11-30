@@ -2,10 +2,35 @@ import csv
 import re
 import copy
 from user_game import *
+from scipy import stats
+import numpy
+import matplotlib
 
-LOGFILE = 'logs/board3em5pilot.csv'
+LOGFILE = ['logs/6_hard_full_nov29.csv','logs/6_hard_pruned_nov29.csv','logs/10_hard_full_nov29.csv','logs/10_hard_pruned_nov29.csv', 'logs/6_easy_full_nov29.csv','logs/6_easy_pruned_nov29.csv','logs/10_easy_full_nov29.csv','logs/10_easy_pruned_nov29.csv','logs/10_medium_full_nov29.csv','logs/10_medium_pruned_nov29.csv']
 USERID = '11e212ff'
-DIMENSION = 10
+DIMENSION = 6
+START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[1,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
+                  [[0,2,0,1,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[2,1,0,2,0,0],[0,1,1,0,0,0],[0,2,0,0,2,0]],
+                  [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,0,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,0,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[0,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,1,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
+                  [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,1,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,1,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[2,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,0,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
+                  [[0,1,0,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,1],[2,0,1,1,2,0],[1,0,2,2,0,0],[0,0,0,0,0,0]],
+                  [[0,1,2,2,0,0],[0,2,1,1,0,1],[1,2,2,2,1,0],[2,0,1,1,2,1],[1,0,2,2,0,0],[0,0,0,0,0,0]],
+                  [[0,0,0,0,1,0,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
+                  [[0,0,0,0,1,2,2,0,0,0],[0,0,0,0,2,1,1,1,0,1],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
+                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,1,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
+                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,1,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
+                  ]
+
+IGNORE_LIST = [[[0,3],[3,0]],
+                  None,
+                  [[2,4],[4,4]],
+                None,
+               [[0,2],[1,5]],
+                None,
+                [[0,5],[1,9]],
+               None,
+            [[3,2],[4,2]],
+               None]
 
 def replay():
     with open(LOGFILE, 'rb') as csvfile:
@@ -14,6 +39,107 @@ def replay():
             if row['userid'] == USERID:
                 if row['key'] in ('click','undo','reset'):
                     draw_board(row)
+
+
+def heat_map_game():
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+        # move_matrix = []
+        # for row in range(DIMENSION):
+        #     row_positions = []
+        #     for col in range(DIMENSION):
+        #         row_positions.append(0)
+        #     move_matrix.append(copy.deepcopy(row_positions))
+        to_ignore = IGNORE_LIST[g];
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            for row in log_reader:
+                # if row['userid'] == USERID:
+                if row['key']=='clickPos':
+                    # print row
+                    rowPos = int(row['value'][0])
+                    colPos = int(row['value'][2])
+                    # print rowPos
+                    # print colPos
+                    # print move_matrix[rowPos][colPos]
+                    if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                        if (to_ignore!=None):
+                            if ((rowPos!=to_ignore[0][0] | colPos!=to_ignore[0][1]) & (rowPos!=to_ignore[1][0] | colPos!=to_ignore[1][1])):
+                                move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                        else:
+                            move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                    #
+                    # # print move_matrix
+                    #     move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+        print LOGFILE[g]
+        for row in move_matrix:
+            print row
+
+def entropy_board(positionIgnore = None):
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+        move_counter = 0.0
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+        # move_matrix = []
+        # for row in range(DIMENSION):
+        #     row_positions = []
+        #     for col in range(DIMENSION):
+        #         row_positions.append(0)
+        #     move_matrix.append(copy.deepcopy(row_positions))
+        to_ignore = IGNORE_LIST[g];
+        to_ignore = None
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            for row in log_reader:
+                # if row['userid'] == USERID:
+                if row['key']=='clickPos':
+                    # print row
+                    rowPos = int(row['value'][0])
+                    colPos = int(row['value'][2])
+                    # print rowPos
+                    # print colPos
+                    # print move_matrix[rowPos][colPos]
+                    if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                        if (to_ignore!=None):
+                            if ((rowPos!=to_ignore[0][0] | colPos!=to_ignore[0][1]) & (rowPos!=to_ignore[1][0] | colPos!=to_ignore[1][1])):
+                                move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                                move_counter+=1.0
+                            # else:
+                            #     print 'ignore'
+                        else:
+                            move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                            move_counter+=1.0
+        print LOGFILE[g]
+        for row in move_matrix:
+            print row
+
+        #compute entropy
+        pk = []
+        cell_counter = 0
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!='X') & (move_matrix[i][j]!='O')):
+                    pk.append(move_matrix[i][j]/move_counter)
+        print pk
+        print stats.entropy(pk)
+
 
 def run_analysis():
     with open(LOGFILE, 'rb') as csvfile:
@@ -114,6 +240,23 @@ def board_to_matrix(board):
     print positions
 
 
+def board_to_matrix_list(board):
+    positions = []
+    board2 = board[1:len(board)-1]
+    b = board2.split(']')
+    for row in b:
+        position_row = []
+        # print row
+        row_new = row[1:]
+        row_new_final = row_new.replace('[',"")
+        if (len(row))>2:
+            marks = row_new_final.split(',')
+            for mark in marks:
+                position_row.append(mark)
+            positions.append(copy.deepcopy(position_row))
+    return positions
+
+
 def construct_heat_map(games, move = 1):
     move_matrix = []
     for row in range(DIMENSION):
@@ -155,5 +298,7 @@ def construct_heat_map(games, move = 1):
 
 
 if __name__ == "__main__":
-    run_analysis()
+    entropy_board()
+    # heat_map_game()
+    # run_analysis()
     # replay()
