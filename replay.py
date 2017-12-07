@@ -3,33 +3,33 @@ import re
 import copy
 from user_game import *
 from scipy import stats
-import numpy
-import matplotlib
+import numpy as np
+import matplotlib.pyplot as plt
 
-LOGFILE = ['logs/6_hard_full_nov29.csv','logs/6_hard_pruned_nov29.csv','logs/10_hard_full_nov29.csv','logs/10_hard_pruned_nov29.csv', 'logs/6_easy_full_nov29.csv','logs/6_easy_pruned_nov29.csv','logs/10_easy_full_nov29.csv','logs/10_easy_pruned_nov29.csv','logs/10_medium_full_nov29.csv','logs/10_medium_pruned_nov29.csv']
+LOGFILE = ['logs/6_hard_full_dec3.csv','logs/6_hard_pruned_dec3.csv','logs/10_hard_full_dec3.csv','logs/10_hard_pruned_dec3.csv', 'logs/6_easy_full_dec3.csv','logs/6_easy_pruned_dec3.csv','logs/10_easy_full_dec3.csv','logs/10_easy_pruned_dec3.csv','logs/10_medium_full_dec3.csv','logs/10_medium_pruned_dec3.csv']
 USERID = '11e212ff'
 DIMENSION = 6
-START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[1,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
-                  [[0,2,0,1,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[2,1,0,2,0,0],[0,1,1,0,0,0],[0,2,0,0,2,0]],
-                  [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,0,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,0,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[0,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,1,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
-                  [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,1,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,1,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[2,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,0,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
-                  [[0,1,0,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,1],[2,0,1,1,2,0],[1,0,2,2,0,0],[0,0,0,0,0,0]],
-                  [[0,1,2,2,0,0],[0,2,1,1,0,1],[1,2,2,2,1,0],[2,0,1,1,2,1],[1,0,2,2,0,0],[0,0,0,0,0,0]],
-                  [[0,0,0,0,1,0,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
-                  [[0,0,0,0,1,2,2,0,0,0],[0,0,0,0,2,1,1,1,0,1],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
-                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,1,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
-                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,1,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
+START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
+                  [[0,2,0,1,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[2,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
+                  [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,0,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,0,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[0,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,0,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
+                 [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,1,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,0,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[2,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,0,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
+                  [[0,1,0,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,0],[2,0,1,1,2,0],[1,0,2,2,0,0],[0,0,0,0,0,0]],
+                  [[0,1,2,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,0],[2,0,1,1,2,1],[1,0,2,2,0,0],[0,0,0,0,0,0]],
+                [[0,0,0,0,1,0,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,0],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
+                  [[0,0,0,0,1,2,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
+                [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
+                 [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
                   ]
 
 IGNORE_LIST = [[[0,3],[3,0]],
                   None,
-                  [[2,4],[4,4]],
+                  [[2,4],[6,0]],
                 None,
-               [[0,2],[1,5]],
+               [[0,2],[3,5]],
                 None,
-                [[0,5],[1,9]],
+                [[0,5],[4,9]],
                None,
-            [[3,2],[4,2]],
+            [[3,2],[3,5]],
                None]
 
 def replay():
@@ -41,7 +41,28 @@ def replay():
                     draw_board(row)
 
 
-def heat_map_game():
+def seperate_log(log_file):
+    with open(log_file, 'rb') as csvfile:
+        log_reader = csv.DictReader(csvfile)
+        curr_log = ''
+        curr_log_records = []
+        for row in log_reader:
+            log = row['boardSize']+'_'+row['boardType']+'_'+row['condition']
+            if log == curr_log:
+                curr_log_records.append(row)
+            elif len(curr_log_records)>0:
+                dataFile = open('logs/'+curr_log+'_dec3.csv', 'wb')
+                print curr_log_records[0]
+                dataWriter = csv.DictWriter(dataFile, fieldnames=curr_log_records[0].keys(), delimiter=',')
+                dataWriter.writeheader()
+                for record in curr_log_records:
+                    dataWriter.writerow(record)
+                curr_log_records = []
+                curr_log = log
+            else:
+                curr_log = log
+
+def heat_map_game(normalized = False):
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
@@ -59,7 +80,8 @@ def heat_map_game():
         #     for col in range(DIMENSION):
         #         row_positions.append(0)
         #     move_matrix.append(copy.deepcopy(row_positions))
-        to_ignore = IGNORE_LIST[g];
+        # to_ignore = IGNORE_LIST[g];
+        move_count = 0.0
         with open(LOGFILE[g], 'rb') as csvfile:
             log_reader = csv.DictReader(csvfile)
             for row in log_reader:
@@ -68,15 +90,15 @@ def heat_map_game():
                     # print row
                     rowPos = int(row['value'][0])
                     colPos = int(row['value'][2])
+                    player = int(row['value'][4])
                     # print rowPos
                     # print colPos
                     # print move_matrix[rowPos][colPos]
-                    if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
-                        if (to_ignore!=None):
-                            if ((rowPos!=to_ignore[0][0] | colPos!=to_ignore[0][1]) & (rowPos!=to_ignore[1][0] | colPos!=to_ignore[1][1])):
-                                move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
-                        else:
-                            move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                    if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O') & (player==1)):
+                        move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1.0
+                        move_count+=1.0
+                    else:
+                        print 'bad click'
                     #
                     # # print move_matrix
                     #     move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
@@ -84,19 +106,420 @@ def heat_map_game():
         for row in move_matrix:
             print row
 
-def entropy_board(positionIgnore = None):
+        for r in range(0,len(move_matrix)):
+            for j in range(0,len(move_matrix[i])):
+                if (move_matrix[r][j]=='X'):
+                    move_matrix[r][j] = -1
+                elif (move_matrix[r][j]=='O'):
+                    move_matrix[r][j] = -2
+                #     print move_matrix[i][j]
+                # else:
+                #     print  move_matrix[i][j]
+
+        if (normalized):
+            for r in range(0,len(move_matrix)):
+                for j in range(0,len(move_matrix[i])):
+                    # if (move_matrix[r][j]>0):
+                    move_matrix[r][j] = move_matrix[r][j]/move_count
+                    # else:
+        #
+
+        print move_matrix
+        a = np.array(move_matrix)
+        a = np.flip(a,0)
+        print a
+        heatmap = plt.pcolor(a)
+
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if((a[y,x]==-1) | (a[y,x]==-1.0/move_count)):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-2.0/move_count)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
+
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name=fig_file_name[:-4]
+        fig_file_name = fig_file_name + '.png'
+        plt.savefig(fig_file_name)
+        plt.clf()
+
+        # plt.imshow(a, cmap='hot', interpolation='nearest')
+
+        # plt.show()
+
+def compare_paths(p1,p2):
+    if len(p1)!=len(p2):
+        return False
+    for i in range(len(p1)):
+        if p1[i]!=p2[i]:
+            return False
+
+    return True
+
+def add_path_count(paths_counts, new_path):
+    for path in paths_counts:
+        if(compare_paths(path[0],new_path)):
+            path[1] = path[1]+1.0
+            return
+    paths_counts.append([new_path,1.0])
+
+def add_path_count_subpaths(paths_counts, new_path):
+    for i in range(0,len(new_path)):
+        add_path_count(paths_counts,new_path[0:i+1])
+
+
+def user_stats(subpaths=False):
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
-        move_counter = 0.0
+        path_counter = 0.0
+        taken_cells = 0.0
         for i in range(len(move_matrix)):
             for j in range(len(move_matrix[i])):
                 if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
                     move_matrix[i][j] = int(move_matrix[i][j])
                 elif (move_matrix[i][j]==1):
                     move_matrix[i][j]='X'
+                    taken_cells+=1
                 elif (move_matrix[i][j]==2):
                     move_matrix[i][j]='O'
+                    taken_cells+=1
+        free_cells = len(move_matrix)*len(move_matrix) - taken_cells
+
+
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            paths = []
+            paths_counts = []
+            curr_path = []
+            curr_user = ''
+            curr_user_num_paths = 0
+            curr_user_undo = 0
+            curr_user_restart = 0
+            curr_user_nodes = 0
+            curr_user_sum_depth = 0
+            curr_user_data = {}
+            users_data = []
+            user_data_headers = ['userid','curr_user_nodes','curr_user_num_paths','curr_user_sum_depth','curr_user_undo','curr_user_restart']
+
+
+            for row in log_reader:
+                # if row['userid'] == USERID:
+                if curr_user=='':
+                    curr_user = row['userid']
+
+
+                if row['userid']!=curr_user:
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        add_path_count(paths_counts,copy.deepcopy(curr_path))
+                        path_counter+=1
+                        curr_user_num_paths+=1
+                        curr_user_sum_depth = curr_user_sum_depth + len(curr_path)
+
+                    curr_user_data['userid'] = curr_user
+                    curr_user_data['curr_user_num_paths'] = curr_user_num_paths
+                    curr_user_data['curr_user_undo'] = curr_user_undo
+                    curr_user_data['curr_user_restart'] = curr_user_restart
+                    curr_user_data['curr_user_nodes'] = curr_user_nodes
+                    curr_user_data['curr_user_sum_depth'] = curr_user_sum_depth
+                    users_data.append(copy.deepcopy(curr_user_data))
+
+                    curr_user_num_paths = 0
+                    curr_user_undo = 0
+                    curr_user_restart = 0
+                    curr_user_nodes = 0
+                    curr_user_sum_depth = 0
+                    curr_user_data = {}
+
+                    curr_path = []
+                    curr_user = row['userid']
+
+                elif row['key']=='clickPos':
+                    # print row
+                    rowPos = int(row['value'][0])
+                    colPos = int(row['value'][2])
+                    player = int(row['value'][4])
+                    # print rowPos
+                    # print colPos
+                    # print move_matrix[rowPos][colPos]
+                    if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                        # move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                        curr_path.append([rowPos,colPos,player])
+                        curr_user_nodes+=1
+
+                elif row['key']=='reset':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        if(subpaths):
+                            add_path_count_subpaths(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=len(curr_path)
+                        else:
+                            add_path_count(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=1
+
+                        curr_user_num_paths+=1
+                        # curr_user_nodes+=1
+                        curr_user_sum_depth = curr_user_sum_depth + len(curr_path)
+                        curr_user_restart+=1
+                        curr_path = []
+                elif row['key']=='undo':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        if(subpaths):
+                            add_path_count_subpaths(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=len(curr_path)
+                        else:
+                            add_path_count(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=1
+
+                        curr_user_num_paths+=1
+                        # curr_user_nodes+=1
+                        curr_user_sum_depth = curr_user_sum_depth + len(curr_path)
+                        curr_user_undo+=1
+                        curr_path = curr_path[:-1]
+
+        print LOGFILE[g][5:]
+
+        dataFile = open('userStats/participants_'+LOGFILE[g][5:], 'wb')
+
+        dataWriter = csv.DictWriter(dataFile, fieldnames=user_data_headers, delimiter=',')
+        dataWriter.writeheader()
+        for record in users_data:
+            dataWriter.writerow(record)
+        # for path in paths:
+        #     print path
+        #     print '-----------'
+
+        # pk = []
+        # for p in paths_counts:
+        #     # print p
+        #     pk.append(p[1]/path_counter)
+        #
+        # ent = stats.entropy(pk)
+        # print ent
+
+
+
+def entropy_paths(subpaths = False):
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+        path_counter = 0.0
+        taken_cells = 0.0
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                    taken_cells+=1
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+                    taken_cells+=1
+        free_cells = len(move_matrix)*len(move_matrix) - taken_cells
+
+        to_ignore = IGNORE_LIST[g];
+        # to_ignore = None
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            paths = []
+            paths_counts = []
+            curr_path = []
+            curr_user = ''
+            for row in log_reader:
+                # if row['userid'] == USERID:
+                if curr_user=='':
+                    curr_user = row['userid']
+
+                if row['userid']!=curr_user:
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        add_path_count(paths_counts,copy.deepcopy(curr_path))
+                        path_counter+=1
+                    curr_path = []
+                    curr_user = row['userid']
+
+                elif row['key']=='clickPos':
+                    # print row
+                    rowPos = int(row['value'][0])
+                    colPos = int(row['value'][2])
+                    player = int(row['value'][4])
+                    # print rowPos
+                    # print colPos
+                    # print move_matrix[rowPos][colPos]
+                    if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                        # move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                        curr_path.append([rowPos,colPos,player])
+                        # move_counter+=1.0
+                            # else:
+                            #     print 'ignore'
+                elif row['key']=='reset':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        if(subpaths):
+                            add_path_count_subpaths(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=len(curr_path)
+                        else:
+                            add_path_count(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=1
+                        curr_path = []
+                elif row['key']=='undo':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        if(subpaths):
+                            add_path_count_subpaths(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=len(curr_path)
+                        else:
+                            add_path_count(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=1
+                        curr_path = curr_path[:-1]
+
+        print LOGFILE[g]
+        # for path in paths:
+        #     print path
+        #     print '-----------'
+
+        pk = []
+        for p in paths_counts:
+            # print p
+            pk.append(p[1]/path_counter)
+
+        ent = stats.entropy(pk)
+        print ent
+
+
+def entropy_paths_average(subpaths = False):
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+        path_counter = 0.0
+        taken_cells = 0.0
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                    taken_cells+=1
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+                    taken_cells+=1
+        free_cells = len(move_matrix)*len(move_matrix) - taken_cells
+
+        to_ignore = IGNORE_LIST[g];
+        # to_ignore = None
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            paths = []
+            paths_counts = []
+            entropy_values = []
+            curr_path = []
+            curr_user = ''
+            for row in log_reader:
+                # if row['userid'] == USERID:
+                if curr_user=='':
+                    curr_user = row['userid']
+
+                if row['userid']!=curr_user:
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        if(subpaths):
+                            add_path_count_subpaths(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=len(curr_path)
+                        else:
+                            add_path_count(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=1
+                    pk = []
+                    for p in paths_counts:
+                        # print p
+                        pk.append(p[1]/path_counter)
+
+                    ent = stats.entropy(pk)
+                    if (path_counter>0):
+                        entropy_values.append(ent)
+                    curr_path = []
+                    curr_user = row['userid']
+                    paths_counts = []
+                    path_counter = 0
+                    paths = []
+
+                elif row['key']=='clickPos':
+                    # print row
+                    rowPos = int(row['value'][0])
+                    colPos = int(row['value'][2])
+                    player = int(row['value'][4])
+                    # print rowPos
+                    # print colPos
+                    # print move_matrix[rowPos][colPos]
+                    if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                        # move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                        curr_path.append([rowPos,colPos,player])
+                        # move_counter+=1.0
+                            # else:
+                            #     print 'ignore'
+                elif row['key']=='reset':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        if(subpaths):
+                            add_path_count_subpaths(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=len(curr_path)
+                        else:
+                            add_path_count(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=1
+                        curr_path = []
+                elif row['key']=='undo':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        if(subpaths):
+                            add_path_count_subpaths(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=len(curr_path)
+                        else:
+                            add_path_count(paths_counts,copy.deepcopy(curr_path))
+                            path_counter+=1
+                        curr_path = curr_path[:-1]
+
+        print LOGFILE[g]
+        avg_ent = sum(entropy_values)/len(entropy_values)
+        print avg_ent
+
+
+
+
+def entropy_board(normalize = False):
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+        move_counter = 0.0
+        taken_cells = 0.0;
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                    taken_cells+=1
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+                    taken_cells+=1
+        free_cells = len(move_matrix)*len(move_matrix) - taken_cells
+        # free_cells = free_cells - 2 #ignoring
+        print free_cells
         # move_matrix = []
         # for row in range(DIMENSION):
         #     row_positions = []
@@ -104,7 +527,7 @@ def entropy_board(positionIgnore = None):
         #         row_positions.append(0)
         #     move_matrix.append(copy.deepcopy(row_positions))
         to_ignore = IGNORE_LIST[g];
-        to_ignore = None
+        # to_ignore = None
         with open(LOGFILE[g], 'rb') as csvfile:
             log_reader = csv.DictReader(csvfile)
             for row in log_reader:
@@ -113,22 +536,24 @@ def entropy_board(positionIgnore = None):
                     # print row
                     rowPos = int(row['value'][0])
                     colPos = int(row['value'][2])
+                    player = int(row['value'][4])
                     # print rowPos
                     # print colPos
                     # print move_matrix[rowPos][colPos]
                     if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
                         if (to_ignore!=None):
                             if ((rowPos!=to_ignore[0][0] | colPos!=to_ignore[0][1]) & (rowPos!=to_ignore[1][0] | colPos!=to_ignore[1][1])):
-                                move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
-                                move_counter+=1.0
+                                if(player==1):
+                                    move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                                    move_counter+=1.0
                             # else:
                             #     print 'ignore'
-                        else:
+                        elif (player==1):
                             move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
                             move_counter+=1.0
         print LOGFILE[g]
-        for row in move_matrix:
-            print row
+        # for row in move_matrix:
+        #     print row
 
         #compute entropy
         pk = []
@@ -137,8 +562,117 @@ def entropy_board(positionIgnore = None):
             for j in range(len(move_matrix[i])):
                 if ((move_matrix[i][j]!='X') & (move_matrix[i][j]!='O')):
                     pk.append(move_matrix[i][j]/move_counter)
-        print pk
-        print stats.entropy(pk)
+        # print pk
+        ent = stats.entropy(pk)
+
+        ent_norm = ent/free_cells
+        print ent
+        print ent_norm
+
+def entropy_board_average():
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+        move_counter = 0.0
+        taken_cells = 0.0;
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                    taken_cells+=1
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+                    taken_cells+=1
+        free_cells = len(move_matrix)*len(move_matrix) - taken_cells
+        # free_cells = free_cells - 2 #ignoring
+        print free_cells
+        # move_matrix = []
+        # for row in range(DIMENSION):
+        #     row_positions = []
+        #     for col in range(DIMENSION):
+        #         row_positions.append(0)
+        #     move_matrix.append(copy.deepcopy(row_positions))
+        to_ignore = IGNORE_LIST[g];
+        to_ignore = None
+
+        curr_user = ''
+        entropy_values = []
+        entropy_values_norm = []
+        curr_move_matrix = copy.deepcopy(move_matrix)
+
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            for row in log_reader:
+                if curr_user == '':
+                    curr_user = row['userid']
+
+                if row['userid']!=curr_user:
+                    #compute entropy
+                    if move_counter>0:
+                        pk = []
+                        for i in range(len(move_matrix)):
+                            for j in range(len(move_matrix[i])):
+                                if ((move_matrix[i][j]!='X') & (move_matrix[i][j]!='O')):
+                                    pk.append(curr_move_matrix[i][j]/move_counter)
+                        # print pk
+                        ent = stats.entropy(pk)
+                        entropy_values.append(ent)
+                        ent_norm = ent/free_cells
+                        entropy_values_norm.append(ent_norm)
+
+                        curr_move_matrix = copy.deepcopy(move_matrix)
+                        move_counter = 0.0
+                    curr_user = row['userid']
+
+                else:
+                    if row['key']=='clickPos':
+                        # print row
+                        rowPos = int(row['value'][0])
+                        colPos = int(row['value'][2])
+                        player = int(row['value'][4])
+                        # print rowPos
+                        # print colPos
+                        # print move_matrix[rowPos][colPos]
+                        if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                            if (to_ignore!=None):
+                                if ((rowPos!=to_ignore[0][0] | colPos!=to_ignore[0][1]) & (rowPos!=to_ignore[1][0] | colPos!=to_ignore[1][1])):
+                                    if(player==1):
+                                        curr_move_matrix[rowPos][colPos] = curr_move_matrix[rowPos][colPos]+1
+                                        move_counter+=1.0
+                                # else:
+                                #     print 'ignore'
+                            elif (player==1):
+                                curr_move_matrix[rowPos][colPos] = curr_move_matrix[rowPos][colPos]+1
+                                move_counter+=1.0
+        print LOGFILE[g]
+        # for row in move_matrix:
+        #     print row
+        avg_entropy = sum(entropy_values)/len(entropy_values)
+        avg_entropy_norm = sum(entropy_values_norm)/len(entropy_values_norm)
+        print avg_entropy
+        print avg_entropy_norm
+
+
+
+def get_games():
+    with open(LOGFILE, 'rb') as csvfile:
+        log_reader = csv.DictReader(csvfile)
+        all_games = []
+        curr_game = []
+        curr_user = ''
+        for row in log_reader:
+            userid = row['userid']
+            if userid == curr_user:
+                curr_game.append(row)
+            else:
+                all_games.append(gameInstance(copy.deepcopy(curr_game)))
+                curr_game = []
+                curr_game.append(row)
+                curr_user = userid
+
+        return all_games
 
 
 def run_analysis():
@@ -298,7 +832,13 @@ def construct_heat_map(games, move = 1):
 
 
 if __name__ == "__main__":
-    entropy_board()
-    # heat_map_game()
+    # seperate_log('logs/fullLogDec3.csv')
+    # entropy_board()
+    # entropy_paths(subpaths=True)
+    # entropy_paths_average(subpaths=False)
+    entropy_board_average()
+    user_stats()
+
+    # heat_map_game(normalized=False)
     # run_analysis()
     # replay()
