@@ -5,8 +5,9 @@ from user_game import *
 from scipy import stats
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
-LOGFILE = ['logs/6_hard_full_dec3.csv','logs/6_hard_pruned_dec3.csv','logs/10_hard_full_dec3.csv','logs/10_hard_pruned_dec3.csv', 'logs/6_easy_full_dec3.csv','logs/6_easy_pruned_dec3.csv','logs/10_easy_full_dec3.csv','logs/10_easy_pruned_dec3.csv','logs/10_medium_full_dec3.csv','logs/10_medium_pruned_dec3.csv']
+LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
 USERID = '11e212ff'
 DIMENSION = 6
 START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
@@ -51,7 +52,7 @@ def seperate_log(log_file):
             if log == curr_log:
                 curr_log_records.append(row)
             elif len(curr_log_records)>0:
-                dataFile = open('logs/'+curr_log+'_dec3.csv', 'wb')
+                dataFile = open('logs/'+curr_log+'_dec22.csv', 'wb')
                 print curr_log_records[0]
                 dataWriter = csv.DictWriter(dataFile, fieldnames=curr_log_records[0].keys(), delimiter=',')
                 dataWriter.writeheader()
@@ -97,8 +98,8 @@ def heat_map_game(normalized = False):
                     if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O') & (player==1)):
                         move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1.0
                         move_count+=1.0
-                    else:
-                        print 'bad click'
+                    # else:
+                    #     print 'bad click'
                     #
                     # # print move_matrix
                     #     move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
@@ -162,6 +163,118 @@ def heat_map_game(normalized = False):
 
         # plt.show()
 
+
+
+
+
+def heat_map_solution(normalized = False):
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+        # move_matrix = []
+        # for row in range(DIMENSION):
+        #     row_positions = []
+        #     for col in range(DIMENSION):
+        #         row_positions.append(0)
+        #     move_matrix.append(copy.deepcopy(row_positions))
+        # to_ignore = IGNORE_LIST[g];
+        move_count = 0.0
+        rows = ['1','2','3','4','5','6','7','8','9','10']
+        cols = ['a','b','c','d','e','f','g','h','i','j']
+        user_count = 0
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            for row in log_reader:
+                # if row['userid'] == USERID:
+                if row['key']=='best_move':
+                    # print row
+                    move = str(row['value']).lower()
+                    user_count+=1
+                    # print move
+                    if(len(move)==2):
+                        if (move[0] in cols):
+                            colPos = cols.index(move[0])
+                            if(move[1] in rows):
+                                rowPos = len(move_matrix)-rows.index(move[1])-1
+
+
+                                if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                                    move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1.0
+                                    move_count+=1.0
+                    # else:
+                    #     print 'bad click'
+                    #
+                    # # print move_matrix
+                    #     move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+        print LOGFILE[g]
+        print user_count
+        for row in move_matrix:
+            print row
+
+        for r in range(0,len(move_matrix)):
+            for j in range(0,len(move_matrix[i])):
+                if (move_matrix[r][j]=='X'):
+                    move_matrix[r][j] = -1
+                elif (move_matrix[r][j]=='O'):
+                    move_matrix[r][j] = -2
+                #     print move_matrix[i][j]
+                # else:
+                #     print  move_matrix[i][j]
+
+        if (normalized):
+            for r in range(0,len(move_matrix)):
+                for j in range(0,len(move_matrix[i])):
+                    # if (move_matrix[r][j]>0):
+                    move_matrix[r][j] = move_matrix[r][j]/move_count
+                    # else:
+        #
+
+        print move_matrix
+        a = np.array(move_matrix)
+        a = np.flip(a,0)
+        print a
+        heatmap = plt.pcolor(a)
+
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if((a[y,x]==-1) | (a[y,x]==-1.0/move_count)):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-2.0/move_count)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
+
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name=fig_file_name[:-4]
+        fig_file_name = fig_file_name + 'solutionHeatmap.png'
+        plt.savefig(fig_file_name)
+        plt.clf()
+
+        # plt.imshow(a, cmap='hot', interpolation='nearest')
+
+        # plt.show()
+
 def compare_paths(p1,p2):
     if len(p1)!=len(p2):
         return False
@@ -184,6 +297,9 @@ def add_path_count_subpaths(paths_counts, new_path):
 
 
 def user_stats(subpaths=False):
+    user_data_headers = ['boardSize','boardType','condition','userid','curr_user_nodes','curr_user_num_paths','curr_user_sum_depth','curr_user_undo','curr_user_restart', 'confidence', 'correctness']
+    users_data = []
+    user_counter = 0
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
@@ -202,6 +318,7 @@ def user_stats(subpaths=False):
         free_cells = len(move_matrix)*len(move_matrix) - taken_cells
 
 
+
         with open(LOGFILE[g], 'rb') as csvfile:
             log_reader = csv.DictReader(csvfile)
             paths = []
@@ -214,14 +331,15 @@ def user_stats(subpaths=False):
             curr_user_nodes = 0
             curr_user_sum_depth = 0
             curr_user_data = {}
-            users_data = []
-            user_data_headers = ['userid','curr_user_nodes','curr_user_num_paths','curr_user_sum_depth','curr_user_undo','curr_user_restart']
+
+            # user_data_headers = ['boardSize','boardType','condition','userid','curr_user_nodes','curr_user_num_paths','curr_user_sum_depth','curr_user_undo','curr_user_restart']
 
 
             for row in log_reader:
                 # if row['userid'] == USERID:
                 if curr_user=='':
                     curr_user = row['userid']
+
 
 
                 if row['userid']!=curr_user:
@@ -232,7 +350,17 @@ def user_stats(subpaths=False):
                         curr_user_num_paths+=1
                         curr_user_sum_depth = curr_user_sum_depth + len(curr_path)
 
+
+                    cond = LOGFILE[g][5:-10]
+                    condition_details = cond.split('_')
+                    curr_user_data['boardSize'] = condition_details[0]
+                    curr_user_data['boardType'] = condition_details[1]
+                    curr_user_data['condition'] = condition_details[2]
                     curr_user_data['userid'] = curr_user
+
+
+                    # print condition_details
+
                     curr_user_data['curr_user_num_paths'] = curr_user_num_paths
                     curr_user_data['curr_user_undo'] = curr_user_undo
                     curr_user_data['curr_user_restart'] = curr_user_restart
@@ -249,6 +377,7 @@ def user_stats(subpaths=False):
 
                     curr_path = []
                     curr_user = row['userid']
+                    user_counter+=1
 
                 elif row['key']=='clickPos':
                     # print row
@@ -294,14 +423,21 @@ def user_stats(subpaths=False):
                         curr_user_undo+=1
                         curr_path = curr_path[:-1]
 
+                elif row['key'] == 'confidence':
+                    curr_user_data['confidence'] = row['value']
+
+                elif row['key'] == 'solvedCorrect':
+                    curr_user_data['correctness'] = row['value']
+
         print LOGFILE[g][5:]
 
-        dataFile = open('userStats/participants_'+LOGFILE[g][5:], 'wb')
+    dataFile = open('userStats/participantsStats_v2.csv', 'wb')
 
-        dataWriter = csv.DictWriter(dataFile, fieldnames=user_data_headers, delimiter=',')
-        dataWriter.writeheader()
-        for record in users_data:
-            dataWriter.writerow(record)
+    dataWriter = csv.DictWriter(dataFile, fieldnames=user_data_headers, delimiter=',')
+    dataWriter.writeheader()
+    for record in users_data:
+        # print record
+        dataWriter.writerow(record)
         # for path in paths:
         #     print path
         #     print '-----------'
@@ -313,6 +449,7 @@ def user_stats(subpaths=False):
         #
         # ent = stats.entropy(pk)
         # print ent
+    print user_counter
 
 
 
@@ -334,7 +471,7 @@ def entropy_paths(subpaths = False):
                     taken_cells+=1
         free_cells = len(move_matrix)*len(move_matrix) - taken_cells
 
-        to_ignore = IGNORE_LIST[g];
+        # to_ignore = IGNORE_LIST[g];
         # to_ignore = None
         with open(LOGFILE[g], 'rb') as csvfile:
             log_reader = csv.DictReader(csvfile)
@@ -342,6 +479,7 @@ def entropy_paths(subpaths = False):
             paths_counts = []
             curr_path = []
             curr_user = ''
+            move_count = 0.0
             for row in log_reader:
                 # if row['userid'] == USERID:
                 if curr_user=='':
@@ -366,6 +504,9 @@ def entropy_paths(subpaths = False):
                     if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
                         # move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
                         curr_path.append([rowPos,colPos,player])
+                        if len(curr_path)==1 & player == 1:
+                            move_matrix[rowPos][colPos] += 1
+                            move_count +=1
                         # move_counter+=1.0
                             # else:
                             #     print 'ignore'
@@ -390,7 +531,7 @@ def entropy_paths(subpaths = False):
                             path_counter+=1
                         curr_path = curr_path[:-1]
 
-        print LOGFILE[g]
+        # print LOGFILE[g]
         # for path in paths:
         #     print path
         #     print '-----------'
@@ -401,7 +542,70 @@ def entropy_paths(subpaths = False):
             pk.append(p[1]/path_counter)
 
         ent = stats.entropy(pk)
-        print ent
+
+        condition = LOGFILE[g][5:-10].replace("_",",")
+
+        measure = 'path entropy (no subpaths)'
+        if (subpaths):
+            measure = 'path entropy (subpaths)'
+
+        # print condition+',' + measure + ',' + str(ent)
+
+        condition = condition + "," + str(subpaths)
+        # if (subpaths):
+        #     condition = condition + "," + "(subpaths)"
+        # else:
+        #     condition = condition + "_" + "with pruned cell"
+        # for i in range(len(entropy_values)):
+        print condition + ',' + str(ent)
+
+        ###heatmap first moves
+        for r in range(0,len(move_matrix)):
+            for j in range(0,len(move_matrix[i])):
+                if (move_matrix[r][j]=='X'):
+                    move_matrix[r][j] = -1
+                elif (move_matrix[r][j]=='O'):
+                    move_matrix[r][j] = -2
+
+        for r in range(0,len(move_matrix)):
+            for j in range(0,len(move_matrix[i])):
+                # if (move_matrix[r][j]>0):
+                move_matrix[r][j] = move_matrix[r][j]/move_count
+        a = np.array(move_matrix)
+        a = np.flip(a,0)
+        print a
+        heatmap = plt.pcolor(a)
+
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if((a[y,x]==-1) | (a[y,x]==-1.0/move_count)):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-2.0/move_count)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
+
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name=fig_file_name[:-4]
+        fig_file_name = fig_file_name + 'first_moves.png'
+        plt.savefig(fig_file_name)
+        plt.clf()
+        # print condition+',entropy, aggregated,' + str(subpaths)+ ',' + str(ent)
+
+        # print ent
 
 
 def entropy_paths_average(subpaths = False):
@@ -494,14 +698,24 @@ def entropy_paths_average(subpaths = False):
                             path_counter+=1
                         curr_path = curr_path[:-1]
 
-        print LOGFILE[g]
+        # print LOGFILE[g]
         avg_ent = sum(entropy_values)/len(entropy_values)
-        print avg_ent
+
+        condition = LOGFILE[g][5:-10].replace("_",",")
+        measure = 'avg path entropy (no subpaths)'
+        if (subpaths):
+            measure = 'avg path entropy (subpaths)'
+
+        # print condition+',' + measure + ',' + str(avg_ent)
+        # print avg_ent
+
+        condition = condition + "," + str(subpaths)
+        for i in range(len(entropy_values)):
+            print condition + ',' + str(entropy_values[i])
 
 
 
-
-def entropy_board(normalize = False):
+def entropy_board(ignore = False):
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
@@ -519,15 +733,20 @@ def entropy_board(normalize = False):
                     taken_cells+=1
         free_cells = len(move_matrix)*len(move_matrix) - taken_cells
         # free_cells = free_cells - 2 #ignoring
-        print free_cells
+        # print free_cells
         # move_matrix = []
         # for row in range(DIMENSION):
         #     row_positions = []
         #     for col in range(DIMENSION):
         #         row_positions.append(0)
         #     move_matrix.append(copy.deepcopy(row_positions))
-        to_ignore = IGNORE_LIST[g];
-        # to_ignore = None
+        # to_ignore = IGNORE_LIST[g];
+        to_ignore = None
+        if ignore == True:
+            to_ignore = IGNORE_LIST[g];
+        if to_ignore!=None:
+            free_cells = free_cells - len(to_ignore) # ignoring
+
         with open(LOGFILE[g], 'rb') as csvfile:
             log_reader = csv.DictReader(csvfile)
             for row in log_reader:
@@ -551,7 +770,7 @@ def entropy_board(normalize = False):
                         elif (player==1):
                             move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
                             move_counter+=1.0
-        print LOGFILE[g]
+        # print LOGFILE[g]
         # for row in move_matrix:
         #     print row
 
@@ -564,17 +783,40 @@ def entropy_board(normalize = False):
                     pk.append(move_matrix[i][j]/move_counter)
         # print pk
         ent = stats.entropy(pk)
+        pk_uniform = []
+        for i in range(len(pk)):
+            pk_uniform.append(1.0/len(pk))
+
+        # print pk_uniform
 
         ent_norm = ent/free_cells
-        print ent
-        print ent_norm
+        ent_norm_max = ent/stats.entropy(pk_uniform)
+        # print ent
+        # print ent_norm
+        condition = LOGFILE[g][5:-10].replace("_",",")
+        # if (ignore):
+        #     print condition+',entropy (without pruned cells),' + str(ent)
+        #     print condition+',entropy normalized free cells (without pruned cells),'+ str(ent_norm)
+        #     print condition+',entropy normalized max (without pruned cells),' + str(ent_norm_max)
+        # else:
+        #     print condition+',entropy (with pruned cells),' + str(ent)
+        #     print condition+',entropy normalized free cells (with pruned cells),'+ str(ent_norm)
+        #     print condition+',entropy normalized max (with pruned cells),' + str(ent_norm_max)
+        # # print condition+',std entropy normalized (participant),' + str(std_entropy_norm)
 
-def entropy_board_average():
+        if (ignore):
+            condition = condition + "_" + "without pruned cell"
+        else:
+            condition = condition + "_" + "with pruned cell"
+        # for i in range(len(entropy_values)):
+        print condition + ',' + str(ent) + ',' + str(ent_norm_max) + "," + str(ent_norm)
+
+def entropy_board_average(ignore = False):
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
         move_counter = 0.0
-        taken_cells = 0.0;
+        taken_cells = 0.0
         for i in range(len(move_matrix)):
             for j in range(len(move_matrix[i])):
                 if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
@@ -587,21 +829,25 @@ def entropy_board_average():
                     taken_cells+=1
         free_cells = len(move_matrix)*len(move_matrix) - taken_cells
         # free_cells = free_cells - 2 #ignoring
-        print free_cells
+        # print free_cells
         # move_matrix = []
         # for row in range(DIMENSION):
         #     row_positions = []
         #     for col in range(DIMENSION):
         #         row_positions.append(0)
         #     move_matrix.append(copy.deepcopy(row_positions))
-        to_ignore = IGNORE_LIST[g];
+
         to_ignore = None
+        if ignore == True:
+            to_ignore = IGNORE_LIST[g];
+        if to_ignore!=None:
+            free_cells = free_cells - len(to_ignore)
 
         curr_user = ''
         entropy_values = []
         entropy_values_norm = []
         curr_move_matrix = copy.deepcopy(move_matrix)
-
+        prob_matrix = copy.deepcopy(move_matrix)
         with open(LOGFILE[g], 'rb') as csvfile:
             log_reader = csv.DictReader(csvfile)
             for row in log_reader:
@@ -614,8 +860,13 @@ def entropy_board_average():
                         pk = []
                         for i in range(len(move_matrix)):
                             for j in range(len(move_matrix[i])):
+                                # prob_matrix[i][j] = np.around(move_matrix[i][j],2)
                                 if ((move_matrix[i][j]!='X') & (move_matrix[i][j]!='O')):
                                     pk.append(curr_move_matrix[i][j]/move_counter)
+                                    prob_matrix[i][j] = curr_move_matrix[i][j]/move_counter
+                                    # print prob_matrix[i][j]
+                                else:
+                                    prob_matrix[i][j] = 0
                         # print pk
                         ent = stats.entropy(pk)
                         entropy_values.append(ent)
@@ -646,14 +897,90 @@ def entropy_board_average():
                             elif (player==1):
                                 curr_move_matrix[rowPos][colPos] = curr_move_matrix[rowPos][colPos]+1
                                 move_counter+=1.0
-        print LOGFILE[g]
+        # print LOGFILE[g][5:-10]
         # for row in move_matrix:
         #     print row
         avg_entropy = sum(entropy_values)/len(entropy_values)
         avg_entropy_norm = sum(entropy_values_norm)/len(entropy_values_norm)
-        print avg_entropy
-        print avg_entropy_norm
 
+        uniform_moves = []
+        for i in range(int(free_cells)):
+            uniform_moves.append(1.0/free_cells)
+
+
+
+        max_entropy = stats.entropy(uniform_moves)
+
+
+        # print max_entropy
+
+        std_entropy = np.std(entropy_values);
+        std_entropy_norm = np.std(entropy_values_norm);
+
+        entropy_values_norm_max = []
+        # print entropy_values
+        for i in range(len(entropy_values)):
+            entropy_values_norm_max.append(entropy_values[i]/max_entropy)
+
+
+
+
+        # print '----'
+        # print max_entropy
+        # ent_alt = len(uniform_moves)*(math.log(len(uniform_moves))/len(uniform_moves))
+        # print ent_alt
+        # print entropy_values_norm_max
+        # # print len(uniform_moves)
+        #
+        # # print sum(uniform_moves)
+        # print '----'
+
+        avg_entropy_norm_max = sum(entropy_values_norm_max)/len(entropy_values_norm_max)
+        std_entropy_norm_max = np.std(entropy_values_norm_max);
+        # std_entropy_norm_max = ' '
+        # avg_entropy_norm_max = ''
+
+        # print np.around(0.555,2)
+
+        condition = LOGFILE[g][5:-10].replace("_",",")
+        # if (ignore):
+        #     print condition+',avg entropy (without pruned cells),' + str(avg_entropy)
+        #     print condition+',std entropy (without pruned cells),' + str(std_entropy)
+        #     print condition+',avg entropy normalized free cells (without pruned cells),' + str(avg_entropy_norm)
+        #     print condition+',std entropy normalized free cells (without pruned cells),' + str(std_entropy_norm)
+        #     print condition+',avg entropy normalized max (without pruned cells),' + str(avg_entropy_norm_max)
+        #     print condition+',std entropy normalized max (without pruned cells),' + str(std_entropy_norm_max)
+        #
+        # else:
+        #     print condition+',avg entropy (with pruned cells),' + str(avg_entropy)
+        #     print condition+',std entropy (with pruned cells),' + str(std_entropy)
+        #     print condition+',avg entropy normalized free cells (with pruned cells),' + str(avg_entropy_norm)
+        #     print condition+',std entropy normalized free cells (with pruned cells),' + str(std_entropy_norm)
+        #     print condition+',avg entropy normalized max (with pruned cells),' + str(avg_entropy_norm_max)
+        #     print condition+',std entropy normalized max (with pruned cells),' + str(std_entropy_norm_max)
+
+        if (ignore):
+            condition = condition + "_" + "without pruned cell"
+        else:
+            condition = condition + "_" + "with pruned cell"
+        for i in range(len(entropy_values)):
+            print condition + ',' + str(entropy_values[i]) + ',' + str(entropy_values_norm_max[i]) + "," + str(entropy_values_norm[i])
+
+
+
+
+
+        # print avg_entropy_norm
+
+        # prob_mat = np.matrix(prob_matrix)
+        # prob_mat = prob_mat.round(2)
+        #
+        # prob_matrix = np.around(prob_matrix,2)
+        # print prob_matrix
+        # print len(entropy_values)
+        # print entropy_values
+        # entropy_values = np.sort(entropy_values)
+        # print entropy_values
 
 
 def get_games():
@@ -832,13 +1159,20 @@ def construct_heat_map(games, move = 1):
 
 
 if __name__ == "__main__":
-    # seperate_log('logs/fullLogDec3.csv')
+    # seperate_log('logs/fullLogDec22.csv')
     # entropy_board()
-    # entropy_paths(subpaths=True)
+    # entropy_board(ignore=True)
+    # entropy_board_average()
+    # entropy_board_average(ignore=True)
+    # # entropy_paths(subpaths=True)
+    # entropy_paths_average(subpaths=True)
+    entropy_paths(subpaths=False)
     # entropy_paths_average(subpaths=False)
-    entropy_board_average()
-    user_stats()
 
-    # heat_map_game(normalized=False)
+    # user_stats()
+
+    # print stats.entropy([0.25,0.25,0.25,0.25])
+    # heat_map_game(normalized=True)
+    # heat_map_solution(normalized=True)
     # run_analysis()
     # replay()
