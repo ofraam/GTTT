@@ -454,6 +454,7 @@ def user_stats(subpaths=False):
 
 
 def entropy_paths(subpaths = False):
+    data_matrices = {}
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
@@ -563,14 +564,14 @@ def entropy_paths(subpaths = False):
         for r in range(0,len(move_matrix)):
             for j in range(0,len(move_matrix[i])):
                 if (move_matrix[r][j]=='X'):
-                    move_matrix[r][j] = -1
+                    move_matrix[r][j] = -0.00001
                 elif (move_matrix[r][j]=='O'):
-                    move_matrix[r][j] = -2
+                    move_matrix[r][j] = -0.00002
 
         for r in range(0,len(move_matrix)):
             for j in range(0,len(move_matrix[i])):
-                # if (move_matrix[r][j]>0):
-                move_matrix[r][j] = move_matrix[r][j]/move_count
+                if (move_matrix[r][j]!=-0.00001) & (move_matrix[r][j]!=-0.00002):
+                    move_matrix[r][j] = move_matrix[r][j]/move_count
         a = np.array(move_matrix)
         a = np.flip(a,0)
         print a
@@ -578,13 +579,13 @@ def entropy_paths(subpaths = False):
 
         for y in range(a.shape[0]):
             for x in range(a.shape[1]):
-                if((a[y,x]==-1) | (a[y,x]==-1.0/move_count)):
+                if((a[y,x]==-1) | (a[y,x]==-0.00001)):
                     plt.text(x + 0.5, y + 0.5, 'X',
                          horizontalalignment='center',
                          verticalalignment='center',
                          color='white'
                     )
-                elif((a[y,x]==-2) | (a[y,x]==-2.0/move_count)):
+                elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
                     plt.text(x + 0.5, y + 0.5, 'O',
                          horizontalalignment='center',
                          verticalalignment='center',
@@ -600,11 +601,12 @@ def entropy_paths(subpaths = False):
         fig = plt.colorbar(heatmap)
         fig_file_name = LOGFILE[g]
         fig_file_name=fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = move_matrix
         fig_file_name = fig_file_name + 'first_moves.png'
-        plt.savefig(fig_file_name)
+        # plt.savefig(fig_file_name)
         plt.clf()
         # print condition+',entropy, aggregated,' + str(subpaths)+ ',' + str(ent)
-
+    return data_matrices
         # print ent
 
 
