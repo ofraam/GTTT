@@ -3,8 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import replay as rp
-from pyemd import emd
+from emd import emd
+# from pyemd import emd
 from scipy import stats
+# from cv2 import *
+
 
 LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
 DIMENSION = 6
@@ -277,7 +280,7 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked):
+        if (path_length == streak_size) & (not blocked) & (path_x_count>0):
             if other_player == 'O':
                 open_paths_lengths.append(path_x_count+1)
                 open_paths_data.append((path_x_count+1,empty_squares))
@@ -309,7 +312,7 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col -= 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked):
+        if (path_length == streak_size) & (not blocked)  & (path_x_count>0):
             if other_player == 'O':
                 open_paths_lengths.append(path_x_count+1)
                 open_paths_data.append((path_x_count+1,empty_squares))
@@ -340,7 +343,7 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_row += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked):
+        if (path_length == streak_size) & (not blocked)  & (path_x_count>0):
             if other_player == 'O':
                 open_paths_lengths.append(path_x_count+1)
                 open_paths_data.append((path_x_count+1,empty_squares))
@@ -371,7 +374,7 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked):
+        if (path_length == streak_size) & (not blocked) & (path_x_count>0):
             if other_player == 'O':
                 open_paths_lengths.append(path_x_count+1)
                 open_paths_data.append((path_x_count+1,empty_squares))
@@ -392,21 +395,6 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             p2 = open_paths_data[j]
             if not(check_path_overlap(p1[1],p2[1])):
                 score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[0]*p2[0]), exp))
-
-
-    # open_paths_lengths.sort(reverse=True)
-    #
-    # if len(open_paths_lengths) == 0:
-    #     return 0.0
-    # if len(open_paths_lengths) == 1:
-    #     if open_paths_lengths[0] == streak_size:
-    #         return 10000000
-    #     score = 1.0/math.pow((streak_size-open_paths_lengths[0]), exp)
-    #     return score
-    # score = 1.0/(math.pow((streak_size-open_paths_lengths[0]), exp)) + 1.0/(math.pow((streak_size-open_paths_lengths[1]), exp)) \
-    #         + 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(open_paths_lengths[0]*open_paths_lengths[1]), exp))
-    #
-
 
 
     return score
@@ -857,8 +845,8 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                         square_score = compute_density(r, c, board_matrix, neighborhood_size)  # check neighborhood
                     density_score_matrix[r][c] = square_score
                     sum_scores += square_score
-                    if lamb!=None:
-                        sum_scores_exp += math.pow(math.e,lamb*square_score)
+                    # if lamb!=None:
+                    #     sum_scores_exp += math.pow(math.e,lamb*square_score)
 
         # normalize
         max_density_score = -1000000
@@ -867,7 +855,7 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                 # score_matrix[r][c] = score_matrix[r][c]/sum_scores
                 if (density_score_matrix[r][c]!='X') & (density_score_matrix[r][c]!='O'):
                     density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores
-                    if (density_score_matrix[r][c] > max_density_score):
+                    if density_score_matrix[r][c] > max_density_score:
                         max_density_score = density_score_matrix[r][c]
                     # score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
@@ -887,6 +875,7 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                     score_matrix[r][c] = square_score
                     sum_scores += square_score
                     if lamb!=None:
+                        score_matrix[r][c] = math.pow(math.e,lamb*square_score)
                         sum_scores_exp += math.pow(math.e,lamb*square_score)
 
         # heatmaps
@@ -900,11 +889,12 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
         if normalized:
             for r in range(len(score_matrix)):
                 for c in range(len(score_matrix[r])):
-                    if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
+                    # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
+                    if (score_matrix[r][c]>0):
                         if lamb is None:
                             score_matrix[r][c] = score_matrix[r][c]/sum_scores
                         else:
-                            score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
+                            score_matrix[r][c] = score_matrix[r][c]/sum_scores_exp
                     # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
                     #     score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
@@ -978,22 +968,31 @@ def transform_matrix_to_list(mat):
 def run_models():
     # # data_composite_guassian = compute_scores_composite(True, exp=2, sig=4)
     # # data_composite_reg = compute_scores_composite(True, exp=2, neighborhood_size=1, density='reg')
-    data_composite_reg_2 = compute_scores_composite(True, exp=2, neighborhood_size=2, density='reg')
+    # data_composite_reg_2 = compute_scores_composite(True, exp=2, neighborhood_size=2, density='reg')
+    # data_layers_reg_2_integrated_lamb2 = compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='reg',o_weight=0.5, integrate=True, lamb=200)
+    data_layers_reg_2_integrated = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=True)
+    data_layers_reg_2_integrated_guass = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='guassian',o_weight=0.5, integrate=True,sig=4)
+    data_layers_reg_2_integrated_noO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=True)
+    data_layers_reg_2 = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
+    data_layers_reg_2_noO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
     # # data_density = compute_scores_density(True,neighborhood_size=1)
     data_density_2 = compute_scores_density(True,neighborhood_size=2)
     # # data_density_guassian = compute_scores_density_guassian(True)
-    data_paths = compute_scores_open_paths(True, exp=2)
+    data_paths_o = compute_scores_open_paths_opponent(True, exp=2,o_weight=0.5)
+    data_paths = compute_scores_open_paths_opponent(True, exp=2,o_weight=0.0)
     data_first_moves = rp.entropy_paths()
+
+
 
     models = []
     # models.append(['dataCompositeGuassianSig3',compute_scores_composite(True, exp=2)])
     # models.append(['dataCompositeGuassianSig10',compute_scores_composite(True, exp=2, sig=10)])
     # models.append(['dataCompositeGuassianReg1',compute_scores_composite(True, exp=2, neighborhood_size=1, density='reg')])
-    models.append(['dataCompositeReg2',data_composite_reg_2])
+    models.append(['data_layers_reg_2',data_layers_reg_2])
     # models.append(['dataDensity',compute_scores_density(True,neighborhood_size=1)])
-    models.append(['dataDensity2',data_density_2])
+    models.append(['data_layers_reg_2_integrated',data_layers_reg_2_integrated])
     # models.append(['dataDensityGuassian',compute_scores_density_guassian(True)])
-    models.append(['dataPaths',data_paths])
+    # models.append(['dataPaths',data_paths])
 
 
     # data_first_moves = rp.entropy_paths()
@@ -1015,7 +1014,7 @@ def run_models():
 
     # print data_density.keys()
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
-        fig_file_name = 'heatmaps/compositeNormalized/' + board+ '_neighborhood=2.png'
+        fig_file_name = 'heatmaps/layers/Jan12/' + board+ '_neighborhood=2_exp=3_notIntegrated.png'
         heatmaps = []
         full = board + '_full'
         pruned = board + '_pruned'
@@ -1030,20 +1029,24 @@ def run_models():
 
 
         i = 0
+        print board
 
+        print '-----'
         # heatmaps.append((data_density_2[full], 'density2 full'))
         # heatmaps.append((data_density_guassian[full], 'density guassian full'))
-        heatmaps.append((data_paths[full], 'paths full'))
-        heatmaps.append((data_composite_reg_2[full], 'composite2  full'))
+        dist = emd(data_layers_reg_2_noO[full],data_first_moves[full]) # earth mover distance
+        heatmaps.append((data_layers_reg_2_noO[full], 'layers' + '\n' +str(round(dist,3))))
+        dist = emd(data_layers_reg_2[full],data_first_moves[full])
+        heatmaps.append((data_layers_reg_2[full], 'layers with O '+'\n' +str(round(dist,3))))
         # heatmaps.append((data_composite_guassian[full], 'composite guassian full'))
-        heatmaps.append((data_first_moves[full], 'first moves full'))
+        heatmaps.append((data_first_moves[full], 'first moves'))
 
-        # heatmaps.append((data_density_2[pruned], 'density2 pruned'))
-        # heatmaps.append((data_density_guassian[full], 'density guassian full'))
-        heatmaps.append((data_paths[pruned], 'paths pruned'))
-        heatmaps.append((data_composite_reg_2[pruned], 'composite2  pruned'))
+        dist = emd(data_layers_reg_2_noO[pruned],data_first_moves[pruned])
+        heatmaps.append((data_layers_reg_2_noO[pruned], 'layers '+'\n' +str(round(dist,3))))
+        dist = emd(data_layers_reg_2[pruned],data_first_moves[pruned])
+        heatmaps.append((data_layers_reg_2[pruned], 'layers with O'+'\n' +str(round(dist,3))))
         # heatmaps.append((data_composite_guassian[full], 'composite guassian full'))
-        heatmaps.append((data_first_moves[pruned], 'first moves pruned'))
+        heatmaps.append((data_first_moves[pruned], 'first moves'))
 
         # heatmaps.append((data_density[pruned],'density pruned'))
         # heatmaps.append((data_density_guassian[pruned], 'density guassian pruned'))
@@ -1115,16 +1118,17 @@ def makeGaussian(size, fwhm = 3, center=None):
 
 
 if __name__ == "__main__":
-    first_histogram = np.array([0.0, 1.0])
-    second_histogram = np.array([5.0, 3.0])
-    distance_matrix = np.array([[0.0, 0.5],[0.5, 0.0]])
-    print emd(first_histogram, second_histogram, distance_matrix)
+    # print emd(np.array([[0.0, 1.0],[0.0, 1.0]]),np.array([[5.0, 3.0],[5.0, 3.0]]))
+    # first_histogram = np.array([0.0, 1.0])
+    # second_histogram = np.array([5.0, 3.0])
+    # distance_matrix = np.array([[0.0, 0.5],[0.5, 0.0]])
+    # print emd(first_histogram, second_histogram, distance_matrix)
     # compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='guassian',o_weight=0.2, integrate=True)
-    # compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.2, integrate=True)
+    # compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='reg',o_weight=0.2, integrate=True)
     # compute_scores_open_paths(True, exp=2)
     # compute_scores_composite(True, exp=2, opponent=True, o_weight=0.2)
     # compute_scores_open_paths_opponent(True,exp=2)
-    # run_models()
+    run_models()
     # gaus = makeGaussian(6,center=[0, 0])
     # print gaus
     # heatmap = plt.pcolor(gaus)
