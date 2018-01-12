@@ -9,9 +9,8 @@ from scipy import stats
 # from cv2 import *
 
 
-# these are the files with user data foeach of the board
 LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
-# these are the boards starting positions (1 = X, 2 = O)
+DIMENSION = 6
 START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
                   [[0,2,0,1,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[2,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
                   [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,0,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,0,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[0,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,0,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
@@ -24,10 +23,7 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
                   ]
 
-'''
-computes the density score for a cell
-@neighborhood_size: how many cells around the square to look at
-'''
+
 def compute_density(row, col, board, neighborhood_size):
     x_count = 0.0
     density_score = 0.0
@@ -45,10 +41,7 @@ def compute_density(row, col, board, neighborhood_size):
 
     return density_score
 
-'''
-computes the density score for a cell using guassians
-@guassian_kernel: this is created separately and sent to the function
-'''
+
 def compute_density_guassian(row, col, board, guassian_kernel):
     density_score = 0.0
     for guas in guassian_kernel:
@@ -56,17 +49,12 @@ def compute_density_guassian(row, col, board, guassian_kernel):
 
     return density_score
 
-'''
-computes the density score for all cells in all boards using guassian approach
-@normalized: whether to normalize the scores such that they sum up to 1
-@sig: the standard deviation to use in guassian
-@lamb: this is what I used before for the quantal response, you can ignore it
-'''
+
 def compute_scores_density_guassian(normalized=False, sig = 3, lamb = 1):
-    data_matrices = {}  # this will be a dictionary that holds the matrics for all the boards, each will be indexed by the board name
-    for g in range(len(LOGFILE)):  # iterate over all boards
-        board_matrix = copy.deepcopy(START_POSITION[g])  # gets the board starting position
-        for i in range(len(board_matrix)):  # replaces 1s with Xs and 2s with Os
+    data_matrices = {}
+    for g in range(len(LOGFILE)):
+        board_matrix = copy.deepcopy(START_POSITION[g])
+        for i in range(len(board_matrix)):
             for j in range(len(board_matrix[i])):
                 if ((board_matrix[i][j]!=1) & (board_matrix[i][j]!=2)):
                     board_matrix[i][j] = int(board_matrix[i][j])
@@ -79,7 +67,8 @@ def compute_scores_density_guassian(normalized=False, sig = 3, lamb = 1):
 
         sum_scores = 0.0
         sum_scores_exp = 0.0
-        score_matrix = copy.deepcopy(board_matrix)  # this will hold the matrix of scores
+        score_matrix = copy.deepcopy(board_matrix)
+
 
         # create guassians for each X square
         guassian_kernel = []
@@ -91,13 +80,23 @@ def compute_scores_density_guassian(normalized=False, sig = 3, lamb = 1):
         # compute density scores
         for r in range(len(board_matrix)):
             for c in range(len(board_matrix[r])):
-                if board_matrix[r][c] == 0:  # only check if cell is free
+                if board_matrix[r][c] == 0:  # only check if free
                     square_score = compute_density_guassian(r,c,board_matrix,guassian_kernel)
                     score_matrix[r][c] = square_score
                     sum_scores += square_score
                     sum_scores_exp += math.pow(math.e,lamb*square_score)
 
-        # put a negative small value instead of X and O so it doesn't affect heatmaps
+        # score_matrix_normalized = copy.deepcopy(score_matrix)
+        # for r in range(len(score_matrix_normalized)):
+        #     for c in range(len(score_matrix_normalized[r])):
+        #         score_matrix_normalized[r][c] = score_matrix_normalized[r][c]/sum_scores
+
+        # print 'score matrix:'
+        # print score_matrix
+        # print 'score matrix normalized'
+        # print score_matrix_normalized
+
+        # heatmaps
         for r in range(0,len(score_matrix)):
             for j in range(0,len(score_matrix[r])):
                 if (score_matrix[r][j]=='X'):
@@ -105,7 +104,7 @@ def compute_scores_density_guassian(normalized=False, sig = 3, lamb = 1):
                 elif (score_matrix[r][j]=='O'):
                     score_matrix[r][j] = -0.00002
 
-        if normalized:  # normalize cell scores to 1
+        if normalized:
             for r in range(len(score_matrix)):
                 for c in range(len(score_matrix[r])):
                     # score_matrix[r][c] = score_matrix[r][c]/sum_scores
@@ -113,18 +112,47 @@ def compute_scores_density_guassian(normalized=False, sig = 3, lamb = 1):
                         score_matrix[r][c] = score_matrix[r][c]/sum_scores
                         # score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
-        board_name = LOGFILE[g]
-        board_name = board_name[:-4]
-        data_matrices[board_name[5:-6]] = score_matrix  # store matrix for this board in the dictionary
 
+        a = np.array(score_matrix)
+        a = np.flip(a,0)
+        # print a
+        heatmap = plt.pcolor(a)
+
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if(a[y,x]==-1) | (a[y,x]==-0.00001):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
+
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name = fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = score_matrix
+        if normalized:
+            fig_file_name = fig_file_name + '_normalized_density_scores.png'
+        else:
+            fig_file_name = fig_file_name + '_density_scores.png'
+
+        plt.savefig(fig_file_name)
+        plt.clf()
     return data_matrices
 
-'''
-computes the density score for all cells based on neighbors
-@normalized: whether to normalize the scores such that they sum up to 1
-@neighborhood_size: how far to look for neighbors
-@lamb: this is what I used before for the quantal response, you can ignore it
-'''
+
 def compute_scores_density(normalized=False, neighborhood_size=1, lamb=1):
     data_matrices = {}
     for g in range(len(LOGFILE)):
@@ -167,38 +195,68 @@ def compute_scores_density(normalized=False, neighborhood_size=1, lamb=1):
                     # score_matrix[r][c] = score_matrix[r][c]/sum_scores
                     if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
                         score_matrix[r][c] = score_matrix[r][c]/sum_scores
+                        # score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
-        board_name = LOGFILE[g]
-        board_name = board_name[:-4]
-        data_matrices[board_name[5:-6]] = score_matrix
 
+        a = np.array(score_matrix)
+        a = np.flip(a,0)
+        # print a
+        heatmap = plt.pcolor(a)
+
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if(a[y,x]==-1) | (a[y,x]==-0.00001):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
+
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name = fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = score_matrix
+        if normalized:
+            fig_file_name = fig_file_name + '_normalized_density_scores.png'
+        else:
+            fig_file_name = fig_file_name + '_density_scores.png'
+
+        plt.savefig(fig_file_name)
+        plt.clf()
     return data_matrices
 
-'''
-checks if the two paths can be blocked by a shared cell
-'''
+
 def check_path_overlap(empty1, empty2):
     for square in empty1:
         if square in empty2:
             return True
     return False
 
-'''
-computes the potential winning paths the cell is part of, of if you send it player = 'O' it will check how many
-paths X destroys if it places an X on this cell
-the @exp parameter creates the non-linearity (i.e., 2 --> squared)
-'''
+
 def compute_open_paths(row, col, board, exp=1, player = 'X'):
     other_player = 'O'
     if player == 'O':
         other_player = 'X'
 
-    streak_size = 4  # how many Xs in a row you need to win
-    if len(board) == 10:  # if it's a 10X10 board you need 5.
+    streak_size = 4
+    if len(board) == 10:
         streak_size = 5
 
-    open_paths_data = []  # this list will hold information on all the potential paths, each path will be represented by a pair (length and empty squares, which will be used to check overlap)
-    # check right-down diagonal (there is a more efficient way to look at all the paths, but it was easier for me to debug when separating them :)
+    open_paths_lengths = []
+    open_paths_data = []
+    # check right-down diagonal
     for i in range(streak_size):
         r = row - i
         c = col - i
@@ -222,10 +280,12 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & (path_x_count>0):  # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & (path_x_count>0):
             if other_player == 'O':
+                open_paths_lengths.append(path_x_count+1)
                 open_paths_data.append((path_x_count+1,empty_squares))
             else:
+                open_paths_lengths.append(path_x_count)
                 open_paths_data.append((path_x_count,empty_squares))
 
     # check left-down diagonal
@@ -252,10 +312,12 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col -= 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked)  & (path_x_count>0): # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked)  & (path_x_count>0):
             if other_player == 'O':
+                open_paths_lengths.append(path_x_count+1)
                 open_paths_data.append((path_x_count+1,empty_squares))
             else:
+                open_paths_lengths.append(path_x_count)
                 open_paths_data.append((path_x_count,empty_squares))
 
     # check vertical
@@ -281,10 +343,12 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_row += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked)  & (path_x_count>0): # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked)  & (path_x_count>0):
             if other_player == 'O':
+                open_paths_lengths.append(path_x_count+1)
                 open_paths_data.append((path_x_count+1,empty_squares))
             else:
+                open_paths_lengths.append(path_x_count)
                 open_paths_data.append((path_x_count,empty_squares))
 
     # check horizontal
@@ -310,32 +374,32 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & (path_x_count>0):  # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & (path_x_count>0):
             if other_player == 'O':
+                open_paths_lengths.append(path_x_count+1)
                 open_paths_data.append((path_x_count+1,empty_squares))
             else:
+                open_paths_lengths.append(path_x_count)
                 open_paths_data.append((path_x_count,empty_squares))
 
     # print open_paths_lengths
 
+    if len(open_paths_lengths) == 0:
+        return 0.0
 
     score = 0.0
-    # compute the score for the cell based on the potential paths
     for i in range(len(open_paths_data)):
         p1 = open_paths_data[i]
-        score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
+        score += 1.0/math.pow((streak_size-p1[0]), exp)
         for j in range(i+1, len(open_paths_data)):
             p2 = open_paths_data[j]
-            if not(check_path_overlap(p1[1],p2[1])):  # interaction score if the paths don't overlap
+            if not(check_path_overlap(p1[1],p2[1])):
                 score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[0]*p2[0]), exp))
 
 
     return score
 
-'''
-computes the score for each cell in each of the boards based on the paths score
-the @exp parameter creates the non-linearity (i.e., 2 --> squared)
-'''
+
 def compute_scores_open_paths(normalized=False, exp=1, lamb = 1):
     data_matrices = {}
     for g in range(len(LOGFILE)):
@@ -365,6 +429,15 @@ def compute_scores_open_paths(normalized=False, exp=1, lamb = 1):
                     sum_scores += square_score
                     sum_scores_exp += math.pow(math.e,lamb*square_score)
 
+        # score_matrix_normalized = copy.deepcopy(score_matrix)
+        # for r in range(len(score_matrix_normalized)):
+        #     for c in range(len(score_matrix_normalized[r])):
+        #         score_matrix_normalized[r][c] = score_matrix_normalized[r][c]/sum_scores
+
+        # print 'score matrix:'
+        # print score_matrix
+        # print 'score matrix normalized'
+        # print score_matrix_normalized
 
         # heatmaps
         for r in range(0,len(score_matrix)):
@@ -382,18 +455,46 @@ def compute_scores_open_paths(normalized=False, exp=1, lamb = 1):
                     # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
                     #     score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
-        board_name = LOGFILE[g]
-        board_name = board_name[:-4]
-        data_matrices[board_name[5:-6]] = score_matrix
+        a = np.array(score_matrix)
+        a = np.flip(a,0)
+        # print a
+        heatmap = plt.pcolor(a)
 
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if(a[y,x]==-1) | (a[y,x]==-0.00001):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
 
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name = fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = score_matrix
+        if normalized:
+            fig_file_name = fig_file_name + '_test_normalized_path_scores' + 'exp=' + str(exp) + '.png'
+        else:
+            fig_file_name = fig_file_name + '_test_path_scores' + 'exp=' + str(exp) + '.png'
+
+        plt.savefig(fig_file_name)
+        plt.clf()
     return data_matrices
 
-'''
-computes the score for each cell in each of the boards based on the paths score, also considers opponent paths
-the @exp parameter creates the non-linearity (i.e., 2 --> squared)
-@o_weight says how much weight to give to blocking the opponent paths when scoring the cell
-'''
+
 def compute_scores_open_paths_opponent(normalized=False, exp=1, lamb = 1, o_weight = 0.5):
     data_matrices = {}
     for g in range(len(LOGFILE)):
@@ -419,11 +520,21 @@ def compute_scores_open_paths_opponent(normalized=False, exp=1, lamb = 1, o_weig
             for c in range(len(board_matrix[r])):
                 if board_matrix[r][c] == 0:  # only check if free
                     x_potential = compute_open_paths(r, c, board_matrix,exp=exp)  # check open paths for win
-                    o_potential = compute_open_paths(r, c, board_matrix,exp=exp, player='O')  # check opponent paths that are blocked
-                    square_score = (1-o_weight)*x_potential + o_weight*o_potential  # combine winning paths with blocked paths
+                    o_potential = compute_open_paths(r, c, board_matrix,exp=exp, player='O')  # check preventive paths
+                    square_score = (1-o_weight)*x_potential + o_weight*o_potential  # check open paths for win
                     score_matrix[r][c] = square_score
                     sum_scores += square_score
                     sum_scores_exp += math.pow(math.e,lamb*square_score)
+
+        # score_matrix_normalized = copy.deepcopy(score_matrix)
+        # for r in range(len(score_matrix_normalized)):
+        #     for c in range(len(score_matrix_normalized[r])):
+        #         score_matrix_normalized[r][c] = score_matrix_normalized[r][c]/sum_scores
+
+        # print 'score matrix:'
+        # print score_matrix
+        # print 'score matrix normalized'
+        # print score_matrix_normalized
 
         # heatmaps
         for r in range(0,len(score_matrix)):
@@ -441,36 +552,61 @@ def compute_scores_open_paths_opponent(normalized=False, exp=1, lamb = 1, o_weig
                     # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
                     #     score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
+        a = np.array(score_matrix)
+        a = np.flip(a,0)
+        # print a
+        heatmap = plt.pcolor(a)
 
-        board_name = LOGFILE[g]
-        board_name = board_name[:-4]
-        data_matrices[board_name[5:-6]] = score_matrix
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if(a[y,x]==-1) | (a[y,x]==-0.00001):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
 
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name = fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = score_matrix
+        if normalized:
+            fig_file_name = fig_file_name + '_opponent_normalized_path_scores' + 'exp=' + str(exp)  + 'o_weight=' + str(o_weight) + '.png'
+        else:
+            fig_file_name = fig_file_name + '_opponent_path_scores' + 'exp=' + str(exp) + 'o_weight=' + str(o_weight)+ '.png'
+
+        plt.savefig(fig_file_name)
+        plt.clf()
     return data_matrices
 
-'''
-computes the score for each cell in each of the boards based on a combination of density and path scores (not layers, multiplication)
-the @exp parameter creates the non-linearity (i.e., 2 --> squared)
-@density says which density function to use
-@neighborhood size is for density score computation when using neighbors
-@sig is for guassians when using guassian density
-'''
+
 def compute_scores_composite(normalized=False, exp=1, neighborhood_size=1, density = 'guassian', lamb=None, sig=3):
     data_matrices = {}
-    # compute scores based on density  for all boards (so we can prune squares)
     if (density=='guassian'):
         density_scores = compute_scores_density_guassian(True,sig=sig)
     else:
         density_scores = compute_scores_density(True, neighborhood_size=neighborhood_size)
-    path_scores = compute_scores_open_paths(True,exp)  # compute path-based scores for all boards
+    path_scores = compute_scores_open_paths(True,exp)
 
     for g in range(len(LOGFILE)):
         board_key = LOGFILE[g]
         board_key = board_key[:-4]
         board_key = board_key[5:-6]
 
-        density_scores_board = density_scores[board_key]  # get density scores for this board
-        path_scores_board = path_scores[board_key] # get path-based scores for this board
+        density_scores_board = density_scores[board_key]
+        path_scores_board = path_scores[board_key]
 
         board_matrix = copy.deepcopy(START_POSITION[g])
         for i in range(len(board_matrix)):
@@ -492,7 +628,13 @@ def compute_scores_composite(normalized=False, exp=1, neighborhood_size=1, densi
         for r in range(len(board_matrix)):
             for c in range(len(board_matrix[r])):
                 if board_matrix[r][c] == 0:  # only check if free
-                    square_score = density_scores_board[r][c] * path_scores_board[r][c]  # combine density and path scores
+                    # if (density=='guassian'):
+                    #     square_score_density = compute_density_guassian(r, c, board_matrix, guassian_kernel) # check density
+                    # else:
+                    #     square_score_density = compute_density(r, c, board_matrix, neighborhood_size) # check density
+                    # square_score_path = compute_open_paths(r, c, board_matrix,exp=exp)  # check open paths for win
+                    # square_score = square_score_density * square_score_path
+                    square_score = density_scores_board[r][c] * path_scores_board[r][c]
                     score_matrix[r][c] = square_score
                     sum_scores += square_score
                     if lamb != None:
@@ -514,18 +656,25 @@ def compute_scores_composite(normalized=False, exp=1, neighborhood_size=1, densi
                             score_matrix[r][c] = score_matrix[r][c]/sum_scores
                         else:
                             score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
+                    # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
+                    #     score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
 
-        board_name = LOGFILE[g]
-        board_name = board_name[:-4]
-        data_matrices[board_name[5:-6]] = score_matrix
+        fig_file_name = LOGFILE[g]
+        fig_file_name = fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = score_matrix
+        # if normalized:
+        #     fig_file_name = fig_file_name + '_normalized_composite_scores_' + 'exp=' + str(exp) + '_neighborhood=' + str(neighborhood_size) +'_lamb=' + str(lamb) + '.png'
+        # else:
+        #     fig_file_name = fig_file_name + '_composite_scores_' + 'exp=' + str(exp) + '_neighborhood=' + str(neighborhood_size) +'_lamb=' + str(lamb) + '.png'
+        #
+        # plt.savefig(fig_file_name)
+        # plt.clf()
 
     return data_matrices
 
-'''
-same as the function above but also considers O paths
-'''
-def compute_scores_composite_opponent(normalized=False, exp=1, neighborhood_size=1, density = 'guassian', lamb=None, sig=3, opponent = False, o_weight=0.5):
+
+def compute_scores_composite(normalized=False, exp=1, neighborhood_size=1, density = 'guassian', lamb=None, sig=3, opponent = False, o_weight=0.5):
     data_matrices = {}
     if (density=='guassian'):
         density_scores = compute_scores_density_guassian(True,sig=sig)
@@ -564,11 +713,27 @@ def compute_scores_composite_opponent(normalized=False, exp=1, neighborhood_size
         for r in range(len(board_matrix)):
             for c in range(len(board_matrix[r])):
                 if board_matrix[r][c] == 0:  # only check if free
+                    # if (density=='guassian'):
+                    #     square_score_density = compute_density_guassian(r, c, board_matrix, guassian_kernel) # check density
+                    # else:
+                    #     square_score_density = compute_density(r, c, board_matrix, neighborhood_size) # check density
+                    # square_score_path = compute_open_paths(r, c, board_matrix,exp=exp)  # check open paths for win
+                    # square_score = square_score_density * square_score_path
                     square_score = density_scores_board[r][c] * path_scores_board[r][c]
                     score_matrix[r][c] = square_score
                     sum_scores += square_score
                     if lamb != None:
                         sum_scores_exp += math.pow(math.e,lamb*square_score)
+
+        # score_matrix_normalized = copy.deepcopy(score_matrix)
+        # for r in range(len(score_matrix_normalized)):
+        #     for c in range(len(score_matrix_normalized[r])):
+        #         score_matrix_normalized[r][c] = score_matrix_normalized[r][c]/sum_scores
+
+        # print 'score matrix:'
+        # print score_matrix
+        # print 'score matrix normalized'
+        # print score_matrix_normalized
 
         # heatmaps
         for r in range(0,len(score_matrix)):
@@ -589,23 +754,59 @@ def compute_scores_composite_opponent(normalized=False, exp=1, neighborhood_size
                     # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
                     #     score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
-        board_name = LOGFILE[g]
-        board_name = board_name[:-4]
-        data_matrices[board_name[5:-6]] = score_matrix
+        a = np.array(score_matrix)
+        a = np.flip(a,0)
+        # print a
+        heatmap = plt.pcolor(a)
+
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if(a[y,x]==-1) | (a[y,x]==-0.00001):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
+
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name = fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = score_matrix
+        if normalized:
+            fig_file_name = fig_file_name + '_normalized_composite_scores_' + 'exp=' + str(exp) + '_neighborhood=' + str(neighborhood_size) +'_lamb=' + str(lamb) + '.png'
+        else:
+            fig_file_name = fig_file_name + '_composite_scores_' + 'exp=' + str(exp) + '_neighborhood=' + str(neighborhood_size) +'_lamb=' + str(lamb) + '.png'
+        if opponent:
+            fig_file_name = fig_file_name[:-4] + 'o_weight=' + str(o_weight) + '_opponent.png'
+
+        plt.savefig(fig_file_name)
+        plt.clf()
+
 
     return data_matrices
 
 
-'''
-computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
-the @exp parameter creates the non-linearity (i.e., 2 --> squared)
-@density says which density function to use
-@neighborhood size is for density score computation when using neighbors
-@sig is for guassians when using guassian density
-@threshold says how much to prune (0.2 means we will remove cells that have score<0.2*maxScore)
-@o_weight says how much weight to give for blocking O paths
-@integrate says whether to combine density and path scores (done if = True), or just use path score after the initial filtering (done if = False)
-'''
+def prune_matrix(matrix, threshold = 0.02):
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            if (matrix[i][j]<threshold):
+                matrix[i][j] = 0
+
+    return matrix
+
+
 def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density = 'guassian', lamb=None, sig=3,
                           threshold=0.2, o_weight=0.5, integrate = False):
     data_matrices = {}
@@ -647,7 +848,7 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                     # if lamb!=None:
                     #     sum_scores_exp += math.pow(math.e,lamb*square_score)
 
-        # compute maximal density score for filtering
+        # normalize
         max_density_score = -1000000
         for r in range(len(density_score_matrix)):
             for c in range(len(density_score_matrix[r])):
@@ -694,16 +895,63 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                             score_matrix[r][c] = score_matrix[r][c]/sum_scores
                         else:
                             score_matrix[r][c] = score_matrix[r][c]/sum_scores_exp
+                    # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
+                    #     score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
-        board_name = LOGFILE[g]
-        board_name = board_name[:-4]
-        data_matrices[board_name[5:-6]] = score_matrix
+        a = np.array(score_matrix)
+        a = np.flip(a,0)
+        # print a
+        heatmap = plt.pcolor(a)
+
+        for y in range(a.shape[0]):
+            for x in range(a.shape[1]):
+                if(a[y,x]==-1) | (a[y,x]==-0.00001):
+                    plt.text(x + 0.5, y + 0.5, 'X',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
+                    plt.text(x + 0.5, y + 0.5, 'O',
+                         horizontalalignment='center',
+                         verticalalignment='center',
+                         color='white'
+                    )
+                elif(a[y,x]!=0):
+                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                     )
+
+        fig = plt.colorbar(heatmap)
+        fig_file_name = LOGFILE[g]
+        fig_file_name = fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = score_matrix
+        fig_file_name += '_layers'
+        if normalized:
+            fig_file_name += '_normalized'
+        if density=='guassian':
+            fig_file_name += '_guassian_sig=' + str(sig)
+        else:
+            fig_file_name += '_neighborhood=' + str(neighborhood_size)
+        if lamb!=None:
+            fig_file_name += '_lamb=' + str(lamb)
+        if integrate:
+            fig_file_name += '_combined'
+        fig_file_name += '_oweight='+str(o_weight) + '.png'
+
+        # fig_file_name = fig_file_name + '_normalized_layers_scores_' + 'exp=' + str(exp) + '_neighborhood=' + str(neighborhood_size) +'_lamb=' + str(lamb) + '.png'
+        # else:
+        #     fig_file_name = fig_file_name + '_layers_scores_' + 'exp=' + str(exp) + '_neighborhood=' + str(neighborhood_size) +'_lamb=' + str(lamb) + '.png'
+
+        plt.savefig(fig_file_name)
+        plt.clf()
+
 
     return data_matrices
 
-'''
-auxilary function, you can ignore
-'''
+
 def transform_matrix_to_list(mat):
     list_rep = []
     for i in range(len(mat)):
@@ -717,86 +965,96 @@ def transform_matrix_to_list(mat):
         list_rep[i]=list_rep[i]/sum_values
     return list_rep
 
-'''
-auxilary function, you can ignore (unless you want to play with the guassians)
-'''
-def makeGaussian(size, fwhm = 3, center=None):
-    """ Make a square gaussian kernel.
-    size is the length of a side of the square
-    fwhm is full-width-half-maximum, which
-    can be thought of as an effective radius.
-    """
-
-    x = np.arange(0, size, 1, float)
-    y = x[:,np.newaxis]
-
-    if center is None:
-        x0 = y0 = size // 2 -1
-    else:
-        x0 = center[0]
-        y0 = center[1]
-
-    # return np.exp(-4*np.log(2) * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
-    return np.exp(-1 * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
-
-
-'''
-use this method to define which models to run, it will create the heatmaps and compute distances
-'''
 def run_models():
-    # generate the models you want to include in the heatmaps
-    # For example, say that I want to show the layers model (just with path scores, with and without opponent,
-    # and compare it to the first moves made by participants) --
-    # I create model without the opponent using the layers model
-    data_layers_reg = compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
-    # and the model with the opponent
-    data_layers_reg_withO = compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
-    # and then the actual distribution of moves (it's computed from another file but you don't need to edit it)
+    # # data_composite_guassian = compute_scores_composite(True, exp=2, sig=4)
+    # # data_composite_reg = compute_scores_composite(True, exp=2, neighborhood_size=1, density='reg')
+    # data_composite_reg_2 = compute_scores_composite(True, exp=2, neighborhood_size=2, density='reg')
+    # data_layers_reg_2_integrated_lamb2 = compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='reg',o_weight=0.5, integrate=True, lamb=200)
+    data_layers_reg_2_integrated = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=True)
+    data_layers_reg_2_integrated_guass = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='guassian',o_weight=0.5, integrate=True,sig=4)
+    data_layers_reg_2_integrated_noO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=True)
+    data_layers_reg_2 = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
+    data_layers_reg_2_noO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
+    # # data_density = compute_scores_density(True,neighborhood_size=1)
+    data_density_2 = compute_scores_density(True,neighborhood_size=2)
+    # # data_density_guassian = compute_scores_density_guassian(True)
+    data_paths_o = compute_scores_open_paths_opponent(True, exp=2,o_weight=0.5)
+    data_paths = compute_scores_open_paths_opponent(True, exp=2,o_weight=0.0)
     data_first_moves = rp.entropy_paths()
 
-    # go over all boards
+
+
+    models = []
+    # models.append(['dataCompositeGuassianSig3',compute_scores_composite(True, exp=2)])
+    # models.append(['dataCompositeGuassianSig10',compute_scores_composite(True, exp=2, sig=10)])
+    # models.append(['dataCompositeGuassianReg1',compute_scores_composite(True, exp=2, neighborhood_size=1, density='reg')])
+    models.append(['data_layers_reg_2',data_layers_reg_2])
+    # models.append(['dataDensity',compute_scores_density(True,neighborhood_size=1)])
+    models.append(['data_layers_reg_2_integrated',data_layers_reg_2_integrated])
+    # models.append(['dataDensityGuassian',compute_scores_density_guassian(True)])
+    # models.append(['dataPaths',data_paths])
+
+
+    # data_first_moves = rp.entropy_paths()
+
+
+
+    # for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
+    #     full = board + '_full'
+    #     pruned = board + '_pruned'
+    #     for model in models:
+    #         qk = transform_matrix_to_list(model[1][full])
+    #         pk = transform_matrix_to_list(data_first_moves[full])
+    #         ent_full = stats.entropy(pk,qk=qk)
+    #         print full + ',' + model[0] + ',' + str(ent_full)
+    #         pk = transform_matrix_to_list(model[1][pruned])
+    #         qk = transform_matrix_to_list(data_first_moves[pruned])
+    #         ent_pruned = stats.entropy(pk,qk=qk)
+    #         print pruned + ',' + model[0] + ',' + str(ent_pruned)
+
+    # print data_density.keys()
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
-        # this tells it where to save the heatmaps and what to call them:
-        fig_file_name = 'heatmaps/layers/Jan12/' + board+ '_neighborhood=2_exp=2_notIntegrated.png'
-        heatmaps = []  # this object will store all the heatmaps and later save to a file
+        fig_file_name = 'heatmaps/layers/Jan12/' + board+ '_neighborhood=2_exp=3_notIntegrated.png'
+        heatmaps = []
         full = board + '_full'
         pruned = board + '_pruned'
-        if board.startswith('6'):  # adjust sizes of heatmaps depending on size of boards
-            fig, axes = plt.subplots(2, 3, figsize=(12,8))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+        if board.startswith('6'):
+            fig, axes = plt.subplots(2, 3, figsize=(12,8))
             # fig, axes = plt.subplots(2, 4, figsize=(10,6))
         else:
-            fig, axes = plt.subplots(2, 3, figsize=(18,12)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            fig, axes = plt.subplots(2, 3, figsize=(18,12))
             # fig, axes = plt.subplots(2, 4, figsize=(18,12))
 
-        fig.suptitle(board)  # add subtitle to the figure based on board name
-
-        i = 0  # this will be used to index into the list of heatmaps
-        print board  # just printing the board name so I know if they finish, you can remove
+        fig.suptitle(board)
 
 
-        # here you will append to the heatmap list any heatmap you want to present. For each heatmap you append a pair -
-        # the first element is the score matrix, the second element is a title for the heatmap. Note that ordering of adding to the heatmap lists
-        #determines where each heatmap is shown (goes from top left to bottom right)
+        i = 0
+        print board
 
-        dist = emd(data_layers_reg[full],data_first_moves[full]) # earth mover distance for the full board
-        # print dist
-        heatmaps.append((data_layers_reg[full], 'layers' + '\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
-
-        dist = emd(data_layers_reg_withO[full],data_first_moves[full]) # earth mover distance for the full board
-        heatmaps.append((data_layers_reg_withO[full], 'layers with O '+'\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
-        # add the empirical distribution heatmap
+        print '-----'
+        # heatmaps.append((data_density_2[full], 'density2 full'))
+        # heatmaps.append((data_density_guassian[full], 'density guassian full'))
+        dist = emd(data_layers_reg_2_noO[full],data_first_moves[full]) # earth mover distance
+        heatmaps.append((data_layers_reg_2_noO[full], 'layers' + '\n' +str(round(dist,3))))
+        dist = emd(data_layers_reg_2[full],data_first_moves[full])
+        heatmaps.append((data_layers_reg_2[full], 'layers with O '+'\n' +str(round(dist,3))))
+        # heatmaps.append((data_composite_guassian[full], 'composite guassian full'))
         heatmaps.append((data_first_moves[full], 'first moves'))
 
-        # and then the same for the pruned boards
-        dist = emd(data_layers_reg[pruned],data_first_moves[pruned]) # earth mover distance for the full board
-        heatmaps.append((data_layers_reg[pruned], 'layers' + '\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
-
-        dist = emd(data_layers_reg_withO[pruned],data_first_moves[pruned]) # earth mover distance for the full board
-        heatmaps.append((data_layers_reg_withO[pruned], 'layers with O '+'\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
-        # add the empirical distribution heatmap
+        dist = emd(data_layers_reg_2_noO[pruned],data_first_moves[pruned])
+        heatmaps.append((data_layers_reg_2_noO[pruned], 'layers '+'\n' +str(round(dist,3))))
+        dist = emd(data_layers_reg_2[pruned],data_first_moves[pruned])
+        heatmaps.append((data_layers_reg_2[pruned], 'layers with O'+'\n' +str(round(dist,3))))
+        # heatmaps.append((data_composite_guassian[full], 'composite guassian full'))
         heatmaps.append((data_first_moves[pruned], 'first moves'))
 
-        # this creates the actual heatmaps
+        # heatmaps.append((data_density[pruned],'density pruned'))
+        # heatmaps.append((data_density_guassian[pruned], 'density guassian pruned'))
+        # heatmaps.append((data_paths[pruned],'paths pruned'))
+        # heatmaps.append((data_composite_reg[pruned], 'composite  pruned'))
+        # heatmaps.append((data_composite_guassian[pruned], 'composite guassian pruned'))
+        # heatmaps.append((data_first_moves[pruned], 'first moves pruned'))
+
         for ax in axes.flatten():  # flatten in case you have a second row at some point
             a = np.array(heatmaps[i][0])
             a = np.flip(a,0)
@@ -838,5 +1096,121 @@ def run_models():
         plt.savefig(fig_file_name)
         plt.clf()
 
+
+def makeGaussian(size, fwhm = 3, center=None):
+    """ Make a square gaussian kernel.
+    size is the length of a side of the square
+    fwhm is full-width-half-maximum, which
+    can be thought of as an effective radius.
+    """
+
+    x = np.arange(0, size, 1, float)
+    y = x[:,np.newaxis]
+
+    if center is None:
+        x0 = y0 = size // 2 -1
+    else:
+        x0 = center[0]
+        y0 = center[1]
+
+    # return np.exp(-4*np.log(2) * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
+    return np.exp(-1 * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
+
+
 if __name__ == "__main__":
-    run_models()  # calls the function that runs the models
+    # print emd(np.array([[0.0, 1.0],[0.0, 1.0]]),np.array([[5.0, 3.0],[5.0, 3.0]]))
+    # first_histogram = np.array([0.0, 1.0])
+    # second_histogram = np.array([5.0, 3.0])
+    # distance_matrix = np.array([[0.0, 0.5],[0.5, 0.0]])
+    # print emd(first_histogram, second_histogram, distance_matrix)
+    # compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='guassian',o_weight=0.2, integrate=True)
+    # compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='reg',o_weight=0.2, integrate=True)
+    # compute_scores_open_paths(True, exp=2)
+    # compute_scores_composite(True, exp=2, opponent=True, o_weight=0.2)
+    # compute_scores_open_paths_opponent(True,exp=2)
+    run_models()
+    # gaus = makeGaussian(6,center=[0, 0])
+    # print gaus
+    # heatmap = plt.pcolor(gaus)
+    # plt.colorbar(heatmap)
+    # # plt.plot(gaus)
+    # plt.show()
+
+    # # plt.colorbar(img)
+    # data_composite = compute_scores_composite(True, exp=2, neighborhood_size=1)
+    # data_density = compute_scores_density(True,neighborhood_size=1)
+    # data_paths = compute_scores_open_paths(True, exp=2)
+    # data_first_moves = rp.entropy_paths()
+    #
+    # print data_density.keys()
+    # for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
+    #     fig_file_name = 'heatmaps/noDensity/' + board+ '_neighborhood=1.png'
+    #     heatmaps = []
+    #     full = board + '_full'
+    #     pruned = board + '_pruned'
+    #     if board.startswith('6'):
+    #         fig, axes = plt.subplots(2, 3, figsize=(12,8))
+    #     else:
+    #         fig, axes = plt.subplots(2, 3, figsize=(18,12))
+    #     fig.suptitle(board)
+    #
+    #
+    #     i = 0
+    #
+    #     # heatmaps.append((data_density[full], 'density full'))
+    #     heatmaps.append((data_paths[full], 'paths full'))
+    #     heatmaps.append((data_composite[full], 'composite full'))
+    #     heatmaps.append((data_first_moves[full], 'first moves full'))
+    #
+    #     # heatmaps.append((data_density[pruned],'density pruned'))
+    #     heatmaps.append((data_paths[pruned],'paths pruned'))
+    #     heatmaps.append((data_composite[pruned], 'composite pruned'))
+    #     heatmaps.append((data_first_moves[pruned], 'first moves pruned'))
+    #
+    #     for ax in axes.flatten():  # flatten in case you have a second row at some point
+    #         a = np.array(heatmaps[i][0])
+    #         a = np.flip(a,0)
+    #         img = ax.pcolormesh(a)
+    #         for y in range(a.shape[0]):
+    #             for x in range(a.shape[1]):
+    #                 if(a[y,x]==-1) | (a[y,x]==-0.00001):
+    #                     ax.text(x + 0.5, y + 0.5, 'X',
+    #                          horizontalalignment='center',
+    #                          verticalalignment='center',
+    #                          color='white'
+    #                              )
+    #                 elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
+    #                     ax.text(x + 0.5, y + 0.5, 'O',
+    #                          horizontalalignment='center',
+    #                          verticalalignment='center',
+    #                          color='white'
+    #                     )
+    #                 elif(a[y,x]!=0):
+    #                     ax.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+    #                              horizontalalignment='center',
+    #                              verticalalignment='center',
+    #                              color='white'
+    #                      )
+    #
+    #         fig.colorbar(img, ax=ax)
+    #         # plt.colorbar(img)
+    #         ax.set_aspect('equal')
+    #         ax.set_title(heatmaps[i][1])
+    #         i+=1
+    #
+    #     # a = np.random.rand(10,4)
+    #     # img = axes[0,0].imshow(a,interpolation='nearest')
+    #     # axes[0,0].set_aspect('auto')
+    #     # plt.colorbar(img)
+    #     # plt.title(board)
+    #     # fig.tight_layout()
+    #     # fig.subplots_adjust(top=0.88)
+    #     plt.savefig(fig_file_name)
+    #     plt.clf()
+    #     # plt.show()
+
+    # compute_scores_density(True,neighborhood_size=2)
+    # compute_scores_density(True)
+    # compute_scores_composite(True, exp=2, neighborhood_size=1)
+    # compute_scores_open_paths(True, 2)
+    # compute_scores_open_paths(True)
