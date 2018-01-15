@@ -150,7 +150,7 @@ class Board:
     return ranked_list
 
 
-  def get_free_spaces_ranked_paths(self):
+  def get_free_spaces_ranked_paths(self, player):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
     list_of_occupied = []
@@ -161,7 +161,7 @@ class Board:
       else:
         list_of_occupied.append(space)
     for free_space in list_of_spaces:
-      list_of_spaces_with_dist.append((free_space,self.compute_square_score(free_space)))
+      list_of_spaces_with_dist.append((free_space,self.compute_square_score(free_space, player)))
 
     sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
     ranked_list  = [x[0] for x in sorted_list]
@@ -219,7 +219,7 @@ class Board:
     return score
 
 
-  def compute_square_score(self, square, turns = 0):
+  def compute_square_score(self, square, turns = 0, player = None):
     """ Heurisitc function to be used for the minimax search.
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE.
@@ -273,8 +273,12 @@ class Board:
           pass
     exp=2
     score = 0.0
+
+
     streak_size = len(self.winning_paths[0])
-    # compute the score for the cell based on the potential paths
+
+    # if (player==c.COMPUTER):
+      # compute the score for the cell based on the potential paths
     for i in range(len(open_win_paths_computer)):
       p1 = open_win_paths_computer[i]
       score += 1.0/math.pow((streak_size-p1[1]), exp)  # score for individual path
@@ -285,6 +289,7 @@ class Board:
             return c.WIN_SCORE
           score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[1]*p2[1]), exp))
 
+    # if (player==c.HUMAN):
     for i in range(len(open_win_paths_human)):
       p1 = open_win_paths_human[i]
       score += 1.0/math.pow((streak_size-p1[1]), exp)  # score for individual path
