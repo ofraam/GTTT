@@ -183,6 +183,173 @@ def check_path_overlap(empty1, empty2):
             return True
     return False
 
+
+'''
+computes the potential winning paths the cell is part of, of if you send it player = 'O' it will check how many
+paths X destroys if it places an X on this cell
+the @exp parameter creates the non-linearity (i.e., 2 --> squared)
+'''
+def compute_open_paths_data(row, col, board, exp=1, player = 'X'):
+    other_player = 'O'
+    if player == 'O':
+        other_player = 'X'
+
+    threshold = 0
+    if len(board)==10:
+        threshold +=1
+
+    streak_size = 4  # how many Xs in a row you need to win
+    if len(board) == 10:  # if it's a 10X10 board you need 5.
+        streak_size = 5
+
+    open_paths_data = []  # this list will hold information on all the potential paths, each path will be represented by a pair (length and empty squares, which will be used to check overlap)
+    paths = []
+    # check right-down diagonal (there is a more efficient way to look at all the paths, but it was easier for me to debug when separating them :)
+    for i in range(streak_size):
+        r = row - i
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check left-down diagonal
+    for i in range(streak_size):
+        r = row - i
+        c = col + i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col -= 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked)  & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check vertical
+    for i in range(streak_size):
+        r = row - i
+        c = col
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+
+            path.append([square_row,square_col])
+            square_row += 1
+            path_length += 1
+
+
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check horizontal
+    for i in range(streak_size):
+        r = row
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row, square_col])
+
+            path.append([square_row, square_col])
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    return open_paths_data
+
+
+def compute_relative_path_score(row, col, path_data, score_matrix, lamb = 1):
+    raw_score = score_matrix[row][col]
+    relative_score = 0.0
+    for p in path_data:
+        path_score = 0.0
+        path_score_exp = 0.0
+        for square in p:
+            path_score += score_matrix[square[0],square[1]]
+            path_score_exp += math.exp(score_matrix[square[0],square[1]]*lamb)
+        relative_score += math.exp(raw_score)/path_score_exp
+    return relative_score
+
+
+
+
+
+
 '''
 computes the potential winning paths the cell is part of, of if you send it player = 'O' it will check how many
 paths X destroys if it places an X on this cell
@@ -192,6 +359,10 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
     other_player = 'O'
     if player == 'O':
         other_player = 'X'
+
+    threshold = 0
+    if len(board)==10:
+        threshold +=1
 
     streak_size = 4  # how many Xs in a row you need to win
     if len(board) == 10:  # if it's a 10X10 board you need 5.
@@ -222,10 +393,10 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & (path_x_count>0):  # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares))
-            else:
+            elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares))
 
     # check left-down diagonal
@@ -252,10 +423,10 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col -= 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked)  & (path_x_count>0): # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked)  & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares))
-            else:
+            elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares))
 
     # check vertical
@@ -281,10 +452,12 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_row += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked)  & (path_x_count>0): # add the path if it's not blocked and if there is already at least one X on it
+
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares))
-            else:
+            elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares))
 
     # check horizontal
@@ -310,15 +483,17 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & (path_x_count>0):  # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares))
-            else:
+            elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares))
 
     # print open_paths_lengths
 
 
+    # if ((row==0) & (col==3)) |((row==3) & (col==0)):
+    #     print 'here'
     score = 0.0
     # compute the score for the cell based on the potential paths
     for i in range(len(open_paths_data)):
@@ -331,6 +506,10 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
 
 
     return score
+
+
+def score_by_paths(score_matrix):
+
 
 '''
 computes the score for each cell in each of the boards based on the paths score
@@ -748,16 +927,16 @@ def run_models():
     # For example, say that I want to show the layers model (just with path scores, with and without opponent,
     # and compare it to the first moves made by participants) --
     # I create model without the opponent using the layers model
-    data_layers_reg = compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
+    data_layers_reg = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
     # and the model with the opponent
-    data_layers_reg_withO = compute_scores_layers(normalized=True,exp=2,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
+    data_layers_reg_withO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
     # and then the actual distribution of moves (it's computed from another file but you don't need to edit it)
     data_first_moves = rp.entropy_paths()
 
     # go over all boards
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
         # this tells it where to save the heatmaps and what to call them:
-        fig_file_name = 'heatmaps/layers/Jan12/' + board+ '_neighborhood=2_exp=2_notIntegrated.png'
+        fig_file_name = 'heatmaps/layers/Jan12/' + board+ '_neighborhood=2_exp=3_thresh=0.2_notIntegrated.png'
         heatmaps = []  # this object will store all the heatmaps and later save to a file
         full = board + '_full'
         pruned = board + '_pruned'
