@@ -330,19 +330,33 @@ def compute_open_paths_data(row, col, board, exp=1, player = 'X'):
             elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares, path))
 
-    return open_paths_data
+
+    score = 0.0
+    # compute the score for the cell based on the potential paths
+    for i in range(len(open_paths_data)):
+        p1 = open_paths_data[i]
+        score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
+        for j in range(i+1, len(open_paths_data)):
+            p2 = open_paths_data[j]
+            if not(check_path_overlap(p1[1],p2[1])):  # interaction score if the paths don't overlap
+                score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[0]*p2[0]), exp))
+
+    return (score, open_paths_data)
 
 
 def compute_relative_path_score(row, col, path_data, score_matrix, lamb = 1):
     raw_score = score_matrix[row][col]
     relative_score = 0.0
+
     for p in path_data:
         path_score = 0.0
         path_score_exp = 0.0
         for square in p:
-            path_score += score_matrix[square[0],square[1]]
-            path_score_exp += math.exp(score_matrix[square[0],square[1]]*lamb)
-        relative_score += math.exp(raw_score)/path_score_exp
+            if (score_matrix[square[0]][square[1]]!='X') & (score_matrix[square[0]][square[1]]!='O'):
+                path_score += score_matrix[square[0]][square[1]]
+                path_score_exp += math.exp(score_matrix[square[0]][square[1]]*lamb)
+        # if raw_score > 0:
+        relative_score += (math.exp(raw_score)/path_score_exp)*path_score
     return relative_score
 
 
@@ -507,10 +521,6 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
 
     return score
 
-
-def score_by_paths(score_matrix):
-
-
 '''
 computes the score for each cell in each of the boards based on the paths score
 the @exp parameter creates the non-linearity (i.e., 2 --> squared)
@@ -597,12 +607,20 @@ def compute_scores_open_paths_opponent(normalized=False, exp=1, lamb = 1, o_weig
         for r in range(len(board_matrix)):
             for c in range(len(board_matrix[r])):
                 if board_matrix[r][c] == 0:  # only check if free
-                    x_potential = compute_open_paths(r, c, board_matrix,exp=exp)  # check open paths for win
+                    # x_potential = compute_open_paths(r, c, board_matrix,exp=exp)  # check open paths for win
+                    x_potential = compute_open_paths_data(r, c, board_matrix,exp=exp)  # check open paths for win
                     o_potential = compute_open_paths(r, c, board_matrix,exp=exp, player='O')  # check opponent paths that are blocked
                     square_score = (1-o_weight)*x_potential + o_weight*o_potential  # combine winning paths with blocked paths
                     score_matrix[r][c] = square_score
                     sum_scores += square_score
                     sum_scores_exp += math.pow(math.e,lamb*square_score)
+
+        absolute_score_matrix = copy.deepcopy(score_matrix)
+        for r in range(len(board_matrix)):
+            for c in range(len(board_matrix[r])):
+                if board_matrix[r][c] == 0:  # only check if free
+                    score_matrix[r][c] = compute_relative_path_score(r,c,x_potential,absolute_score_matrix)
+
 
         # heatmaps
         for r in range(0,len(score_matrix)):
@@ -842,10 +860,17 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
         sum_scores_exp = 0.0
         score_matrix = copy.deepcopy(board_matrix)
 
+        paths_data = copy.deepcopy(board_matrix)
+
         for r in range(len(board_matrix)):
             for c in range(len(board_matrix[r])):
-                if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free
-                    square_score_x = compute_open_paths(r, c, board_matrix,exp=exp)  # check open paths for win
+                if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free & passed threshold
+                    x_paths = compute_open_paths_data(r, c, board_matrix,exp=exp)  # check open paths for win
+                    square_score_x = x_paths[0]
+                    x_paths_data = []
+                    for path in x_paths[1]:
+                        x_paths_data.append(path[2])
+                    paths_data[r][c] = copy.deepcopy(x_paths_data)
                     square_score_o = compute_open_paths(r, c, board_matrix, exp=exp, player = 'O')
                     square_score = (1-o_weight)*square_score_x + o_weight*square_score_o
                     if integrate:
@@ -855,6 +880,17 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                     if lamb!=None:
                         score_matrix[r][c] = math.pow(math.e,lamb*square_score)
                         sum_scores_exp += math.pow(math.e,lamb*square_score)
+
+        # x_paths_data = []
+        # for path in x_paths[1]:
+        #     x_paths_data.append(path[2])
+        # sum_scores = 0.0
+        # absolute_score_matrix = copy.deepcopy(score_matrix)
+        # for r in range(len(board_matrix)):
+        #     for c in range(len(board_matrix[r])):
+        #         if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free
+        #             score_matrix[r][c] = compute_relative_path_score(r,c,paths_data[r][c],absolute_score_matrix)
+        #             sum_scores+=score_matrix[r][c]
 
         # heatmaps
         for r in range(0,len(score_matrix)):
@@ -927,7 +963,7 @@ def run_models():
     # For example, say that I want to show the layers model (just with path scores, with and without opponent,
     # and compare it to the first moves made by participants) --
     # I create model without the opponent using the layers model
-    data_layers_reg = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
+    data_layers_reg = compute_scores_layers(normalized=False,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
     # and the model with the opponent
     data_layers_reg_withO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
     # and then the actual distribution of moves (it's computed from another file but you don't need to edit it)
@@ -936,7 +972,7 @@ def run_models():
     # go over all boards
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
         # this tells it where to save the heatmaps and what to call them:
-        fig_file_name = 'heatmaps/layers/Jan12/' + board+ '_neighborhood=2_exp=3_thresh=0.2_notIntegrated.png'
+        fig_file_name = 'heatmaps/layers/Jan12/' + board+ '_neighborhood=2_exp=3_thresh=0.2_notIntegrated_noPaths_t1_notNorm.png'
         heatmaps = []  # this object will store all the heatmaps and later save to a file
         full = board + '_full'
         pruned = board + '_pruned'

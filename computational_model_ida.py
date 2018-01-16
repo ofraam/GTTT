@@ -67,13 +67,10 @@ class Game:
     winning_player = False
     space = 100
     # while not winning_player:
-    # while self.num_turns<1:
-    while not winning_player:
+    while self.num_turns<1:
       self.node_count = 0
       self.display_game()
       space = self.get_next_move(max_depth)
-      if space is None:
-        print 'darn'
       print self.node_count
       winning_player = self.make_move(space, self.whos_turn)
       self.change_player()
@@ -321,16 +318,16 @@ class Game:
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     if board.is_terminal() or depth <= 0:
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0)),None)  # Terminal (the space will be picked up via recursion)
+      return (board.obj_interaction(c.COMPUTER,depth),None)  # Terminal (the space will be picked up via recursion)
     else:
       self.node_count += 1
       max_child = (c.NEG_INF, None)
       # print 'depth = '+ str(depth) + ', free =' +str(board.get_free_spaces())
       # for space in board.get_free_spaces_ranked():
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
-      # top_moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER)[:20]
-      for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0)):
-      # for space in top_moves:
+      top_moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER)[:20]
+      # for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER):
+      for space in top_moves:
         # print 'depth = ' + str(depth) + ', space = ' + str(space)
         new_board = board.get_board_copy()
         new_board.add_marker(space, c.COMPUTER)
@@ -348,15 +345,15 @@ class Game:
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     if board.is_terminal() or depth <= 0:
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0))),None)
+      return (board.obj_interaction(c.HUMAN,depth),None)
     else:
       self.node_count += 1
       min_child = (c.POS_INF, None)
       # for space in board.get_free_spaces_ranked():
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
-      # top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)[:20]
-      for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0)):
-      # for space in top_moves:
+      top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)[:20]
+      # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN):
+      for space in top_moves:
         new_board = board.get_board_copy()
         new_board.add_marker(space, c.HUMAN)
         score = self.minimax_max_alphabeta_DL(alpha, beta, new_board, depth - 1)[0]
@@ -501,18 +498,16 @@ if __name__ == "__main__":
         file_path = "examples/board_6_4.txt"
         continue
       else:
-        # if filename.startswith("10by10_easy"):
-        if not(filename.startswith("10by10_medium")):
+        if filename.startswith("10by10_easy"):
           continue
         file_path = "examples/board_10_5.txt"
-        # continue
 
 
       game = start_game(file_path)
       print filename
       win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
       print 'depth = '+ str(win_depth)
-      game.play_game(max_depth)
+      game.play_game(win_depth)
 
 
     # for filename in os.listdir("predefinedBoards/"):

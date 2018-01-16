@@ -150,7 +150,7 @@ class Board:
     return ranked_list
 
 
-  def get_free_spaces_ranked_paths(self, player):
+  def get_free_spaces_ranked_paths(self, player, remaining_turns_x = None):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
     list_of_occupied = []
@@ -161,11 +161,25 @@ class Board:
       else:
         list_of_occupied.append(space)
     for free_space in list_of_spaces:
-      list_of_spaces_with_dist.append((free_space,self.compute_square_score(free_space, player)))
+      list_of_spaces_with_dist.append((free_space,self.compute_square_score(free_space, player,remaining_turns_x=remaining_turns_x)))
 
     sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
-    ranked_list  = [x[0] for x in sorted_list]
+    ranked_list = []
+    for sp in sorted_list:
+      if sp[1] > -10000000:
+        ranked_list.append(sp[0])
+      else:
+        return ranked_list
+
+    if len(ranked_list)==0:
+      print 'oopsy'
+      # ranked_list.append(sorted_list[0][0])
+
+    # ranked_list  = [x[0] for x in sorted_list]
+
     return ranked_list
+
+  # def is_win_possible(self, moves_limit):
 
 
   def get_free_spaces_ranked(self):
@@ -219,7 +233,7 @@ class Board:
     return score
 
 
-  def compute_square_score(self, square, turns = 0, player = None):
+  def compute_square_score(self, square, turns = 0, player = None, remaining_turns_x = None):
     """ Heurisitc function to be used for the minimax search.
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE.
@@ -232,6 +246,8 @@ class Board:
     score = 0
     open_win_paths_computer = []
     open_win_paths_human = []
+    max_length_path_X = 0
+    max_length_path_O = 0
     # if player == c.COMPUTER:
     for path in self.winning_paths:
       if square in path:
@@ -271,11 +287,17 @@ class Board:
         else:
           # Path cannot be won, so it has no effect on score
           pass
+
+        if (c.HUMAN_count > max_length_path_O):
+          max_length_path_O = c.HUMAN_count
     exp=2
     score = 0.0
 
 
     streak_size = len(self.winning_paths[0])
+    if streak_size-max_length_path_O > remaining_turns_x:
+      return -10000000
+
 
     # if (player==c.COMPUTER):
       # compute the score for the cell based on the potential paths
@@ -305,7 +327,7 @@ class Board:
 
 
 
-  def obj_interaction(self, player, turns = 0):
+  def obj_interaction(self, player, remaining_turns_x = 0):
     """ Heurisitc function to be used for the minimax search.
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE.
@@ -318,6 +340,8 @@ class Board:
     score = 0
     open_win_paths_computer = []
     open_win_paths_human = []
+    max_length_path_X = 0
+    max_length_path_O = 0
     # if player == c.COMPUTER:
     for path in self.winning_paths:
       len_path = len(path)
@@ -344,6 +368,10 @@ class Board:
         # Opponent wins :(
         return c.LOSE_SCORE
 
+
+      if (c.HUMAN_count > max_length_path_O):
+        max_length_path_O = c.HUMAN_count
+
       elif c.HUMAN_count == 0:
         # Opponent not on path, so count number of player's tokens on path
         # score += 10*3**(c.COMPUTER_count - 1)
@@ -359,6 +387,10 @@ class Board:
     exp=2
     score = 0.0
     streak_size = len(self.winning_paths[0])
+
+    if streak_size-max_length_path_O > remaining_turns_x:
+      return -10000000
+
     # compute the score for the cell based on the potential paths
     for i in range(len(open_win_paths_computer)):
       p1 = open_win_paths_computer[i]
