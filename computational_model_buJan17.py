@@ -67,8 +67,8 @@ class Game:
     winning_player = False
     space = 100
     # while not winning_player:
-    while self.num_turns<1:
-    # while not winning_player:
+    # while self.num_turns<1:
+    while not winning_player:
       self.node_count = 0
       self.display_game()
       space = self.get_next_move(max_depth)
@@ -321,18 +321,16 @@ class Game:
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     if board.is_terminal() or depth <= 0:
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0)),depth)  # Terminal (the space will be picked up via recursion)
+      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0)),None)  # Terminal (the space will be picked up via recursion)
     else:
       self.node_count += 1
       max_child = (c.NEG_INF, None)
-      # print 'depth = '+ str(depth) + ', free =' +str
+      # print 'depth = '+ str(depth) + ', free =' +str(board.get_free_spaces())
+      # for space in board.get_free_spaces_ranked():
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
-      # top_moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER)
-      # print top_moves
-      for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
+      # top_moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER)[:20]
+      for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0)):
       # for space in top_moves:
-        # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
-        #   continue
         # print 'depth = ' + str(depth) + ', space = ' + str(space)
         new_board = board.get_board_copy()
         new_board.add_marker(space, c.COMPUTER)
@@ -354,38 +352,27 @@ class Game:
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     if board.is_terminal() or depth <= 0:
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0))),depth)
-
-    # if board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0)))==-20000000:
-    #   # print 'cutting'
-    #   return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0))),None)
-    #
-
+      return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0))),None)
     else:
       self.node_count += 1
       min_child = (c.POS_INF, None)
       # for space in board.get_free_spaces_ranked():
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
-      # top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)
-      # if (self.whos_turn==c.COMPUTER):
-
-      for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
+      # top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)[:20]
+      for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0)):
       # for space in top_moves:
-        # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
-        #     continue
         new_board = board.get_board_copy()
         new_board.add_marker(space, c.HUMAN)
-        if (new_board.check_possible_win(remaining_turns_O=math.ceil(depth/2.0))):
-          score = self.minimax_max_alphabeta_DL(alpha, beta, new_board, depth - 1)[0]
-          if score < min_child[0]:
-            min_child = (score, space)
-          # if min_child[0] <= alpha:
-          #   return min_child # Shouldn't help anyway
-          if min_child[0] <= alpha:
-            return min_child # Shouldn't help anyway
-          # if min_child[1] is None:
-          #   print 'min none_' +str(depth)
-          beta = min(beta, score)
+        score = self.minimax_max_alphabeta_DL(alpha, beta, new_board, depth - 1)[0]
+        if score < min_child[0]:
+          min_child = (score, space)
+        # if min_child[0] <= alpha:
+        #   return min_child # Shouldn't help anyway
+        if min_child[0] <= alpha:
+          return min_child # Shouldn't help anyway
+        # if min_child[1] is None:
+        #   print 'min none_' +str(depth)
+        beta = min(beta, score)
       return min_child
 
 
@@ -428,7 +415,7 @@ def fill_board_from_file(json_file,game):
 
       space+=1
 
-  # print board_positions
+  print board_positions
   return int(json1_data['win_depth'])
 
 
@@ -518,14 +505,11 @@ if __name__ == "__main__":
     for filename in os.listdir("predefinedBoards/"):
       if filename.startswith("6"):
         file_path = "examples/board_6_4.txt"
-        # continue
-        # if not(filename.startswith("6by6_hard")):
-          # continue
-
+        continue
       else:
         # if filename.startswith("10by10_easy"):
-        # if not(filename.startswith("10by10_medium")):
-        #   continue
+        if not(filename.startswith("10by10_easy")):
+          continue
         file_path = "examples/board_10_5.txt"
         # continue
 

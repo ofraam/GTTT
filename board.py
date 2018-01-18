@@ -150,7 +150,7 @@ class Board:
     return ranked_list
 
 
-  def get_free_spaces_ranked_paths(self, player, remaining_turns_x = None):
+  def get_free_spaces_ranked_paths(self, player, remaining_turns_x = None, depth = 0):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
     list_of_occupied = []
@@ -161,18 +161,18 @@ class Board:
       else:
         list_of_occupied.append(space)
     for free_space in list_of_spaces:
-      list_of_spaces_with_dist.append((free_space,self.compute_square_score(free_space, player,remaining_turns_x=remaining_turns_x)))
+      list_of_spaces_with_dist.append((free_space,self.compute_square_score(free_space, player,remaining_turns_x=remaining_turns_x,depth=depth)))
 
     sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
     ranked_list = []
     for sp in sorted_list:
-      if sp[1] > -10000000:
+      if sp[1] > -20000000:
         ranked_list.append(sp[0])
       else:
         return ranked_list
 
-    if len(ranked_list)==0:
-      print 'oopsy'
+    # if len(ranked_list)==0:
+    #   print 'oopsy'
       # ranked_list.append(sorted_list[0][0])
 
     # ranked_list  = [x[0] for x in sorted_list]
@@ -233,7 +233,7 @@ class Board:
     return score
 
 
-  def compute_square_score(self, square, turns = 0, player = None, remaining_turns_x = None):
+  def compute_square_score(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0):
     """ Heurisitc function to be used for the minimax search.
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE.
@@ -268,12 +268,16 @@ class Board:
           # print turns
           # print self.last_space
           # print c.WIN_SCORE-turns
-          return c.WIN_SCORE
+          if (depth!=0):
+            print 'yup'
+          return c.WIN_SCORE-depth
 
         elif c.HUMAN_count == len_path:
           # print path
           # Opponent wins :(
-          return c.LOSE_SCORE
+          if (depth!=0):
+            print 'yup'
+          return c.LOSE_SCORE+depth
 
         elif c.HUMAN_count == 0:
           # Opponent not on path, so count number of player's tokens on path
@@ -284,19 +288,20 @@ class Board:
           # Player not on path, so count number of opponent's tokens on path
           # score -= 10*3**(c.HUMAN_count - 1)
           open_win_paths_human.append((free_on_path,c.HUMAN_count))
+          if (c.HUMAN_count > max_length_path_O):
+            max_length_path_O = c.HUMAN_count
         else:
           # Path cannot be won, so it has no effect on score
           pass
 
-        if (c.HUMAN_count > max_length_path_O):
-          max_length_path_O = c.HUMAN_count
+
     exp=2
     score = 0.0
 
 
     streak_size = len(self.winning_paths[0])
-    if streak_size-max_length_path_O > remaining_turns_x:
-      return -10000000
+    if (streak_size-max_length_path_O > remaining_turns_x):
+      return -20000000
 
 
     # if (player==c.COMPUTER):
@@ -325,9 +330,59 @@ class Board:
 
     return score
 
+  def check_possible_win(self, remaining_turns_O=0):
+    open_win_paths_computer = []
+    open_win_paths_human = []
+
+    max_length_path_O = 0
+    # if player == c.COMPUTER:
+    for path in self.winning_paths:
+      len_path = len(path)
+      c.COMPUTER_count, c.HUMAN_count = 0, 0
+      free_on_path = []
+      for space in path:
+        if self.board[space] == c.COMPUTER:
+          c.COMPUTER_count += 1
+        elif self.board[space] == c.HUMAN:
+          c.HUMAN_count += 1
+        else:
+          free_on_path.append(space)
+
+      if c.COMPUTER_count == len_path:
+        return False
+
+      elif c.HUMAN_count == len_path:
+        # print path
+        # Opponent wins :(
+        return True
 
 
-  def obj_interaction(self, player, remaining_turns_x = 0):
+
+
+      elif c.HUMAN_count == 0:
+        # Opponent not on path, so count number of player's tokens on path
+        # score += 10*3**(c.COMPUTER_count - 1)
+        open_win_paths_computer.append((free_on_path,c.COMPUTER_count))
+
+
+      elif c.COMPUTER_count == 0:
+        # Player not on path, so count number of opponent's tokens on path
+        # score -= 10*3**(c.HUMAN_count - 1)
+        open_win_paths_human.append((free_on_path,c.HUMAN_count))
+        if (c.HUMAN_count > max_length_path_O):
+          max_length_path_O = c.HUMAN_count
+      else:
+        # Path cannot be won, so it has no effect on score
+        pass
+    exp=2
+    score = 0.0
+    streak_size = len(self.winning_paths[0])
+
+    if (streak_size-max_length_path_O > remaining_turns_O):
+      return False
+    return True
+
+  def obj_win_loss(self, player, remaining_turns_x = 0):
     """ Heurisitc function to be used for the minimax search.
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE.
@@ -368,9 +423,57 @@ class Board:
         # Opponent wins :(
         return c.LOSE_SCORE
 
+      return 0
 
-      if (c.HUMAN_count > max_length_path_O):
-        max_length_path_O = c.HUMAN_count
+
+  def obj_interaction(self, player, remaining_turns_x = 0, depth = 0):
+    """ Heurisitc function to be used for the minimax search.
+    If it is a winning board for the COMPUTER, returns WIN_SCORE.
+    If it is a losing board for the COMPUTER, returns LOSE_SCORE.
+
+    Then, for all the winning paths in which the COMPUTER has i spaces,
+    and the HUMAN has 0 spaces, returns 10*3^i.
+    For all the winning paths in which the c.HUMAN is i away
+    from winning, returns -10*3^i
+    """
+    score = 0
+    # print depth
+    open_win_paths_computer = []
+    open_win_paths_human = []
+    max_length_path_X = 0
+    max_length_path_O = 0
+    # if player == c.COMPUTER:
+    for path in self.winning_paths:
+      len_path = len(path)
+      c.COMPUTER_count, c.HUMAN_count = 0, 0
+      free_on_path = []
+      for space in path:
+        if self.board[space] == c.COMPUTER:
+          c.COMPUTER_count += 1
+        elif self.board[space] == c.HUMAN:
+          c.HUMAN_count += 1
+        else:
+          free_on_path.append(space)
+
+      if c.COMPUTER_count == len_path:
+        # print path
+        # Player wins!
+        # print turns
+        # print self.last_space
+        # print c.WIN_SCORE-turns
+        if depth!=0:
+          print 'yup'
+        return c.WIN_SCORE+depth
+
+      elif c.HUMAN_count == len_path:
+        # print path
+        # Opponent wins :(
+        if depth!=0:
+          print 'yup'
+        return c.LOSE_SCORE-depth
+
+
+
 
       elif c.HUMAN_count == 0:
         # Opponent not on path, so count number of player's tokens on path
@@ -381,6 +484,8 @@ class Board:
         # Player not on path, so count number of opponent's tokens on path
         # score -= 10*3**(c.HUMAN_count - 1)
         open_win_paths_human.append((free_on_path,c.HUMAN_count))
+        if (c.HUMAN_count > max_length_path_O):
+          max_length_path_O = c.HUMAN_count
       else:
         # Path cannot be won, so it has no effect on score
         pass
@@ -388,10 +493,11 @@ class Board:
     score = 0.0
     streak_size = len(self.winning_paths[0])
 
-    if streak_size-max_length_path_O > remaining_turns_x:
-      return -10000000
+    if (streak_size-max_length_path_O > remaining_turns_x):
+      return -20000000
 
     # compute the score for the cell based on the potential paths
+    # if (player==c.COMPUTER):
     for i in range(len(open_win_paths_computer)):
       p1 = open_win_paths_computer[i]
       score += 1.0/math.pow((streak_size-p1[1]), exp)  # score for individual path
@@ -402,6 +508,7 @@ class Board:
             return c.WIN_SCORE
           score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[1]*p2[1]), exp))
 
+    # if (player==c.HUMAN):
     for i in range(len(open_win_paths_human)):
       p1 = open_win_paths_human[i]
       score += 1.0/math.pow((streak_size-p1[1]), exp)  # score for individual path
@@ -411,7 +518,8 @@ class Board:
           if (streak_size-1)*(streak_size-1) == p1[1]*p2[1]:
             return c.LOSE_SCORE
           score -= 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[1]*p2[1]), exp))
-
+    # if (player==c.COMPUTER):
+    #   score = -1*score
 
     return score
 

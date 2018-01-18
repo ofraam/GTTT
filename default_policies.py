@@ -1,4 +1,5 @@
 import random
+import copy
 
 
 def immediate_reward(state_node):
@@ -46,13 +47,65 @@ def random_terminal_roll_out(state_node):
 def _roll_out(state_node, stopping_criterion):
     reward = 0
     state = state_node.state
+    print 'state node bef'
+    print state_node.state.board.board
+    print state_node.state.actions
+
+    print 'state  bef'
+    print state.board.board
+    print state.actions
+    #
+
+
     parent = state_node.parent.parent.state
     action = state_node.parent.action
+    while_count = 0
     while not stopping_criterion(state):
+        print while_count
         reward += state.reward(parent, action)
 
         action = random.choice(state_node.state.actions)
-        parent = state
-        state = parent.perform(action)
+        print 'parent before'
+        print while_count
+        print parent.board.board
+        print parent.actions
 
+
+        # print 'state bef'
+        # print while_count
+        # print state_node.state.board.board
+        # print state_node.state.actions
+
+        parent = state
+        # if not(parent==state):
+        #     print  'boo'
+
+        print action
+        print 'state aft'
+        # print while_count
+        print state.board.board
+        print state.actions
+        print 'parent after'
+        # print while_count
+        print parent.board.board
+        print parent.actions
+        # if not(parent==state):
+        #     print  'boo'
+        # print '------------'
+        # if not(parent==state):
+        #     print  'boo'
+        # else:
+        #     print '***********'
+        #     print while_count
+        #     print parent.actions
+        #     print state.actions
+        #     print '***********'
+        print '****--*******'
+        # print while_count
+        print parent.actions
+        print state.actions
+        print '****--*******'
+        state = parent.perform(action)
+        print '------------'
+        while_count+=1
     return reward

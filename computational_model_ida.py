@@ -128,22 +128,6 @@ class Game:
       # self.save_board_to_file(space, score)
       return space
 
-    ######---------for human input------------------######
-    #   try:
-    #     space = int(raw_input("Enter a next move: "))
-    #   except:
-    #     print "Invalid input. Enter a positive integer."
-    #     return self.get_next_move(max_depth)
-    #
-    #   if space in xrange(1, self.num_spaces+1) and self.board.get_player(space) is c.BLANK:
-    #     return space
-    #   else:
-    #     print "Invalid input. Pick an available space."
-    #     return self.get_next_move(max_depth)
-    # elif self.board.is_empty() and max_depth > 4: # First move if large max_depth
-    #   return self.first_move()
-    ######---------for human input------------------######
-
     else:
       board_copy = self.board.get_board_copy()
       if max_depth:
@@ -211,36 +195,6 @@ class Game:
             row_str += "O\t"
         print row_str
 
-  def save_board_to_file(self, winning_move, score):
-    ''' If the board size is square, creates a visual representation of the board. '''
-    # timestamp = str(time.time())
-    filename = c.PATH + "board_" + str(c.WIN_DEPTH) + "_" + str(game.random_moves) + "_" + c.TIME[:-3] + ".txt"
-    print filename
-    num_rows = int(math.sqrt(self.num_spaces))
-    with open(filename, "a") as text_file:
-      for row in range(num_rows):
-        row_str = ""
-        for col in range(num_rows):
-          space = num_rows * row + col + 1
-          token = self.board.get_player(space)
-          if token == c.BLANK:
-            row_str += "_\t"
-          elif token == c.HUMAN:
-            if space==winning_move:
-              row_str += "Xw\t"
-            else:
-              row_str += "X\t"
-          else:
-            if space == winning_move:
-              row_str += "Ow\t"
-            else:
-              row_str += "O\t"
-        text_file.write(row_str)
-        text_file.write("\n")
-      text_file.write('next move = ' + str(winning_move) + '\n')
-      text_file.write('score = ' + str(score) + '\n')
-
-
 
             ## ---------AI METHODS----------- ##
 
@@ -255,6 +209,25 @@ class Game:
   def random_play(self,num_markers):
     self.get_random_move();
 
+
+  def ida_star(self, board, depth):
+    ''' IDA*'''
+    if board.is_terminal():
+      return (board.obj(), None) # Space is none, because the board is terminal
+    else:
+      children = []
+      for space in board.get_free_spaces():
+        new_board = board.get_board_copy()
+        new_board.add_marker(space, self.whos_turn)
+        if new_board.obj_interaction(None, remaining_turns_x=math.ceil(depth/2.0)) != -10000000:
+          children.append((self.minimax_min(new_board)[0], space))
+      return max(children)
+
+
+  def ida_star_recurr(self, board, depth):
+    if board.is_terminal():
+
+      return (board.obj(), None) # Space is none, because the board is terminal
 
   def minimax_max(self, board):
     ''' Minimax algorithm without alpha-beta pruning (not used in production)'''
