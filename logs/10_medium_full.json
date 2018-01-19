@@ -12,6 +12,6 @@
     ],
     "winMove": [33,43,53],
     "turn":1,
-    "win_depth":10
+    "win_depth":8
 }
 

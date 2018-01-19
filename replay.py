@@ -728,6 +728,7 @@ def entropy_paths_average(subpaths = False):
 
 
 def entropy_board(ignore = False):
+    data_matrices = {}
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
@@ -822,6 +823,26 @@ def entropy_board(ignore = False):
             condition = condition + "_" + "with pruned cell"
         # for i in range(len(entropy_values)):
         print condition + ',' + str(ent) + ',' + str(ent_norm_max) + "," + str(ent_norm)
+
+
+        for r in range(0,len(move_matrix)):
+            for j in range(0,len(move_matrix[r])):
+                if (move_matrix[r][j]=='X'):
+                    move_matrix[r][j] = -0.00001
+                elif (move_matrix[r][j]=='O'):
+                    move_matrix[r][j] = -0.00002
+
+        for r in range(0,len(move_matrix)):
+            for j in range(0,len(move_matrix[r])):
+                if (move_matrix[r][j]!=-0.00001) & (move_matrix[r][j]!=-0.00002):
+                    move_matrix[r][j] = move_matrix[r][j]/move_counter
+
+        fig_file_name = LOGFILE[g]
+        fig_file_name=fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = move_matrix
+
+    return data_matrices
+
 
 def entropy_board_average(ignore = False):
     for g in range(len(LOGFILE)):

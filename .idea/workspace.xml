@@ -2,24 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f27e7977-f565-4ab6-8925-e8910730b8bd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/computational_model_buJan17.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_easy.json" afterPath="$PROJECT_DIR$/predefinedBoards/10_easy_full.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_easyPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/10_easy_pruned.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_hard.json" afterPath="$PROJECT_DIR$/predefinedBoards/10_hard_full.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_hardPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/10_hard_pruned.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_medium.json" afterPath="$PROJECT_DIR$/logs/10_medium_full.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_mediumPruned.json" afterPath="$PROJECT_DIR$/logs/10_medium_pruned.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/6by6_easy.json" afterPath="$PROJECT_DIR$/predefinedBoards/6_easy_full.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/6by6_easyPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/6_easy_pruned.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/6by6_hard.json" afterPath="$PROJECT_DIR$/predefinedBoards/6_hard_full.json" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/predefinedBoards/6by6_hardPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/6_hard_pruned.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/board.py" afterPath="$PROJECT_DIR$/board.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/board_mcts.py" afterPath="$PROJECT_DIR$/board_mcts.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/computational_model.py" afterPath="$PROJECT_DIR$/computational_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/computational_model_ida.py" afterPath="$PROJECT_DIR$/computational_model_ida.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/default_policies.py" afterPath="$PROJECT_DIR$/default_policies.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.py" afterPath="$PROJECT_DIR$/config.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mcts.py" afterPath="$PROJECT_DIR$/mcts.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_easy.json" afterPath="$PROJECT_DIR$/predefinedBoards/10by10_easy.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_easyPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/10by10_easyPruned.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_hard.json" afterPath="$PROJECT_DIR$/predefinedBoards/10by10_hard.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_hardPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/10by10_hardPruned.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_medium.json" afterPath="$PROJECT_DIR$/predefinedBoards/10by10_medium.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/10by10_mediumPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/10by10_mediumPruned.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/6by6_easy.json" afterPath="$PROJECT_DIR$/predefinedBoards/6by6_easy.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/6by6_easyPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/6by6_easyPruned.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/6by6_hard.json" afterPath="$PROJECT_DIR$/predefinedBoards/6by6_hard.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/predefinedBoards/6by6_hardPruned.json" afterPath="$PROJECT_DIR$/predefinedBoards/6by6_hardPruned.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/replay.py" afterPath="$PROJECT_DIR$/replay.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,15 +31,15 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/GTTT$model.coverage" NAME="model Coverage Results" MODIFIED="1516110008590" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$computational_model.coverage" NAME="computational_model Coverage Results" MODIFIED="1516268923808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$computational_model.coverage" NAME="computational_model Coverage Results" MODIFIED="1516350453096" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$model.coverage" NAME="model Coverage Results" MODIFIED="1516351214455" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gentictactoe.coverage" NAME="gentictactoe Coverage Results" MODIFIED="1496778985524" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_gentictactoe.coverage" NAME="Unittests in gentictactoe Coverage Results" MODIFIED="1490666924715" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittest_TicTacToeTest_test_basic_game_play.coverage" NAME="Unittest TicTacToeTest.test_basic_game_play Coverage Results" MODIFIED="1490667105400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_computational_model.coverage" NAME="Unittests in computational_model Coverage Results" MODIFIED="1515839066274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gen_winning_paths.coverage" NAME="gen_winning_paths Coverage Results" MODIFIED="1494872363873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$replay.coverage" NAME="replay Coverage Results" MODIFIED="1515316797108" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$board_mcts.coverage" NAME="board_mcts Coverage Results" MODIFIED="1516291397764" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$board_mcts.coverage" NAME="board_mcts Coverage Results" MODIFIED="1516294173397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -57,39 +57,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="mcts.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/mcts.py">
+      <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="35" column="13" selection-start-line="35" selection-start-column="8" selection-end-line="35" selection-end-column="13" />
+            <state vertical-scroll-proportion="-570.37933">
+              <caret line="973" column="0" selection-start-line="973" selection-start-column="0" selection-end-line="973" selection-end-column="0" />
               <folding>
-                <element signature="e#0#37#0" expanded="true" />
+                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="board_mcts.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/board_mcts.py">
+      <file leaf-file-name="replay.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/replay.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="146" column="19" selection-start-line="146" selection-start-column="19" selection-end-line="146" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.43535188">
+              <caret line="781" column="30" selection-start-line="781" selection-start-column="30" selection-end-line="781" selection-end-column="30" />
               <folding>
-                <element signature="e#319#488#0" expanded="false" />
-                <element signature="e#353#369#0" expanded="false" />
-                <element signature="e#408#438#0" expanded="false" />
-                <element signature="e#472#488#0" expanded="false" />
-                <element signature="e#2435#2642#0" expanded="false" />
-                <element signature="e#2469#2497#0" expanded="false" />
-                <element signature="e#2536#2571#0" expanded="false" />
-                <element signature="e#2605#2642#0" expanded="false" />
-                <element signature="e#2673#3438#0" expanded="false" />
-                <element signature="e#2706#2910#0" expanded="false" />
-                <element signature="e#2951#3042#0" expanded="false" />
-                <element signature="e#3090#3185#0" expanded="false" />
-                <element signature="e#3222#3295#0" expanded="false" />
-                <element signature="e#3334#3367#0" expanded="false" />
-                <element signature="e#3401#3438#0" expanded="false" />
+                <element signature="e#0#10#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -98,8 +84,8 @@
       <file leaf-file-name="board.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/board.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="332" column="48" selection-start-line="332" selection-start-column="31" selection-end-line="332" selection-end-column="48" />
+            <state vertical-scroll-proportion="-3.125">
+              <caret line="141" column="0" selection-start-line="141" selection-start-column="0" selection-end-line="143" selection-end-column="24" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -107,11 +93,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="computational_model.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="computational_model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/computational_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.20668693">
-              <caret line="438" column="9" selection-start-line="438" selection-start-column="9" selection-end-line="438" selection-end-column="9" />
+            <state vertical-scroll-proportion="-10.172414">
+              <caret line="571" column="0" selection-start-line="571" selection-start-column="0" selection-end-line="571" selection-end-column="0" />
               <folding>
                 <element signature="e#27#44#0" expanded="true" />
               </folding>
@@ -194,21 +180,14 @@
         <option value="$PROJECT_DIR$/gentictactoe.py" />
         <option value="$PROJECT_DIR$/user_game.py" />
         <option value="$PROJECT_DIR$/logs/board1em5pilot.csv" />
-        <option value="$PROJECT_DIR$/replay.py" />
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/predefinedBoards/10by10_board4.json" />
         <option value="$PROJECT_DIR$/state_representation_mcts.py" />
-        <option value="$PROJECT_DIR$/model.py" />
         <option value="$PROJECT_DIR$/backups.py" />
         <option value="$PROJECT_DIR$/__init__.py" />
-        <option value="$PROJECT_DIR$/config.py" />
         <option value="$PROJECT_DIR$/computational_model_ida.py" />
         <option value="$PROJECT_DIR$/graph.py" />
         <option value="$PROJECT_DIR$/default_policies.py" />
-        <option value="$PROJECT_DIR$/board.py" />
-        <option value="$PROJECT_DIR$/mcts.py" />
-        <option value="$PROJECT_DIR$/board_mcts.py" />
-        <option value="$PROJECT_DIR$/computational_model.py" />
         <option value="$PROJECT_DIR$/predefinedBoards/6by6_easy.json" />
         <option value="$PROJECT_DIR$/predefinedBoards/6by6_easyPruned.json" />
         <option value="$PROJECT_DIR$/predefinedBoards/6by6_hard.json" />
@@ -217,8 +196,15 @@
         <option value="$PROJECT_DIR$/predefinedBoards/10by10_easyPruned.json" />
         <option value="$PROJECT_DIR$/predefinedBoards/10by10_hard.json" />
         <option value="$PROJECT_DIR$/predefinedBoards/10by10_hardPruned.json" />
-        <option value="$PROJECT_DIR$/predefinedBoards/10by10_medium.json" />
         <option value="$PROJECT_DIR$/predefinedBoards/10by10_mediumPruned.json" />
+        <option value="$PROJECT_DIR$/config.py" />
+        <option value="$PROJECT_DIR$/mcts.py" />
+        <option value="$PROJECT_DIR$/board_mcts.py" />
+        <option value="$PROJECT_DIR$/predefinedBoards/10by10_medium.json" />
+        <option value="$PROJECT_DIR$/board.py" />
+        <option value="$PROJECT_DIR$/replay.py" />
+        <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/computational_model.py" />
       </list>
     </option>
   </component>
@@ -355,14 +341,14 @@
       <recent name="$PROJECT_DIR$/predefinedBoards" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\oamir\PycharmProjects\GTTT\logs" />
       <recent name="$PROJECT_DIR$/logs" />
       <recent name="$PROJECT_DIR$/boards10/good" />
       <recent name="$PROJECT_DIR$/boards5/maybeUseful" />
       <recent name="$PROJECT_DIR$/boards5/seemsUseful" />
-      <recent name="$PROJECT_DIR$/boards5/notUseful" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.board_mcts">
+  <component name="RunManager" selected="Python.model">
     <configuration default="false" name="replay" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -660,9 +646,9 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.board_mcts" />
+        <item index="0" class="java.lang.String" itemvalue="Python.model" />
         <item index="1" class="java.lang.String" itemvalue="Python.computational_model" />
-        <item index="2" class="java.lang.String" itemvalue="Python.model" />
+        <item index="2" class="java.lang.String" itemvalue="Python.board_mcts" />
         <item index="3" class="java.lang.String" itemvalue="Python tests.Unittests in computational_model" />
         <item index="4" class="java.lang.String" itemvalue="Python.replay" />
       </list>
@@ -709,7 +695,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30186722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32883817" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28838176" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30705395" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24946696" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -766,12 +752,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1096</line>
+          <line>1117</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1092</line>
+          <line>1113</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -801,17 +787,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1033</line>
+          <line>1054</line>
           <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1042</line>
+          <line>1063</line>
           <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1112</line>
+          <line>1133</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -821,7 +807,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1144</line>
+          <line>1165</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -836,7 +822,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>934</line>
+          <line>955</line>
           <option name="timeStamp" value="59" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -851,58 +837,38 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>611</line>
+          <line>613</line>
           <option name="timeStamp" value="147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1053</line>
+          <line>1062</line>
           <option name="timeStamp" value="168" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/computational_model.py</url>
-          <line>558</line>
+          <line>669</line>
           <option name="timeStamp" value="169" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/computational_model.py</url>
-          <line>498</line>
-          <option name="timeStamp" value="170" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>523</line>
+          <line>546</line>
           <option name="timeStamp" value="176" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>965</line>
-          <option name="timeStamp" value="184" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/model.py</url>
-          <line>621</line>
+          <line>623</line>
           <option name="timeStamp" value="194" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>810</line>
+          <line>812</line>
           <option name="timeStamp" value="203" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board_mcts.py</url>
-          <line>158</line>
+          <line>177</line>
           <option name="timeStamp" value="221" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/board_mcts.py</url>
-          <line>150</line>
-          <option name="timeStamp" value="229" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/board_mcts.py</url>
-          <line>146</line>
-          <option name="timeStamp" value="231" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/default_policies.py</url>
@@ -926,26 +892,56 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>464</line>
+          <line>487</line>
           <option name="timeStamp" value="248" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>471</line>
+          <line>494</line>
           <option name="timeStamp" value="249" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>279</line>
+          <line>302</line>
           <option name="timeStamp" value="250" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>272</line>
+          <line>295</line>
           <option name="timeStamp" value="251" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board_mcts.py</url>
+          <line>164</line>
+          <option name="timeStamp" value="262" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board_mcts.py</url>
+          <line>165</line>
+          <option name="timeStamp" value="263" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/computational_model.py</url>
+          <line>641</line>
+          <option name="timeStamp" value="266" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/computational_model.py</url>
+          <line>601</line>
+          <option name="timeStamp" value="267" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>976</line>
+          <option name="timeStamp" value="268" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>973</line>
+          <option name="timeStamp" value="270" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="259" />
+      <option name="time" value="271" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
@@ -1072,16 +1068,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/replay.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="70.37931">
-          <caret line="45" column="8" selection-start-line="45" selection-start-column="7" selection-end-line="45" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/boardsFilled/board_8_0_.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1127,16 +1113,6 @@
         <state vertical-scroll-proportion="0.33273056">
           <caret line="283" column="4" selection-start-line="283" selection-start-column="4" selection-end-line="283" selection-end-column="4" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.448276">
-          <caret line="979" column="57" selection-start-line="979" selection-start-column="57" selection-end-line="979" selection-end-column="57" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1214,14 +1190,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="5" column="9" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/state_representation_mcts.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.7735849">
@@ -1264,7 +1232,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/6by6_easy.json">
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/6_easy_full.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.65384614">
           <caret line="1" column="21" selection-start-line="1" selection-start-column="21" selection-end-line="1" selection-end-column="21" />
@@ -1272,7 +1240,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/6by6_easyPruned.json">
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/6_easy_pruned.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-5.230769">
           <caret line="8" column="18" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
@@ -1280,7 +1248,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/6by6_hard.json">
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/6_hard_full.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-5.230769">
           <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
@@ -1288,7 +1256,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/6by6_hardPruned.json">
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/6_hard_pruned.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-5.230769">
           <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
@@ -1296,7 +1264,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/10by10_easy.json">
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/10_easy_full.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-7.8461537">
           <caret line="12" column="21" selection-start-line="12" selection-start-column="21" selection-end-line="12" selection-end-column="21" />
@@ -1304,7 +1272,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/10by10_easyPruned.json">
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/10_easy_pruned.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-7.8461537">
           <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
@@ -1312,7 +1280,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/10by10_hard.json">
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/10_hard_full.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-1.9615384">
           <caret line="3" column="18" selection-start-line="3" selection-start-column="17" selection-end-line="3" selection-end-column="18" />
@@ -1320,7 +1288,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/10by10_hardPruned.json">
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/10_hard_pruned.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-7.8461537">
           <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
@@ -1328,18 +1296,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/10by10_medium.json">
+    <entry file="file://$PROJECT_DIR$/config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.8461537">
-          <caret line="12" column="24" selection-start-line="12" selection-start-column="24" selection-end-line="12" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/predefinedBoards/10by10_mediumPruned.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3227848">
-          <caret line="12" column="20" selection-start-line="12" selection-start-column="20" selection-end-line="12" selection-end-column="20" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="8" column="14" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
           <folding />
         </state>
       </provider>
@@ -1347,7 +1307,7 @@
     <entry file="file://$PROJECT_DIR$/mcts.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="35" column="13" selection-start-line="35" selection-start-column="8" selection-end-line="35" selection-end-column="13" />
+          <caret line="36" column="99" selection-start-line="36" selection-start-column="99" selection-end-line="36" selection-end-column="99" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>
@@ -1357,7 +1317,7 @@
     <entry file="file://$PROJECT_DIR$/board_mcts.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="146" column="19" selection-start-line="146" selection-start-column="19" selection-end-line="146" selection-end-column="19" />
+          <caret line="155" column="0" selection-start-line="155" selection-start-column="0" selection-end-line="155" selection-end-column="0" />
           <folding>
             <element signature="e#319#488#0" expanded="false" />
             <element signature="e#353#369#0" expanded="false" />
@@ -1380,20 +1340,56 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/board.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="332" column="48" selection-start-line="332" selection-start-column="31" selection-end-line="332" selection-end-column="48" />
+        <state vertical-scroll-proportion="-3.125">
+          <caret line="141" column="0" selection-start-line="141" selection-start-column="0" selection-end-line="143" selection-end-column="24" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logs/10_medium_full.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="17" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/10_medium_pruned.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.6153846">
+          <caret line="4" column="14" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/computational_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.20668693">
-          <caret line="438" column="9" selection-start-line="438" selection-start-column="9" selection-end-line="438" selection-end-column="9" />
+        <state vertical-scroll-proportion="-10.172414">
+          <caret line="571" column="0" selection-start-line="571" selection-start-column="0" selection-end-line="571" selection-end-column="0" />
           <folding>
             <element signature="e#27#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-570.37933">
+          <caret line="973" column="0" selection-start-line="973" selection-start-column="0" selection-end-line="973" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/replay.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.43535188">
+          <caret line="781" column="30" selection-start-line="781" selection-start-column="30" selection-end-line="781" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>

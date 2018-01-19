@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import replay as rp
+import computational_model as cm
 from emd import emd
 # from pyemd import emd
 from scipy import stats
@@ -10,7 +11,8 @@ from scipy import stats
 
 
 # these are the files with user data foeach of the board
-LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
+LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv']
+           # 'logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
 # these are the boards starting positions (1 = X, 2 = O)
 START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
                   [[0,2,0,1,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[2,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
@@ -19,9 +21,9 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
                   [[0,1,0,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,0],[2,0,1,1,2,0],[1,0,2,2,0,0],[0,0,0,0,0,0]],
                   [[0,1,2,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,0],[2,0,1,1,2,1],[1,0,2,2,0,0],[0,0,0,0,0,0]],
                 [[0,0,0,0,1,0,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,0],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
-                  [[0,0,0,0,1,2,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
-                [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
-                 [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
+                  [[0,0,0,0,1,2,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]]
+                # [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
+                #  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
                   ]
 
 '''
@@ -963,24 +965,26 @@ def run_models():
     # For example, say that I want to show the layers model (just with path scores, with and without opponent,
     # and compare it to the first moves made by participants) --
     # I create model without the opponent using the layers model
-    data_layers_reg = compute_scores_layers(normalized=False,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
-    # and the model with the opponent
-    data_layers_reg_withO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
+    # data_layers_reg = compute_scores_layers(normalized=False,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
+    # # and the model with the opponent
+    # data_layers_reg_withO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
     # and then the actual distribution of moves (it's computed from another file but you don't need to edit it)
-    data_first_moves = rp.entropy_paths()
+    data_computational_model = cm.get_heatmaps_alpha_beta()
+    # data_first_moves = rp.entropy_paths()
+    data_clicks = rp.entropy_board()
 
     # go over all boards
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
         # this tells it where to save the heatmaps and what to call them:
-        fig_file_name = 'heatmaps/layers/Jan12/' + board+ '_neighborhood=2_exp=3_thresh=0.2_notIntegrated_noPaths_t1_notNorm.png'
+        fig_file_name = 'heatmaps/compVsPeople/' + board + '_peopleVsAlphaBeta.png'
         heatmaps = []  # this object will store all the heatmaps and later save to a file
         full = board + '_full'
         pruned = board + '_pruned'
         if board.startswith('6'):  # adjust sizes of heatmaps depending on size of boards
-            fig, axes = plt.subplots(2, 3, figsize=(12,8))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            fig, axes = plt.subplots(2, 2, figsize=(12,8))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
             # fig, axes = plt.subplots(2, 4, figsize=(10,6))
         else:
-            fig, axes = plt.subplots(2, 3, figsize=(18,12)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            fig, axes = plt.subplots(2, 2, figsize=(18,12)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
             # fig, axes = plt.subplots(2, 4, figsize=(18,12))
 
         fig.suptitle(board)  # add subtitle to the figure based on board name
@@ -993,23 +997,28 @@ def run_models():
         # the first element is the score matrix, the second element is a title for the heatmap. Note that ordering of adding to the heatmap lists
         #determines where each heatmap is shown (goes from top left to bottom right)
 
-        dist = emd(data_layers_reg[full],data_first_moves[full]) # earth mover distance for the full board
-        # print dist
-        heatmaps.append((data_layers_reg[full], 'layers' + '\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
 
-        dist = emd(data_layers_reg_withO[full],data_first_moves[full]) # earth mover distance for the full board
-        heatmaps.append((data_layers_reg_withO[full], 'layers with O '+'\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
-        # add the empirical distribution heatmap
-        heatmaps.append((data_first_moves[full], 'first moves'))
-
-        # and then the same for the pruned boards
-        dist = emd(data_layers_reg[pruned],data_first_moves[pruned]) # earth mover distance for the full board
-        heatmaps.append((data_layers_reg[pruned], 'layers' + '\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
-
-        dist = emd(data_layers_reg_withO[pruned],data_first_moves[pruned]) # earth mover distance for the full board
-        heatmaps.append((data_layers_reg_withO[pruned], 'layers with O '+'\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
-        # add the empirical distribution heatmap
-        heatmaps.append((data_first_moves[pruned], 'first moves'))
+        heatmaps.append((data_computational_model[full], 'alpha-beta'))
+        heatmaps.append((data_clicks[full], 'people'))
+        heatmaps.append((data_computational_model[pruned], 'alpha-beta'))
+        heatmaps.append((data_clicks[pruned], 'people'))
+        # dist = emd(data_layers_reg[full],data_first_moves[full]) # earth mover distance for the full board
+        # # print dist
+        # heatmaps.append((data_layers_reg[full], 'layers' + '\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
+        #
+        # dist = emd(data_layers_reg_withO[full],data_first_moves[full]) # earth mover distance for the full board
+        # heatmaps.append((data_layers_reg_withO[full], 'layers with O '+'\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
+        # # add the empirical distribution heatmap
+        # heatmaps.append((data_first_moves[full], 'first moves'))
+        #
+        # # and then the same for the pruned boards
+        # dist = emd(data_layers_reg[pruned],data_first_moves[pruned]) # earth mover distance for the full board
+        # heatmaps.append((data_layers_reg[pruned], 'layers' + '\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
+        #
+        # dist = emd(data_layers_reg_withO[pruned],data_first_moves[pruned]) # earth mover distance for the full board
+        # heatmaps.append((data_layers_reg_withO[pruned], 'layers with O '+'\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
+        # # add the empirical distribution heatmap
+        # heatmaps.append((data_first_moves[pruned], 'first moves'))
 
         # this creates the actual heatmaps
         for ax in axes.flatten():  # flatten in case you have a second row at some point

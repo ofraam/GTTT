@@ -8,6 +8,8 @@ import random
 import time
 import json
 import os
+import copy
+
 
 class Game:
   ## MORE LIKE POOP METHODS ##
@@ -30,6 +32,20 @@ class Game:
     self.last_depth = 0
     # self.random_moves = random.randint(6,18)
     self.random_moves = 0
+    self.spaces = []
+    self.dist_between_spaces_on_path = 0.0
+    # self.dist_between_spaces_undo = 0.0
+    self.dist_between_spaces_reset = 0.0
+    self.count_between_spaces_on_path = 0.0
+    # self.count_between_spaces_undo = 0.0
+    self.count_between_spaces_reset = 0.0
+    self.on_same_win_path = 0.0
+    self.node_count_x = 0
+    self.move_matrix = []
+    self.move_counter = 0.0
+    self.prev_move_x = None
+    self.prev_move_x_depth = 0
+    self.max_depth = None
 
   def make_move(self, space, player):
     """Puts <player>'s token on <space>
@@ -68,9 +84,11 @@ class Game:
     space = 100
     # while not winning_player:
     while self.num_turns<1:
+      print self.num_turns
     # while not winning_player:
       self.node_count = 0
       self.display_game()
+      self.max_depth = max_depth-self.num_turns
       space = self.get_next_move(max_depth)
       if space is None:
         print 'darn'
@@ -317,7 +335,7 @@ class Game:
         beta = min(beta, score)
       return min_child
 
-  def minimax_max_alphabeta_DL(self, alpha, beta, board, depth):
+  def minimax_max_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None):
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     if board.is_terminal() or depth <= 0:
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
@@ -336,7 +354,7 @@ class Game:
         # print 'depth = ' + str(depth) + ', space = ' + str(space)
         new_board = board.get_board_copy()
         new_board.add_marker(space, c.COMPUTER)
-        score = self.minimax_min_alphabeta_DL(alpha, beta, new_board, depth - 1)[0]
+        score = self.minimax_min_alphabeta_DL(alpha, beta, new_board, depth - 1, prev_space_x = prev_space_x)[0]
         if score > max_child[0]:
           max_child = (score, space)
         if max_child[0] >= beta:
@@ -350,7 +368,7 @@ class Game:
         alpha = max(alpha, score)
       return max_child
 
-  def minimax_min_alphabeta_DL(self, alpha, beta, board, depth):
+  def minimax_min_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None):
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     if board.is_terminal() or depth <= 0:
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
@@ -373,10 +391,39 @@ class Game:
       # for space in top_moves:
         # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
         #     continue
+        # if space == 43:
+        #   continue
         new_board = board.get_board_copy()
         new_board.add_marker(space, c.HUMAN)
+        col = ((space - 1) % len(self.move_matrix))
+        row = (float(space)/float(len(self.move_matrix)))-1
+        row = math.ceil(row)
+        self.move_matrix[int(row)][int(col)] += 1
+        self.move_counter += 1
         if (new_board.check_possible_win(remaining_turns_O=math.ceil(depth/2.0))):
-          score = self.minimax_max_alphabeta_DL(alpha, beta, new_board, depth - 1)[0]
+
+          if prev_space_x!=None:
+            self.node_count_x+=1
+            distance = board.get_manhattan_dist(space, prev_space_x)
+            # on_same_path =
+
+            if (depth==self.max_depth-2):
+              self.dist_between_spaces_reset += distance
+              self.count_between_spaces_reset += 1
+            # elif (depth == self.prev_move_x_depth):
+            #   # self.dist_between_spaces_undo += distance
+            else:
+              if space == prev_space_x:
+                print 'oopsy'
+                print space
+              self.count_between_spaces_on_path += 1
+              self.dist_between_spaces_on_path += distance
+              if board.get_is_on_same_path(space, prev_space_x):
+                self.on_same_win_path += 1
+
+          # self.prev_move_x = space
+          # self.prev_move_x_depth = depth
+          score = self.minimax_max_alphabeta_DL(alpha, beta, new_board, depth - 1, prev_space_x = space)[0]
           if score < min_child[0]:
             min_child = (score, space)
           # if min_child[0] <= alpha:
@@ -386,11 +433,20 @@ class Game:
           # if min_child[1] is None:
           #   print 'min none_' +str(depth)
           beta = min(beta, score)
+
+
       return min_child
 
 
 
-
+  def init_move_matrix(self, board_positions):
+    self.move_matrix = copy.deepcopy(board_positions)
+    for r in range(len(self.move_matrix)):
+      for j in range(len(self.move_matrix[r])):
+        if self.move_matrix[r][j] == 1:
+          self.move_matrix[r][j] = 'X'
+        elif self.move_matrix[r][j] == 2:
+          self.move_matrix[r][j] = 'O'
 
   def first_move(self):
     '''Picks the space that appears in the most winning paths first.
@@ -428,7 +484,19 @@ def fill_board_from_file(json_file,game):
 
       space+=1
 
+  game.init_move_matrix(board_positions)
+
+  #
+  # game.move_matrix = copy.deepcopy(board_positions)
+  # for r in range(len(game.move_matrix)):
+  #   for c in range(len(game.move_matrix[r])):
+  #     if game.move_matrix[r][c] == 1:
+  #       game.move_matrix[r][c] = 'X'
+  #     elif game.move_matrix[r][c] == 2:
+  #       game.move_matrix[r][c] = 'O'
+
   # print board_positions
+  c.WIN_MOVES = json1_data['winMove']
   return int(json1_data['win_depth'])
 
 
@@ -486,48 +554,66 @@ def start_game(file_path):
 #     assert self.game.board.obj() == c.WIN_SCORE
 
 
+def get_heatmaps_alpha_beta():
+  data_matrices = {}
+  for filename in os.listdir("predefinedBoards/"):
+    if filename.startswith("6"):
+      file_path = "examples/board_6_4.txt"
+      # continue
+      # if not(filename.startswith("6_easy")):
+      #   continue
+
+    else:
+      # if filename.startswith("10by10_easy"):
+      # if not(filename.startswith("10by10_medium")):
+      #   continue
+      file_path = "examples/board_10_5.txt"
+      # continue
+
+
+
+    game = start_game(file_path)
+    print filename
+    win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
+    print 'depth = '+ str(win_depth)
+    game.play_game(win_depth)
+    # print game.dist_between_spaces_on_path
+    # print game.count_between_spaces_on_path
+    move_matrix = copy.deepcopy(game.move_matrix)
+    for r in range(0,len(move_matrix)):
+        for j in range(0,len(move_matrix[r])):
+            if (move_matrix[r][j]=='X'):
+                move_matrix[r][j] = -0.00001
+            elif (move_matrix[r][j]=='O'):
+                move_matrix[r][j] = -0.00002
+    normalized = True
+    if normalized:
+      for r in range(len(move_matrix)):
+          for j in range(len(move_matrix[r])):
+              if (move_matrix[r][j]!=-0.00001) & (move_matrix[r][j]!=-0.00002):
+                  move_matrix[r][j] = move_matrix[r][j]/game.move_counter
+
+    print move_matrix
+    data_matrices[filename[:-5]] = move_matrix
+  return data_matrices
+
 if __name__ == "__main__":
-
-  # if len(sys.argv) != 2:
-  #   print "Invalid input. Make sure to include a file path."
-  #   print "Example: $ python gentictactoe.py <file_path>"
-  # else:
-  #   max_depth = raw_input("Do you want the AI to perform a depth-limited search? \
-  #   \nIf yes, enter a positive integer representing the desired depth. \
-  #   \nIf no, enter 'n': ")
-
+    data = get_heatmaps_alpha_beta()
     max_depth = 4
-    # Ask user for maximum depth
-    # if max_depth == 'n':
-    #   max_depth = False
-    # else:
-    #   try:
-    #     if int(max_depth) > 0:
-    #       max_depth = int(max_depth)
-    #     else:
-    #       raise Exception("Please enter a positive integer for max_depth, or an 'n'")
-    #   except:
-    #     raise Exception("Please enter a positive integer for max_depth, or a 'n'")
-
-    # Get file path, and start playing!
-    # file_path = sys.argv[1]
-    # file_path = "examples/board_6_4.txt"
-    #
-    # game = start_game(file_path)
 
     for filename in os.listdir("predefinedBoards/"):
       if filename.startswith("6"):
         file_path = "examples/board_6_4.txt"
         # continue
         # if not(filename.startswith("6by6_hard")):
-          # continue
+        #   continue
 
       else:
         # if filename.startswith("10by10_easy"):
-        # if not(filename.startswith("10by10_medium")):
-        #   continue
+        if not(filename.startswith("10by10_medium")):
+          continue
         file_path = "examples/board_10_5.txt"
-        # continue
+        continue
 
 
       game = start_game(file_path)
@@ -535,7 +621,32 @@ if __name__ == "__main__":
       win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
       print 'depth = '+ str(win_depth)
       game.play_game(win_depth)
+      # print game.dist_between_spaces_on_path
+      # print game.count_between_spaces_on_path
+      move_matrix = copy.deepcopy(game.move_matrix)
+      for r in range(0,len(move_matrix)):
+          for j in range(0,len(move_matrix[r])):
+              if (move_matrix[r][j]=='X'):
+                  move_matrix[r][j] = -0.00001
+              elif (move_matrix[r][j]=='O'):
+                  move_matrix[r][j] = -0.00002
+      normalized = True
+      if normalized:
+        for r in range(len(move_matrix)):
+            for j in range(len(move_matrix[r])):
+                if (move_matrix[r][j]!=-0.00001) & (move_matrix[r][j]!=-0.00002):
+                    move_matrix[r][j] = move_matrix[r][j]/game.move_counter
 
+      print move_matrix
+
+      print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
+      # print game.on_same_win_path
+      print game.on_same_win_path/game.count_between_spaces_on_path
+      print '----'
+      # print game.dist_between_spaces_reset
+      # print game.count_between_spaces_reset
+      print game.dist_between_spaces_reset/game.count_between_spaces_reset
+      # print game.node_count_x
 
     # for filename in os.listdir("predefinedBoards/"):
     #   if filename.startswith("6"):

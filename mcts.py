@@ -33,8 +33,8 @@ class MCTS(object):
             node.reward = self.default_policy(node)
             self.node_counter+=count
             self.backup(node)
-        print (self.node_counter)
-        return utils.rand_max(root.children.values(), key=lambda x: x.q).action
+        # print ()
+        return (utils.rand_max(root.children.values(), key=lambda x: x.q).action,self.node_counter)
 
 
 def _expand(state_node):

@@ -83,6 +83,29 @@ class Board:
     dist = abs(row1-row2) + abs(col1-col2)
     return dist
 
+
+  def get_is_on_same_path(self,space1, space2):
+    if self.get_manhattan_dist(space1, space2) > ((len(self.winning_paths[0])-1)*2):
+      return False
+    for path in self.winning_paths:
+      if space1 in path:
+        len_path = len(path)
+        c.COMPUTER_count, c.HUMAN_count = 0, 0
+        free_on_path = []
+        for space in path:
+          if self.board[space] == c.COMPUTER:
+            c.COMPUTER_count += 1
+          elif self.board[space] == c.HUMAN:
+            c.HUMAN_count += 1
+          else:
+            free_on_path.append(space)
+        if c.COMPUTER_count == 0:
+          if space2 in path:
+            return True
+    return False
+
+
+
   def compute_avg_distance(self, space, list_of_occupied):
     sum_distances = 0.0
     for occupied_space in list_of_occupied:
@@ -166,7 +189,7 @@ class Board:
     sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
     ranked_list = []
     for sp in sorted_list:
-      if sp[1] > -20000000:
+      if (sp[1] > -20000000):
         ranked_list.append(sp[0])
       else:
         return ranked_list
