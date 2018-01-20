@@ -62,7 +62,7 @@ def seperate_log(log_file):
             if log == curr_log:
                 curr_log_records.append(row)
             elif len(curr_log_records)>0:
-                dataFile = open('logs/'+curr_log+'_dec22.csv', 'wb')
+                dataFile = open('logs/'+curr_log+'_dec19.csv', 'wb')
                 print curr_log_records[0]
                 dataWriter = csv.DictWriter(dataFile, fieldnames=curr_log_records[0].keys(), delimiter=',')
                 dataWriter.writeheader()
@@ -441,7 +441,7 @@ def user_stats(subpaths=False):
 
         print LOGFILE[g][5:]
 
-    dataFile = open('userStats/participantsStats_v2.csv', 'wb')
+    dataFile = open('userStats/participantsStats_jan20.csv', 'wb')
 
     dataWriter = csv.DictWriter(dataFile, fieldnames=user_data_headers, delimiter=',')
     dataWriter.writeheader()
@@ -727,6 +727,324 @@ def entropy_paths_average(subpaths = False):
 
 
 
+def paths_stats():
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+
+        path_counter = 0.0
+        path_counter_subpaths = 0.0
+        taken_cells = 0.0
+
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                    taken_cells+=1
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+                    taken_cells+=1
+
+        first_move_matrix = copy.deepcopy(move_matrix)
+
+        curr_move_matrix = copy.deepcopy(move_matrix)
+        curr_first_move_matrix = copy.deepcopy(move_matrix)
+
+
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            paths = []
+            paths_counts = []
+            paths_counts_subpaths = []
+            entropy_values = []
+            entropy_values_subpaths = []
+            entropy_values_clicks = []
+            entropy_values_first_moves = []
+            avg_times_after_click = []
+            avg_times_after_undo = []
+            avg_times_after_reset = []
+            curr_path = []
+            curr_user = ''
+            move_counter = 0.0
+            first_move_counter = 0.0
+            num_participants = 0.0
+            prev_action = None
+            prev_time = None
+            prev_row = None
+            curr_times_after_click = []
+            curr_times_after_undo = []
+            curr_times_after_reset = []
+
+            for row in log_reader:
+                if curr_user == '':
+                    curr_user = row['userid']
+
+                if row['userid']!=curr_user:
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+
+                        add_path_count_subpaths(paths_counts_subpaths,copy.deepcopy(curr_path))
+                        path_counter_subpaths+=len(curr_path)
+                        add_path_count(paths_counts,copy.deepcopy(curr_path))
+                        path_counter += 1
+
+                    pk = []
+                    for p in paths_counts:
+                        # print p
+                        pk.append(p[1]/path_counter)
+
+                    ent = stats.entropy(pk)
+                    if (path_counter>0):
+                        entropy_values.append(ent)
+
+                    pk = []
+                    for p in paths_counts_subpaths:
+                        # print p
+                        pk.append(p[1]/path_counter_subpaths)
+
+                    ent = stats.entropy(pk)
+                    if (path_counter_subpaths>0):
+                        entropy_values_subpaths.append(ent)
+
+                    if move_counter > 0:
+                        pk = []
+                        # normalize move matrices
+                        for i in range(len(curr_move_matrix)):
+                            for j in range(len(curr_move_matrix[i])):
+                                if ((curr_move_matrix[i][j]!='X') & (curr_move_matrix[i][j]!='O')):
+                                    pk.append(curr_move_matrix[i][j]/move_counter)
+                                    curr_move_matrix[i][j] = curr_move_matrix[i][j]/move_counter
+                                    move_matrix[i][j] += curr_move_matrix[i][j]
+                        ent_moves = stats.entropy(pk)
+
+                        pk_uniform = []
+                        for i in range(len(pk)):
+                            pk_uniform.append(1.0/len(pk))
+
+                        ent_moves_norm_max = ent/stats.entropy(pk_uniform)
+                        entropy_values_clicks.append(ent_moves_norm_max)
+
+                        # normalize move matrices
+                        pk = []
+                        for i in range(len(curr_first_move_matrix)):
+                            for j in range(len(curr_first_move_matrix[i])):
+                                if ((curr_first_move_matrix[i][j]!='X') & (curr_first_move_matrix[i][j]!='O')):
+                                    pk.append(curr_first_move_matrix[i][j]/first_move_counter)
+                                    curr_first_move_matrix[i][j] = curr_first_move_matrix[i][j]/move_counter
+                                    first_move_matrix[i][j] += curr_first_move_matrix[i][j]
+                        ent_first_moves = stats.entropy(pk)
+                        pk_uniform = []
+                        for i in range(len(pk)):
+                            pk_uniform.append(1.0/len(pk))
+
+                        ent_first_moves_norm_max = ent_first_moves/stats.entropy(pk_uniform)
+                        entropy_values_first_moves.append(ent_first_moves_norm_max)
+
+                        # times
+                        if len(curr_times_after_click) > 0:
+                            avg_times_after_click.append(sum(curr_times_after_click)/len(curr_times_after_click))
+                        if len(curr_times_after_reset) > 0:
+                            avg_times_after_reset.append(sum(curr_times_after_reset)/len(curr_times_after_reset))
+                        if len(curr_times_after_undo) > 0:
+                           avg_times_after_undo.append(sum(curr_times_after_undo)/len(curr_times_after_undo))
+
+                    # reset all values for next user
+                    curr_path = []
+                    curr_user = row['userid']
+                    paths_counts = []
+                    path_counter = 0
+                    path_counter_subpaths = 0
+                    paths_counts_subpaths = []
+                    paths = []
+                    move_counter = 0
+                    first_move_counter = 0
+                    curr_first_move_matrix = copy.deepcopy(first_move_matrix)
+                    curr_move_matrix = copy.deepcopy(move_matrix)
+                    curr_times_after_click = []
+                    curr_times_after_undo = []
+                    curr_times_after_reset = []
+                    prev_time = None
+                    prev_action = None
+
+                    num_participants += 1
+
+                elif row['key'] == 'clickPos':
+                    rowPos = int(row['value'][0])
+                    colPos = int(row['value'][2])
+                    player = int(row['value'][4])
+                    # print rowPos
+                    # print colPos
+                    # print move_matrix[rowPos][colPos]
+                    if ((curr_move_matrix[rowPos][colPos]!='X') & (curr_move_matrix[rowPos][colPos]!='O')):
+                        curr_move_matrix[rowPos][colPos] += 1
+                        move_counter+=1.0
+                        curr_path.append([rowPos,colPos,player])
+                        if len(curr_path) == 1:
+                            curr_first_move_matrix[rowPos][colPos] +=1
+                            first_move_counter += 1.0
+                    time_between = 0
+                    if prev_time == None:
+                        if prev_row != None:
+                            # print 'why'
+                            prev_time = prev_row['time']
+
+                    if int(row['time']) < int(prev_time):
+                        print int(row['time'])
+                        print int(prev_time)
+                        print 'problem'
+                    time_between = int(row['time']) - int(prev_time)
+                    if (time_between < 120000):
+                        time_between = time_between/1000.0
+                        # print time_between
+                        # if (prev_action is None) | (prev_action == 'reset'):
+                        if len(curr_path) == 1:
+                            curr_times_after_reset.append(time_between)
+                        elif prev_action == 'undo':
+                            curr_times_after_undo.append(time_between)
+                        elif prev_action == 'click':
+                            curr_times_after_click.append(time_between)
+
+                    prev_action = 'click'
+                    prev_time = row['time']
+
+                elif row['key'] == 'reset':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                        add_path_count_subpaths(paths_counts_subpaths,copy.deepcopy(curr_path))
+                        path_counter_subpaths+=len(curr_path)
+                        add_path_count(paths_counts,copy.deepcopy(curr_path))
+                        path_counter += 1
+                        curr_path = []
+                    prev_action = 'reset'
+                    prev_time = row['time']
+
+                elif row['key'] == 'undo':
+                    if len(curr_path) > 0:
+                        paths.append(copy.deepcopy(curr_path))
+                        add_path_count_subpaths(paths_counts_subpaths,copy.deepcopy(curr_path))
+                        path_counter_subpaths += len(curr_path)
+                        add_path_count(paths_counts,copy.deepcopy(curr_path))
+                        path_counter += 1
+                        curr_path = curr_path[:-1]
+                    prev_action = 'undo'
+                    prev_time = row['time']
+                prev_row = copy.deepcopy(row)
+        # print LOGFILE[g]
+        avg_ent = sum(entropy_values)/len(entropy_values)
+        avg_ent_subpaths = sum(entropy_values_subpaths)/len(entropy_values_subpaths)
+        avg_ent_moves = sum(entropy_values_clicks)/len(entropy_values_clicks)
+        avg_ent_first_moves = sum(entropy_values_first_moves)/len(entropy_values_first_moves)
+        # avg_times_after_click_agg = sum(avg_times_after_click)/len(avg_times_after_click)
+        avg_times_after_click_agg = np.median(avg_times_after_click)
+        std_times_after_click_agg = np.std(avg_times_after_click)
+        # avg_times_after_undo_agg = sum(avg_times_after_undo)/len(avg_times_after_undo)
+        avg_times_after_undo_agg = np.median(avg_times_after_undo)
+        std_times_after_undo_agg = np.std(avg_times_after_undo)
+        # avg_times_after_reset_agg = sum(avg_times_after_reset)/len(avg_times_after_reset)
+        avg_times_after_reset_agg = np.median(avg_times_after_reset)
+        std_times_after_reset_agg = np.std(avg_times_after_reset)
+        #
+        # avg_times_after_click_agg = np.median(curr_times_after_click)
+        # std_times_after_click_agg = np.std(curr_times_after_click)
+        # # avg_times_after_undo_agg = sum(curr_times_after_undo)/len(curr_times_after_undo)
+        # avg_times_after_undo_agg = np.median(curr_times_after_undo)
+        # std_times_after_undo_agg = np.std(curr_times_after_undo)
+        # # avg_times_after_reset_agg = sum(curr_times_after_reset)/len(curr_times_after_reset)
+        # avg_times_after_reset_agg = np.median(curr_times_after_reset)
+        # std_times_after_reset_agg = np.std(curr_times_after_reset)
+
+
+        condition = LOGFILE[g][5:-10].replace("_",",")
+
+        print condition + "," + str(avg_ent_moves) + "," +str(avg_ent_first_moves) + "," + str(avg_ent) + ","+ str(avg_ent_subpaths) + ","\
+              + str(avg_times_after_click_agg) + ","+ str(avg_times_after_undo_agg) + "," + str(avg_times_after_reset_agg) + "," \
+        + str(std_times_after_click_agg) + ","+ str(std_times_after_undo_agg) + "," + str(std_times_after_reset_agg)
+
+
+
+
+def first_moves_average():
+    for g in range(len(LOGFILE)):
+        # print g
+        move_matrix = copy.deepcopy(START_POSITION[g])
+        path_counter = 0.0
+        taken_cells = 0.0
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!=1) & (move_matrix[i][j]!=2)):
+                    move_matrix[i][j] = int(move_matrix[i][j])
+                elif (move_matrix[i][j]==1):
+                    move_matrix[i][j]='X'
+                    taken_cells+=1
+                elif (move_matrix[i][j]==2):
+                    move_matrix[i][j]='O'
+                    taken_cells+=1
+        free_cells = len(move_matrix)*len(move_matrix) - taken_cells
+
+        with open(LOGFILE[g], 'rb') as csvfile:
+            log_reader = csv.DictReader(csvfile)
+            paths = []
+            paths_counts = []
+            entropy_values = []
+            curr_path = []
+            curr_user = ''
+            for row in log_reader:
+                if curr_user=='':
+                    curr_user = row['userid']
+
+                if row['userid']!=curr_user:
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+                    pk = []
+                    for p in paths_counts:
+                        # print p
+                        pk.append(p[1]/path_counter)
+
+                    ent = stats.entropy(pk)
+                    if (path_counter>0):
+                        entropy_values.append(ent)
+                    curr_path = []
+                    curr_user = row['userid']
+                    paths_counts = []
+                    path_counter = 0
+                    paths = []
+
+                elif row['key']=='clickPos':
+                    # print row
+                    rowPos = int(row['value'][0])
+                    colPos = int(row['value'][2])
+                    player = int(row['value'][4])
+
+                    if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                        # move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1
+                        curr_path.append([rowPos,colPos,player])
+                        # move_counter+=1.0
+                            # else:
+                            #     print 'ignore'
+                elif row['key']=='reset':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+
+                        curr_path = []
+                elif row['key']=='undo':
+                    if len(curr_path)>0:
+                        paths.append(copy.deepcopy(curr_path))
+
+                        curr_path = curr_path[:-1]
+
+        # print LOGFILE[g]
+        avg_ent = sum(entropy_values)/len(entropy_values)
+
+        condition = LOGFILE[g][5:-10].replace("_",",")
+        measure = 'avg path entropy (no subpaths)'
+
+        for i in range(len(entropy_values)):
+            print condition + ',' + str(entropy_values[i])
+
+
+
 def entropy_board(ignore = False):
     data_matrices = {}
     for g in range(len(LOGFILE)):
@@ -839,12 +1157,13 @@ def entropy_board(ignore = False):
 
         fig_file_name = LOGFILE[g]
         fig_file_name=fig_file_name[:-4]
-        data_matrices[fig_file_name[5:-6]] = move_matrix
-
+        data_matrices[fig_file_name[5:-6]] = (move_matrix, ent_norm_max)
+        print ent_norm_max
     return data_matrices
 
 
 def entropy_board_average(ignore = False):
+    data_matrices = {}
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
@@ -861,14 +1180,6 @@ def entropy_board_average(ignore = False):
                     move_matrix[i][j]='O'
                     taken_cells+=1
         free_cells = len(move_matrix)*len(move_matrix) - taken_cells
-        # free_cells = free_cells - 2 #ignoring
-        # print free_cells
-        # move_matrix = []
-        # for row in range(DIMENSION):
-        #     row_positions = []
-        #     for col in range(DIMENSION):
-        #         row_positions.append(0)
-        #     move_matrix.append(copy.deepcopy(row_positions))
 
         to_ignore = None
         if ignore == True:
@@ -955,19 +1266,6 @@ def entropy_board_average(ignore = False):
         for i in range(len(entropy_values)):
             entropy_values_norm_max.append(entropy_values[i]/max_entropy)
 
-
-
-
-        # print '----'
-        # print max_entropy
-        # ent_alt = len(uniform_moves)*(math.log(len(uniform_moves))/len(uniform_moves))
-        # print ent_alt
-        # print entropy_values_norm_max
-        # # print len(uniform_moves)
-        #
-        # # print sum(uniform_moves)
-        # print '----'
-
         avg_entropy_norm_max = sum(entropy_values_norm_max)/len(entropy_values_norm_max)
         std_entropy_norm_max = np.std(entropy_values_norm_max);
         # std_entropy_norm_max = ' '
@@ -996,11 +1294,14 @@ def entropy_board_average(ignore = False):
             condition = condition + "_" + "without pruned cell"
         else:
             condition = condition + "_" + "with pruned cell"
-        for i in range(len(entropy_values)):
-            print condition + ',' + str(entropy_values[i]) + ',' + str(entropy_values_norm_max[i]) + "," + str(entropy_values_norm[i])
+        # for i in range(len(entropy_values)):
+        #     print condition + ',' + str(entropy_values[i]) + ',' + str(entropy_values_norm_max[i]) + "," + str(entropy_values_norm[i])
 
-
-
+        fig_file_name = LOGFILE[g]
+        fig_file_name=fig_file_name[:-4]
+        data_matrices[fig_file_name[5:-6]] = (move_matrix, avg_entropy_norm_max)
+        print avg_entropy_norm_max
+    return data_matrices
 
 
         # print avg_entropy_norm
@@ -1192,20 +1493,21 @@ def construct_heat_map(games, move = 1):
 
 
 if __name__ == "__main__":
-    # seperate_log('logs/fullLogDec22.csv')
-    # entropy_board()
-    # entropy_board(ignore=True)
-    # entropy_board_average()
-    # entropy_board_average(ignore=True)
-    # # entropy_paths(subpaths=True)
+    # paths_stats()
+    # seperate_log('logs/fullLogCogSci.csv')
+    # # entropy_board()
+    # # entropy_board(ignore=True)
+    # # entropy_board_average()
+    # # entropy_board_average(ignore=True)
+    # entropy_paths(subpaths=True)
     # entropy_paths_average(subpaths=True)
     # entropy_paths(subpaths=False)
     # entropy_paths_average(subpaths=False)
 
-    # user_stats()
+    user_stats()
 
     # print stats.entropy([0.25,0.25,0.25,0.25])
-    heat_map_game(normalized=True)
+    # heat_map_game(normalized=True)
     # heat_map_solution(normalized=True)
     # run_analysis()
     # replay()

@@ -9,6 +9,7 @@ import time
 import json
 import os
 import copy
+from scipy import stats
 
 
 class Game:
@@ -46,6 +47,7 @@ class Game:
     self.prev_move_x = None
     self.prev_move_x_depth = 0
     self.max_depth = None
+    self.max_moves = 1000000000
 
   def make_move(self, space, player):
     """Puts <player>'s token on <space>
@@ -337,7 +339,7 @@ class Game:
 
   def minimax_max_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None):
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
-    if board.is_terminal() or depth <= 0:
+    if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
       return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0)),depth)  # Terminal (the space will be picked up via recursion)
     else:
@@ -345,10 +347,11 @@ class Game:
       max_child = (c.NEG_INF, None)
       # print 'depth = '+ str(depth) + ', free =' +str
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
-      # top_moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER)
+      moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
+      top_moves = moves
       # print top_moves
-      for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
-      # for space in top_moves:
+      # for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)[:5]:
+      for space in top_moves:
         # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
         #   continue
         # print 'depth = ' + str(depth) + ', space = ' + str(space)
@@ -370,7 +373,7 @@ class Game:
 
   def minimax_min_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None):
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
-    if board.is_terminal() or depth <= 0:
+    if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
       return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0))),depth)
 
@@ -386,9 +389,11 @@ class Game:
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
       # top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)
       # if (self.whos_turn==c.COMPUTER):
-
-      for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
-      # for space in top_moves:
+      moves = board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
+      top_moves = moves
+      # print top_moves
+      # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth)[:5]:
+      for space in top_moves:
         # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
         #     continue
         # if space == 43:
@@ -568,7 +573,7 @@ def get_heatmaps_alpha_beta():
       # if not(filename.startswith("10by10_medium")):
       #   continue
       file_path = "examples/board_10_5.txt"
-      # continue
+      continue
 
 
 
@@ -594,11 +599,30 @@ def get_heatmaps_alpha_beta():
                   move_matrix[r][j] = move_matrix[r][j]/game.move_counter
 
     print move_matrix
-    data_matrices[filename[:-5]] = move_matrix
+    #compute entropy
+    pk = []
+    cell_counter = 0
+    for i in range(len(move_matrix)):
+        for j in range(len(move_matrix[i])):
+            if ((move_matrix[i][j]!=-0.00001) & (move_matrix[i][j]!=-0.00002)):
+                pk.append(move_matrix[i][j]/game.move_counter)
+    # print pk
+    ent = stats.entropy(pk)
+    pk_uniform = []
+    for i in range(len(pk)):
+        pk_uniform.append(1.0/len(pk))
+
+    # print pk_uniform
+
+    # ent_norm = ent/free_cells
+    ent_norm_max = ent/stats.entropy(pk_uniform)
+    data_matrices[filename[:-5]] = (move_matrix, ent_norm_max)
+    print ent_norm_max
+
   return data_matrices
 
 if __name__ == "__main__":
-    data = get_heatmaps_alpha_beta()
+    # data = get_heatmaps_alpha_beta()
     max_depth = 4
 
     for filename in os.listdir("predefinedBoards/"):
@@ -610,8 +634,8 @@ if __name__ == "__main__":
 
       else:
         # if filename.startswith("10by10_easy"):
-        if not(filename.startswith("10by10_medium")):
-          continue
+        # if not(filename.startswith("10by10_medium")):
+        #   continue
         file_path = "examples/board_10_5.txt"
         continue
 
@@ -639,9 +663,9 @@ if __name__ == "__main__":
 
       print move_matrix
 
-      print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
+      # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
       # print game.on_same_win_path
-      print game.on_same_win_path/game.count_between_spaces_on_path
+      # print game.on_same_win_path/game.count_between_spaces_on_path
       print '----'
       # print game.dist_between_spaces_reset
       # print game.count_between_spaces_reset

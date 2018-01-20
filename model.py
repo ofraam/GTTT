@@ -971,12 +971,12 @@ def run_models():
     # and then the actual distribution of moves (it's computed from another file but you don't need to edit it)
     data_computational_model = cm.get_heatmaps_alpha_beta()
     # data_first_moves = rp.entropy_paths()
-    data_clicks = rp.entropy_board()
+    data_clicks = rp.entropy_board_average()
 
     # go over all boards
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
         # this tells it where to save the heatmaps and what to call them:
-        fig_file_name = 'heatmaps/compVsPeople/' + board + '_peopleVsAlphaBeta.png'
+        fig_file_name = 'heatmaps/compVsPeople/' + board + '_peopleAvgVsAlphaBeta.png'
         heatmaps = []  # this object will store all the heatmaps and later save to a file
         full = board + '_full'
         pruned = board + '_pruned'
@@ -998,10 +998,10 @@ def run_models():
         #determines where each heatmap is shown (goes from top left to bottom right)
 
 
-        heatmaps.append((data_computational_model[full], 'alpha-beta'))
-        heatmaps.append((data_clicks[full], 'people'))
-        heatmaps.append((data_computational_model[pruned], 'alpha-beta'))
-        heatmaps.append((data_clicks[pruned], 'people'))
+        heatmaps.append((data_computational_model[full][0], 'alpha-beta' +'\n' +str(round(data_computational_model[full][1],3))))
+        heatmaps.append((data_clicks[full][0], 'people'+'\n' +str(round(data_clicks[full][1],3))))
+        heatmaps.append((data_computational_model[pruned][0], 'alpha-beta' +'\n' +str(round(data_computational_model[pruned][1],3))))
+        heatmaps.append((data_clicks[pruned][0], 'people'+'\n' +str(round(data_clicks[pruned][1],3))))
         # dist = emd(data_layers_reg[full],data_first_moves[full]) # earth mover distance for the full board
         # # print dist
         # heatmaps.append((data_layers_reg[full], 'layers' + '\n' +str(round(dist,3)))) # add the model to the heatmap list with name and distance
