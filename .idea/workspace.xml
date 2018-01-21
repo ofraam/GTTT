@@ -1,437 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/board.py" line="283" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="f27e7977-f565-4ab6-8925-e8910730b8bd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/heatmaps/compVsPeople/10_easy_peopleVsAlphaBeta.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/heatmaps/compVsPeople/10_hard_peopleVsAlphaBeta.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/heatmaps/compVsPeople/6_easy_peopleVsAlphaBeta.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/heatmaps/compVsPeople/6_hard_peopleVsAlphaBeta.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/heatmaps/compVsPeople/New folder (2)/6_easy_peopleVsAlphaBeta.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/heatmaps/compVsPeople/New folder (2)/6_hard_peopleVsAlphaBeta.png" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_full_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_verify_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_verify_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_full_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_verify_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_verify_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_full_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned.json" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_verify_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_medium_verify_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_full_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_verify_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_verify_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_guassian_sig=3_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_guassian_sig=3_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_guassian_sig=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_guassian_sig=5_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=1000_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=100_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=200_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=40_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_lamb=4_combined_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=2_oweight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_layers_normalized_neighborhood=3_oweight=0.1.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=1_lamb=None_opponent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_normalized_composite_scores_exp=2_neighborhood=2_lamb=None.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_normalized_density_scores.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_opponent_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_opponent_normalized_path_scoresexp=2o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.0.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_opponent_normalized_path_scoresexp=3o_weight=0.5.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_opponent_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_test_normalized_path_scoresexp=2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19first_moves.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19solutionHeatmap.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec3.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_nov29.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_nov29.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_verify_dec19.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_verify_dec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6by6board1_old.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/Book5.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/Book8.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/board1em5pilot.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/board3em5pilot.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/board3em5pilot.xlsx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/board4pilot.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/board4pilot.xlsx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/fullLogDec19.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/fullLogDec22.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/fullLogDec3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/pilotTTT6by6full.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/ttt.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/ttt.prn" afterPath="" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logs/tttResCogSci_jmp.csv" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logs/tttResultsCogSci.csv" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/predefinedBoards/10_medium_full.json" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/predefinedBoards/10_medium_pruned.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/board.py" afterPath="$PROJECT_DIR$/board.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/computational_model.py" afterPath="$PROJECT_DIR$/computational_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/10_easy_full_dec19.csv" afterPath="$PROJECT_DIR$/logs/10_easy_full_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/10_easy_pruned_dec19.csv" afterPath="$PROJECT_DIR$/logs/10_easy_pruned_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/10_easy_verify_dec19.csv" afterPath="$PROJECT_DIR$/logs/10_easy_verify_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/10_hard_full_dec19.csv" afterPath="$PROJECT_DIR$/logs/10_hard_full_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/10_hard_pruned_dec19.csv" afterPath="$PROJECT_DIR$/logs/10_hard_pruned_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/10_hard_verify_dec19.csv" afterPath="$PROJECT_DIR$/logs/10_hard_verify_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/10_medium_full_dec19.csv" afterPath="$PROJECT_DIR$/logs/10_medium_full_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/10_medium_pruned_dec19.csv" afterPath="$PROJECT_DIR$/logs/10_medium_pruned_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/6_easy_full_dec19.csv" afterPath="$PROJECT_DIR$/logs/6_easy_full_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/6_easy_pruned_dec19.csv" afterPath="$PROJECT_DIR$/logs/6_easy_pruned_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/6_easy_verify_dec19.csv" afterPath="$PROJECT_DIR$/logs/6_easy_verify_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19.csv" afterPath="$PROJECT_DIR$/logs/6_hard_full_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19.csv" afterPath="$PROJECT_DIR$/logs/6_hard_pruned_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/6_hard_verify_dec19.csv" afterPath="$PROJECT_DIR$/logs/6_hard_verify_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/replay.py" afterPath="$PROJECT_DIR$/replay.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/userStats/participantsStats_jan20.csv" afterPath="$PROJECT_DIR$/userStats/participantsStats_jan20.csv" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -443,15 +25,15 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/GTTT$computational_model.coverage" NAME="computational_model Coverage Results" MODIFIED="1516447437796" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$model.coverage" NAME="model Coverage Results" MODIFIED="1516461213228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$computational_model.coverage" NAME="computational_model Coverage Results" MODIFIED="1516566500988" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gentictactoe.coverage" NAME="gentictactoe Coverage Results" MODIFIED="1496778985524" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_gentictactoe.coverage" NAME="Unittests in gentictactoe Coverage Results" MODIFIED="1490666924715" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittest_TicTacToeTest_test_basic_game_play.coverage" NAME="Unittest TicTacToeTest.test_basic_game_play Coverage Results" MODIFIED="1490667105400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_computational_model.coverage" NAME="Unittests in computational_model Coverage Results" MODIFIED="1515839066274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gen_winning_paths.coverage" NAME="gen_winning_paths Coverage Results" MODIFIED="1494872363873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$board_mcts.coverage" NAME="board_mcts Coverage Results" MODIFIED="1516294173397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$replay.coverage" NAME="replay Coverage Results" MODIFIED="1516467647027" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$replay.coverage" NAME="replay Coverage Results" MODIFIED="1516534686971" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -481,11 +63,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="replay.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="replay.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/replay.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.37953794">
-              <caret line="1496" column="19" selection-start-line="1496" selection-start-column="19" selection-end-line="1496" selection-end-column="19" />
+            <state vertical-scroll-proportion="-5.862069">
+              <caret line="158" column="49" selection-start-line="158" selection-start-column="48" selection-end-line="158" selection-end-column="49" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -503,11 +85,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="board.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="board.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/board.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.8214285">
-              <caret line="6" column="26" selection-start-line="6" selection-start-column="26" selection-end-line="6" selection-end-column="26" />
+            <state vertical-scroll-proportion="0.5">
+              <caret line="295" column="17" selection-start-line="295" selection-start-column="17" selection-end-line="295" selection-end-column="17" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -518,8 +100,8 @@
       <file leaf-file-name="computational_model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/computational_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.7931035">
-              <caret line="610" column="0" selection-start-line="610" selection-start-column="0" selection-end-line="611" selection-end-column="0" />
+            <state vertical-scroll-proportion="-9.379311">
+              <caret line="49" column="23" selection-start-line="49" selection-start-column="23" selection-end-line="49" selection-end-column="23" />
               <folding>
                 <element signature="e#27#44#0" expanded="true" />
               </folding>
@@ -576,8 +158,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/boards4/board_8_1.0_0.8_1493568905.txt" />
-        <option value="$PROJECT_DIR$/boards5/board_8_5_1493569860.txt" />
         <option value="$PROJECT_DIR$/boards5/board_8_12_1493569904.txt" />
         <option value="$PROJECT_DIR$/boards5/board_8_1_1493570118.txt" />
         <option value="$PROJECT_DIR$/boards5/board_8_1_1493570207.txt" />
@@ -621,12 +201,14 @@
         <option value="$PROJECT_DIR$/mcts.py" />
         <option value="$PROJECT_DIR$/board_mcts.py" />
         <option value="$PROJECT_DIR$/predefinedBoards/10by10_medium.json" />
-        <option value="$PROJECT_DIR$/board.py" />
         <option value="$PROJECT_DIR$/model.py" />
         <option value="$PROJECT_DIR$/logs/6_easy_full_dec19.csv" />
-        <option value="$PROJECT_DIR$/computational_model.py" />
         <option value="$PROJECT_DIR$/logs/10_medium_pruned_dec19.csv" />
+        <option value="$PROJECT_DIR$/predefinedBoards/10_medium_full.json" />
         <option value="$PROJECT_DIR$/replay.py" />
+        <option value="$PROJECT_DIR$/predefinedBoards/10_medium_pruned.json" />
+        <option value="$PROJECT_DIR$/computational_model.py" />
+        <option value="$PROJECT_DIR$/board.py" />
       </list>
     </option>
   </component>
@@ -636,10 +218,10 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
+    <option name="x" value="1358" />
     <option name="y" value="-8" />
-    <option name="width" value="1382" />
-    <option name="height" value="744" />
+    <option name="width" value="1936" />
+    <option name="height" value="1096" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -784,7 +366,7 @@
       <recent name="$PROJECT_DIR$/boards5/seemsUseful" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.replay">
+  <component name="RunManager" selected="Python.computational_model">
     <configuration default="false" name="replay" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -1082,9 +664,9 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.replay" />
-        <item index="1" class="java.lang.String" itemvalue="Python.model" />
-        <item index="2" class="java.lang.String" itemvalue="Python.computational_model" />
+        <item index="0" class="java.lang.String" itemvalue="Python.computational_model" />
+        <item index="1" class="java.lang.String" itemvalue="Python.replay" />
+        <item index="2" class="java.lang.String" itemvalue="Python.model" />
         <item index="3" class="java.lang.String" itemvalue="Python.board_mcts" />
         <item index="4" class="java.lang.String" itemvalue="Python tests.Unittests in computational_model" />
       </list>
@@ -1121,21 +703,21 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
+    <frame x="1358" y="-8" width="1936" height="1096" extended-state="6" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20726173" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15085287" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30186722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32883817" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4117647" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.46161824" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24946696" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28104576" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40975103" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1188,12 +770,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1418</line>
+          <line>1444</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1414</line>
+          <line>1440</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -1223,17 +805,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1355</line>
+          <line>1381</line>
           <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1364</line>
+          <line>1390</line>
           <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1434</line>
+          <line>1460</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -1243,7 +825,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1466</line>
+          <line>1492</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1258,7 +840,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1266</line>
+          <line>1292</line>
           <option name="timeStamp" value="59" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1283,12 +865,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/computational_model.py</url>
-          <line>693</line>
+          <line>699</line>
           <option name="timeStamp" value="169" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>546</line>
+          <line>588</line>
           <option name="timeStamp" value="176" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1328,22 +910,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>487</line>
-          <option name="timeStamp" value="248" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/board.py</url>
-          <line>494</line>
+          <line>525</line>
           <option name="timeStamp" value="249" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>302</line>
-          <option name="timeStamp" value="250" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/board.py</url>
-          <line>295</line>
+          <line>322</line>
           <option name="timeStamp" value="251" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1358,12 +930,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/computational_model.py</url>
-          <line>665</line>
-          <option name="timeStamp" value="266" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/computational_model.py</url>
-          <line>625</line>
+          <line>631</line>
           <option name="timeStamp" value="267" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1381,8 +948,38 @@
           <line>1000</line>
           <option name="timeStamp" value="273" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/replay.py</url>
+          <line>801</line>
+          <option name="timeStamp" value="280" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>549</line>
+          <option name="timeStamp" value="290" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>321</line>
+          <option name="timeStamp" value="300" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>519</line>
+          <option name="timeStamp" value="305" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>125</line>
+          <option name="timeStamp" value="306" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>367</line>
+          <option name="timeStamp" value="307" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="280" />
+      <option name="time" value="308" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
@@ -1745,16 +1342,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/board.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.8214285">
-          <caret line="6" column="26" selection-start-line="6" selection-start-column="26" selection-end-line="6" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Anaconda2/Lib/site-packages/emd/emd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1763,13 +1350,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/computational_model.py">
+    <entry file="file://$PROJECT_DIR$/logs/6_easy_full_dec19.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.7931035">
-          <caret line="610" column="0" selection-start-line="610" selection-start-column="0" selection-end-line="611" selection-end-column="0" />
-          <folding>
-            <element signature="e#27#44#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.7289294">
+          <caret line="5021" column="55" selection-start-line="5021" selection-start-column="55" selection-end-line="5021" selection-end-column="55" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1783,14 +1368,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/6_easy_full_dec19.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7289294">
-          <caret line="5021" column="55" selection-start-line="5021" selection-start-column="55" selection-end-line="5021" selection-end-column="55" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/10_medium_pruned_dec19.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1799,12 +1376,48 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/10_medium_full.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.576923">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/predefinedBoards/10_medium_pruned.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.9230769">
+          <caret line="6" column="30" selection-start-line="6" selection-start-column="30" selection-end-line="6" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/replay.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.37953794">
-          <caret line="1496" column="19" selection-start-line="1496" selection-start-column="19" selection-end-line="1496" selection-end-column="19" />
+        <state vertical-scroll-proportion="-5.862069">
+          <caret line="158" column="49" selection-start-line="158" selection-start-column="48" selection-end-line="158" selection-end-column="49" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/computational_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-9.379311">
+          <caret line="49" column="23" selection-start-line="49" selection-start-column="23" selection-end-line="49" selection-end-column="23" />
+          <folding>
+            <element signature="e#27#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/board.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5">
+          <caret line="295" column="17" selection-start-line="295" selection-start-column="17" selection-end-line="295" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

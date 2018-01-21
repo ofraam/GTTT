@@ -47,7 +47,7 @@ class Game:
     self.prev_move_x = None
     self.prev_move_x_depth = 0
     self.max_depth = None
-    self.max_moves = 1000000000
+    self.max_moves = 50
 
   def make_move(self, space, player):
     """Puts <player>'s token on <space>
@@ -134,6 +134,7 @@ class Game:
     if self.whos_turn == c.HUMAN:
       board_copy = self.board.get_board_copy()
       if max_depth:
+        self.max_depth = max_depth
         (score, space) = self.minimax_min_alphabeta_DL(c.NEG_INF, c.POS_INF, board_copy, max_depth)
       else:
         (score, space) = self.minimax_min_alphabeta(c.NEG_INF, c.POS_INF, board_copy)
@@ -339,14 +340,16 @@ class Game:
 
   def minimax_max_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None):
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
+    # or ((depth==self.max_depth-1) & (beta==c.LOSE_SCORE))
     if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0)),depth)  # Terminal (the space will be picked up via recursion)
+      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0)),None)  # Terminal (the space will be picked up via recursion)
     else:
       self.node_count += 1
       max_child = (c.NEG_INF, None)
       # print 'depth = '+ str(depth) + ', free =' +str
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
+      # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
       top_moves = moves
       # print top_moves
@@ -373,9 +376,11 @@ class Game:
 
   def minimax_min_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None):
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
+    # if ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
+    #   print 'happened'
     if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0))),depth)
+      return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0)), other_player=True),None)
 
     # if board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0)))==-20000000:
     #   # print 'cutting'
@@ -389,6 +394,7 @@ class Game:
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
       # top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)
       # if (self.whos_turn==c.COMPUTER):
+      # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       moves = board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
       top_moves = moves
       # print top_moves
@@ -630,14 +636,14 @@ if __name__ == "__main__":
         file_path = "examples/board_6_4.txt"
         # continue
         # if not(filename.startswith("6by6_hard")):
-        #   continue
+        # continue
 
       else:
         # if filename.startswith("10by10_easy"):
-        # if not(filename.startswith("10by10_medium")):
+        # if not(filename.startswith("10_medium_p")):
         #   continue
         file_path = "examples/board_10_5.txt"
-        continue
+        # continue
 
 
       game = start_game(file_path)
