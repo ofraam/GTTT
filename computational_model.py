@@ -10,12 +10,13 @@ import json
 import os
 import copy
 from scipy import stats
+import csv
 
 
 class Game:
   ## MORE LIKE POOP METHODS ##
 
-  def __init__(self, num_spaces, winning_paths, board = {}, whos_turn = c.COMPUTER, other_player = c.HUMAN, noise = c.NOISE_HUMAN):
+  def __init__(self, num_spaces, winning_paths, board={}, whos_turn=c.COMPUTER, other_player=c.HUMAN, noise=c.NOISE_HUMAN, heuristic="paths", exp=1, interaction=False, opponent=False, neighborhood=2, prune = False, potential='square'):
     ''' Initalizes a Game object '''
     self.num_spaces = num_spaces
     self.winning_paths = winning_paths
@@ -47,7 +48,15 @@ class Game:
     self.prev_move_x = None
     self.prev_move_x_depth = 0
     self.max_depth = None
-    self.max_moves = 50
+    self.max_moves = 1000000
+    self.heuristic = heuristic
+    self.prune = prune
+    self.exp = exp
+    self.interaction = interaction
+    self.potential = potential
+    self.opponent = opponent
+    self.neighborhood_size = neighborhood
+
 
   def make_move(self, space, player):
     """Puts <player>'s token on <space>
@@ -99,7 +108,8 @@ class Game:
       self.change_player()
     self.display_game()
     print self.node_count
-    return winning_player
+    return (self.node_count, space)
+    # return winning_player
 
 
   def play_random_game(self, num_markers = 8):
@@ -350,11 +360,12 @@ class Game:
       # print 'depth = '+ str(depth) + ', free =' +str
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
-      moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
-      top_moves = moves
+      # moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
+      moves = board.get_free_spaces_ranked_heuristic(player=c.COMPUTER, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
+      # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)[:5]:
-      for space in top_moves:
+      for space in moves:
         # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
         #   continue
         # print 'depth = ' + str(depth) + ', space = ' + str(space)
@@ -395,22 +406,24 @@ class Game:
       # top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)
       # if (self.whos_turn==c.COMPUTER):
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
-      moves = board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
-      top_moves = moves
+      moves = board.get_free_spaces_ranked_heuristic(player=c.HUMAN, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
+
+      # top_moves = moves
       # print top_moves
-      # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth)[:5]:
-      for space in top_moves:
-        # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
-        #     continue
-        # if space == 43:
-        #   continue
+      # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
+      for space in moves:
+        # if depth==8:
+        #   print space
+        # if space==24:
+        #   print '24' + '_' + str(depth)
+        # if space==56:
+        #   print '56' + '_' + str(depth)
         new_board = board.get_board_copy()
         new_board.add_marker(space, c.HUMAN)
         col = ((space - 1) % len(self.move_matrix))
         row = (float(space)/float(len(self.move_matrix)))-1
         row = math.ceil(row)
-        self.move_matrix[int(row)][int(col)] += 1
-        self.move_counter += 1
+
         if (new_board.check_possible_win(remaining_turns_O=math.ceil(depth/2.0))):
 
           if prev_space_x!=None:
@@ -435,6 +448,10 @@ class Game:
           # self.prev_move_x = space
           # self.prev_move_x_depth = depth
           score = self.minimax_max_alphabeta_DL(alpha, beta, new_board, depth - 1, prev_space_x = space)[0]
+          # if depth == 8:
+          #   print score
+          self.move_matrix[int(row)][int(col)] += 1
+          self.move_counter += 1
           if score < min_child[0]:
             min_child = (score, space)
           # if min_child[0] <= alpha:
@@ -494,10 +511,9 @@ def fill_board_from_file(json_file,game):
         game.board.add_marker(space,c.COMPUTER)
 
       space+=1
-
+  game.board.prune_squares_density()
   game.init_move_matrix(board_positions)
 
-  #
   # game.move_matrix = copy.deepcopy(board_positions)
   # for r in range(len(game.move_matrix)):
   #   for c in range(len(game.move_matrix[r])):
@@ -511,7 +527,10 @@ def fill_board_from_file(json_file,game):
   return int(json1_data['win_depth'])
 
 
-def start_game(file_path):
+
+
+
+def start_game(file_path, configuration = None):
   '''Opens the file, processes the input, and initailizes the Game() object'''
   try:
     input_file = open(file_path ,'r')
@@ -522,47 +541,20 @@ def start_game(file_path):
   for line in input_file:
     path = map(int, line.split())
     winning_paths.append(path)
-  game = Game(num_spaces, winning_paths)
+  if configuration == None:
+    game = Game(num_spaces, winning_paths)
+  else:
+    game = Game(num_spaces, winning_paths, heuristic=configuration['heuristic'], interaction=configuration['interaction'], neighborhood=configuration['neighborhood'], exp=configuration['exp'], opponent=configuration['opponent'], potential=configuration['potential'], prune=configuration['prune'])
 
 
   return game
-#
-# class TicTacToeTest(unittest.TestCase):
-#   ''' Test suite, only used for debugging. I wanted to experiment with
-#   test-driven development.
-#   '''
-#   def setUp(self):
-#     self.game = start_game('examples/tictactoe.txt')
-#     self.board = board.Board(self.game.num_spaces, self.game.winning_paths)
-#
-#   def tearDown(self):
-#     self.game = None
-#
-#   def test_board_properties(self):
-#     assert self.board.get_free_spaces() == [1,2,3,4,5,6,7,8,9]
-#     assert len(self.board.get_children(c.COMPUTER)) == 9
-#     self.board.add_marker(1, c.COMPUTER)
-#     assert self.board.get_free_spaces() == [2,3,4,5,6,7,8,9]
-#     assert len(self.board.get_children(c.HUMAN)) == 8
-#
-#   def test_basic_game_play(self):
-#     assert self.game.board.obj() == 0
-#     assert self.game.board.obj() == 0
-#
-#     self.game.make_move(2, c.COMPUTER)
-#     assert self.game.board.get_player(2) == c.COMPUTER
-#     assert self.game.board.obj() == 10*2
-#
-#     self.game.make_move(3, c.HUMAN)
-#     assert self.game.board.get_player(3) == c.HUMAN
-#     assert self.game.board.obj() == -10
-#
-#     self.game.make_move(5, c.COMPUTER)
-#
-#     self.game.make_move(4, c.HUMAN)
-#
-#     self.game.make_move(8, c.COMPUTER)
-#     assert self.game.board.obj() == c.WIN_SCORE
+
+
+def get_game_configs(config_file):
+  json1_file = open(config_file)
+  json1_str = json1_file.read()
+  json1_data = json.loads(json1_str)
+  return json1_data['configs']
 
 
 def get_heatmaps_alpha_beta():
@@ -627,55 +619,93 @@ def get_heatmaps_alpha_beta():
 
   return data_matrices
 
+
+def write_results(filename, results, header = None):
+
+    res_file = open(filename, 'wb')
+    res_writer = csv.writer(res_file, delimiter=',')
+    if header!=None:
+      res_writer.writerow(header)
+    for res_line in results:
+        res_writer.writerow(res_line)
+
+
 if __name__ == "__main__":
     # data = get_heatmaps_alpha_beta()
-    max_depth = 4
 
-    for filename in os.listdir("predefinedBoards/"):
-      if filename.startswith("6"):
-        file_path = "examples/board_6_4.txt"
-        # continue
-        # if not(filename.startswith("6by6_hard")):
-        # continue
+    results = []
+    header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
+    configs = get_game_configs("ab_config1.json")
+    for conf in configs:
+      for filename in os.listdir("predefinedBoards/"):
+        if filename.startswith("6"):
+          file_path = "examples/board_6_4.txt"
+          # continue
+          # if not(filename.startswith("6by6_hard")):
+          # continue
 
-      else:
-        # if filename.startswith("10by10_easy"):
-        # if not(filename.startswith("10_medium_p")):
-        #   continue
-        file_path = "examples/board_10_5.txt"
-        # continue
+        else:
+          # if filename.startswith("10by10_easy"):
+          # if not(filename.startswith("10_hard_p")):
+          #   continue
+          file_path = "examples/board_10_5.txt"
+          continue
 
+        game = start_game(file_path, conf)
+        board_results = []
+        board_results.append(filename[:-5])
+        board_results.append(conf['name'])
+        board_results.append(game.heuristic)
+        board_results.append(game.prune)
+        board_results.append(game.interaction)
+        board_results.append(game.exp)
+        board_results.append(game.potential)
+        board_results.append(game.neighborhood_size)
+        board_results.append(game.opponent)
 
-      game = start_game(file_path)
-      print filename
-      win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
-      print 'depth = '+ str(win_depth)
-      game.play_game(win_depth)
-      # print game.dist_between_spaces_on_path
-      # print game.count_between_spaces_on_path
-      move_matrix = copy.deepcopy(game.move_matrix)
-      for r in range(0,len(move_matrix)):
-          for j in range(0,len(move_matrix[r])):
-              if (move_matrix[r][j]=='X'):
-                  move_matrix[r][j] = -0.00001
-              elif (move_matrix[r][j]=='O'):
-                  move_matrix[r][j] = -0.00002
-      normalized = True
-      if normalized:
-        for r in range(len(move_matrix)):
-            for j in range(len(move_matrix[r])):
-                if (move_matrix[r][j]!=-0.00001) & (move_matrix[r][j]!=-0.00002):
-                    move_matrix[r][j] = move_matrix[r][j]/game.move_counter
+        print filename
+        win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
+        print 'depth = '+ str(win_depth)
+        nodes, solution = game.play_game(win_depth)
+        board_results.append(nodes)
+        board_results.append(solution)
+        if solution in c.WIN_MOVES:
+          board_results.append(1)
+        else:
+          board_results.append(0)
 
-      print move_matrix
+        # print game.dist_between_spaces_on_path
+        # print game.count_between_spaces_on_path
+        move_matrix = copy.deepcopy(game.move_matrix)
+        for r in range(0,len(move_matrix)):
+            for j in range(0,len(move_matrix[r])):
+                if (move_matrix[r][j]=='X'):
+                    move_matrix[r][j] = -0.00001
+                elif (move_matrix[r][j]=='O'):
+                    move_matrix[r][j] = -0.00002
+        normalized = True
+        if normalized:
+          for r in range(len(move_matrix)):
+              for j in range(len(move_matrix[r])):
+                  if (move_matrix[r][j]!=-0.00001) & (move_matrix[r][j]!=-0.00002):
+                      move_matrix[r][j] = move_matrix[r][j]/game.move_counter
+
+        print move_matrix
+        board_results.append(copy.deepcopy(move_matrix))
+        results.append(copy.deepcopy(board_results))
+
+    for i in range(len(results)):
+      print results[i]
+
+    # write_results('stats/alpha_beta_stats35_fixed.csv', results, header)
 
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
       # print game.on_same_win_path
       # print game.on_same_win_path/game.count_between_spaces_on_path
-      print '----'
-      # print game.dist_between_spaces_reset
-      # print game.count_between_spaces_reset
-      print game.dist_between_spaces_reset/game.count_between_spaces_reset
+      # print '----'
+      # # print game.dist_between_spaces_reset
+      # # print game.count_between_spaces_reset
+      # print game.dist_between_spaces_reset/game.count_between_spaces_reset
       # print game.node_count_x
 
     # for filename in os.listdir("predefinedBoards/"):

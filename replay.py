@@ -991,6 +991,9 @@ def paths_stats(participants = 'all'):
         return (move_matrix, first_move_matrix)
 
 
+# def normalize_matrix(am)
+
+
 def first_moves_average():
     for g in range(len(LOGFILE)):
         # print g
@@ -1519,6 +1522,7 @@ def construct_heat_map(games, move = 1):
 
 
 if __name__ == "__main__":
+    paths_stats(participants='all')
     paths_stats(participants='solvedCorrect')
     paths_stats(participants='wrong')
     paths_stats(participants='validatedCorrect')

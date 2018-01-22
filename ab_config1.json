@@ -1,0 +1,13 @@
+{
+  "configs": [
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": false,
+      "prune": false,
+      "exp": 2,
+      "potential": "full",
+      "neighborhood": 2,
+       "name": "paths_non-linear_full_no_interaction"
+    }]
+}

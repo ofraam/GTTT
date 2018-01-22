@@ -2,7 +2,7 @@ import config as c
 import math
 
 class Board:
-  def __init__(self, num_spaces, winning_paths, board = None):
+  def __init__(self, num_spaces, winning_paths, board = None, pruned_spaces = None):
     ''' Initializes a Board object '''
     self.size = num_spaces
     self.winning_paths = winning_paths
@@ -13,6 +13,12 @@ class Board:
       for space in xrange(1, num_spaces+1):
         self.board[space] = c.BLANK
     self.last_space = 0
+    if pruned_spaces!=None:
+      self.pruned_spaces_x = pruned_spaces
+    else:
+      self.pruned_spaces_x = []
+    # self.prune_squares_density()
+    # self.pruned_spaces_o = []
 
   def get_board(self):
     ''' Returns a dictionary representing the state of the board'''
@@ -22,7 +28,7 @@ class Board:
   def get_board_copy(self):
     ''' Returns a copy of the Board object '''
     board_copy = self.board.copy()
-    return Board(self.size, self.winning_paths, board_copy)
+    return Board(self.size, self.winning_paths, board_copy, pruned_spaces=self.pruned_spaces_x)
     
   def get_player(self, space):
     ''' Returns the player who occupies <space>. If no player occupies
@@ -116,9 +122,31 @@ class Board:
     return avg_dist
 
 
-  def compute_square_score_density(self, space, player, neighborhood_size, remaining_turns_x):
+  def prune_squares_density(self, neighborhood_size=2, threshold=0.2):
+    spaces = self.get_free_spaces()
+    scores = []
+    max_score = -100
+    for space in spaces:
+      score = self.compute_square_score_density(space, c.HUMAN, neighborhood_size)
+      scores.append(score)
+      if score > max_score:
+        max_score = score
+
+    for i in range(len(spaces)):
+      score = scores[i]
+      # print score
+      # print max_score
+      # print threshold*max_score
+      if score < threshold*max_score:
+        self.pruned_spaces_x.append(spaces[i])
+      # else:
+      #   print 'not pruned'
+    print self.pruned_spaces_x
+
+
+  def compute_square_score_density(self, space, player, neighborhood_size, remaining_turns_x=None):
     # print space
-    if player == c.HUMAN:
+    if (player == c.HUMAN) & (remaining_turns_x != None):
       if not(self.check_possible_win(remaining_turns_x)):
         return -20000000
 
@@ -170,6 +198,46 @@ class Board:
     return density_score
 
 
+  def get_free_spaces_ranked_heuristic(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False):
+    ''' Return a list of unoccupied spaces. '''
+    list_of_spaces = []
+    list_of_occupied = []
+    list_of_spaces_with_dist = []
+    for space in self.board:
+      if self.board[space] == c.BLANK:
+        list_of_spaces.append(space)
+      else:
+        list_of_occupied.append(space)
+    if player is None:
+      print 'problem'
+
+    forced_move = self.win_or_forced_move(player)
+    if forced_move:
+      return forced_move
+
+    for free_space in list_of_spaces:
+      # if (free_space not in self.pruned_spaces_x):
+      #   print 'pruning'
+      if (free_space not in self.pruned_spaces_x) | (player == c.COMPUTER) | (not(prune)):
+        if heuristic == 'paths':
+          list_of_spaces_with_dist.append((free_space,self.compute_square_score_paths(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
+        else:
+          list_of_spaces_with_dist.append((free_space,self.compute_square_score_density(free_space, player,remaining_turns_x=remaining_turns_x, neighborhood_size=neighborhood)))
+
+    # if player==c.COMPUTER:
+    sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
+    # else:
+    #   sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=False)
+    ranked_list = []
+    for sp in sorted_list:
+      if (sp[1] > -20000000):
+        ranked_list.append(sp[0])
+      else:
+        return ranked_list
+
+    return ranked_list
+
+
   def get_free_spaces_ranked_neighbors(self, player, remaining_turns_x = None, depth = 0, neighborhood_size = 2):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
@@ -211,7 +279,7 @@ class Board:
     if player is None:
       print 'problem'
     for free_space in list_of_spaces:
-      list_of_spaces_with_dist.append((free_space,self.compute_square_score_paths(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=2, interaction=False, other_player=True)))
+      list_of_spaces_with_dist.append((free_space,self.compute_square_score_paths(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=2, interaction=True, other_player=False, potential="square")))
 
     # if player==c.COMPUTER:
     sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
@@ -279,9 +347,36 @@ class Board:
     return score
 
 
+  def win_or_forced_move(self, player):
+    open_win_paths_computer = []
+    open_win_paths_human = []
+    # if player == c.COMPUTER:
+    for path in self.winning_paths:
+      len_path = len(path)
+      c.COMPUTER_count, c.HUMAN_count = 0, 0
+      free_on_path = []
+      for space in path:
+        if self.board[space] == c.COMPUTER:
+          c.COMPUTER_count += 1
+        elif self.board[space] == c.HUMAN:
+          c.HUMAN_count += 1
+        else:
+          free_on_path.append(space)
+
+      if (((c.COMPUTER_count == (len_path-1)) & (c.HUMAN_count==0))) & (player == c.COMPUTER):
+        return free_on_path
+      elif (((c.HUMAN_count == (len_path-1)) & (c.COMPUTER_count==0))) & (player == c.HUMAN):
+        return free_on_path
+      if (((c.COMPUTER_count == (len_path-1)) & (c.HUMAN_count==0))) & (player == c.HUMAN):
+        return free_on_path
+      elif (((c.HUMAN_count == (len_path-1)) & (c.COMPUTER_count==0))) & (player == c.COMPUTER):
+        return free_on_path
+
+    return False
 
 
-  def compute_square_score_paths(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0, other_player = True, interaction = False, exp = 1):
+
+  def compute_square_score_paths(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0, other_player = True, interaction = False, exp = 1, potential = "square"):
     """ Heurisitc function to be used for the minimax search.
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE.
@@ -293,14 +388,14 @@ class Board:
     """
     score = 0
     # exp =1
-    interaction = False
+    # interaction = False
     open_win_paths_computer = []
     open_win_paths_human = []
     max_length_path_X = 0
     # max_length_path_O = 0
     # if player == c.COMPUTER:
     for path in self.winning_paths:
-      if square in path:
+      if (square in path) | (potential=='full'):
         len_path = len(path)
         c.COMPUTER_count, c.HUMAN_count = 0, 0
         free_on_path = []
@@ -309,7 +404,7 @@ class Board:
             c.COMPUTER_count += 1
           elif self.board[space] == c.HUMAN:
             c.HUMAN_count += 1
-          else:
+          elif space!=square:
             free_on_path.append(space)
 
         if c.COMPUTER_count == len_path:
@@ -332,12 +427,12 @@ class Board:
         elif c.HUMAN_count == 0:
           # Opponent not on path, so count number of player's tokens on path
           # score += 10*3**(c.COMPUTER_count - 1)
-          open_win_paths_computer.append((free_on_path,c.COMPUTER_count))
+          open_win_paths_computer.append((free_on_path,c.COMPUTER_count, square in path))
 
         elif c.COMPUTER_count == 0:
           # Player not on path, so count number of opponent's tokens on path
           # score -= 10*3**(c.HUMAN_count - 1)
-          open_win_paths_human.append((free_on_path,c.HUMAN_count))
+          open_win_paths_human.append((free_on_path,c.HUMAN_count, square in path))
           if (c.HUMAN_count > max_length_path_X):
             max_length_path_X = c.HUMAN_count
         else:
@@ -362,30 +457,83 @@ class Board:
     if player == c.COMPUTER:
       for i in range(len(open_win_paths_computer)):
         p1 = open_win_paths_computer[i]
+
         if streak_size == p1[1]+1:
           return c.WIN_SCORE
-        score += 1.0/math.pow((streak_size-(p1[1]+1)), exp)  # score for individual path
+        path_length = p1[1]
+        if p1[2]:
+          path_length+=1
+        score += 1.0/math.pow((streak_size-(path_length)), exp)  # score for individual path
         if interaction:
           for j in range(i+1, len(open_win_paths_computer)):
             p2 = open_win_paths_computer[j]
+            path_length2 = p2[1]
+            if p2[2]:
+             path_length2+=1
             if not(self.check_overlap(p1[0],p2[0])):  # interaction score if the paths don't overlap
-              if (streak_size-1)*(streak_size-1) == p1[1]*p2[1]:
+              if (streak_size-1)*(streak_size-1) == path_length*path_length2:
                 return c.WIN_SCORE
-              score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[1]*p2[1]), exp))
+              score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(path_length*path_length2), exp))
 
     if player == c.HUMAN:
       for i in range(len(open_win_paths_human)):
         p1 = open_win_paths_human[i]
-        if (p1[1]+1==streak_size):
+        path_length = p1[1]
+        if p1[2]:
+          path_length += 1
+        if (p1[1]+1 == streak_size):
           return  -1*c.LOSE_SCORE
-        score += 1.0/math.pow((streak_size-(p1[1]+1)), exp)  # score for individual path
+        score += 1.0/math.pow((streak_size-path_length), exp)  # score for individual path
         if interaction:
           for j in range(i+1, len(open_win_paths_human)):
             p2 = open_win_paths_human[j]
+            path_length2 = p2[1]
+            if p2[2]:
+             path_length2 += 1
             if not(self.check_overlap(p1[0],p2[0])):  # interaction score if the paths don't overlap
-              if (streak_size-1)*(streak_size-1) == p1[1]*p2[1]:
+              if (streak_size-1)*(streak_size-1) == path_length*path_length2:
                 return -1*c.LOSE_SCORE
-              score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-((p1[1]+1)*(p2[1]+1)), exp))
+              score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(path_length*path_length2), exp))
+
+    # if other_player:  # give scores for blocking paths
+    #   if player == c.HUMAN:
+    #     for i in range(len(open_win_paths_computer)):
+    #       p1 = open_win_paths_computer[i]
+    #       if
+    #       path_length = p1[1]
+    #       if p1[2]:
+    #         path_length+=1
+    #       score += 1.0/math.pow((streak_size-(path_length)), exp)  # score for individual path
+    #       if interaction:
+    #         for j in range(i+1, len(open_win_paths_computer)):
+    #           p2 = open_win_paths_computer[j]
+    #           path_length2 = p2[1]
+    #           if p2[2]:
+    #            path_length2+=1
+    #           if not(self.check_overlap(p1[0],p2[0])):  # interaction score if the paths don't overlap
+    #             if (streak_size-1)*(streak_size-1) == path_length*path_length2:
+    #               return c.WIN_SCORE
+    #             score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(path_length*path_length2), exp))
+    #
+    #   if player == c.HUMAN:
+    #     for i in range(len(open_win_paths_human)):
+    #       p1 = open_win_paths_human[i]
+    #       path_length = p1[1]
+    #       if p1[2]:
+    #         path_length += 1
+    #       if (p1[1]+1 == streak_size):
+    #         return  -1*c.LOSE_SCORE
+    #       score += 1.0/math.pow((streak_size-path_length), exp)  # score for individual path
+    #       if interaction:
+    #         for j in range(i+1, len(open_win_paths_human)):
+    #           p2 = open_win_paths_human[j]
+    #           path_length2 = p2[1]
+    #           if p2[2]:
+    #            path_length2 += 1
+    #           if not(self.check_overlap(p1[0],p2[0])):  # interaction score if the paths don't overlap
+    #             if (streak_size-1)*(streak_size-1) == path_length*path_length2:
+    #               return -1*c.LOSE_SCORE
+    #             score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(path_length*path_length2), exp))
 
     return score
 
