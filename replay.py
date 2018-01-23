@@ -760,7 +760,7 @@ def paths_stats(participants = 'all'):
                 elif (initial_board[i][j]==2):
                     initial_board[i][j]='O'
                     taken_cells+=1
-        # TODO leave one matrix ontouched
+
         move_matrix = copy.deepcopy(initial_board)
         first_move_matrix = copy.deepcopy(initial_board)
 
@@ -851,7 +851,7 @@ def paths_stats(participants = 'all'):
                                 for j in range(len(curr_first_move_matrix[i])):
                                     if ((curr_first_move_matrix[i][j]!='X') & (curr_first_move_matrix[i][j]!='O')):
                                         pk.append(curr_first_move_matrix[i][j]/first_move_counter)
-                                        curr_first_move_matrix[i][j] = curr_first_move_matrix[i][j]/move_counter
+                                        curr_first_move_matrix[i][j] = curr_first_move_matrix[i][j]/first_move_counter
                                         first_move_matrix[i][j] += curr_first_move_matrix[i][j]
                             ent_first_moves = stats.entropy(pk)
                             pk_uniform = []
@@ -978,6 +978,24 @@ def paths_stats(participants = 'all'):
         # std_times_after_reset_agg = np.std(curr_times_after_reset)
 
 
+        for i in range(len(move_matrix)):
+            for j in range(len(move_matrix[i])):
+                if ((move_matrix[i][j]!='X') & (move_matrix[i][j]!='O')):
+                    move_matrix[i][j] = move_matrix[i][j]/num_participants
+                elif move_matrix[i][j] == 'X':
+                    move_matrix[i][j]  = -0.00001
+                elif move_matrix[i][j] == 'O':
+                    move_matrix[i][j]  = -0.00002
+
+        for i in range(len(first_move_matrix)):
+            for j in range(len(first_move_matrix[i])):
+                if ((first_move_matrix[i][j]!='X') & (first_move_matrix[i][j]!='O')):
+                    first_move_matrix[i][j] = first_move_matrix[i][j]/num_participants
+                elif first_move_matrix[i][j] == 'X':
+                    first_move_matrix[i][j]  = -0.00001
+                elif first_move_matrix[i][j] == 'O':
+                    first_move_matrix[i][j]  = -0.00002
+
         condition = LOGFILE[g][5:-10].replace("_",",")
 
         print condition + "," + str(avg_ent_moves) + "," +str(avg_ent_first_moves) + "," + str(avg_ent) + ","+ str(avg_ent_subpaths) + ","\
@@ -985,11 +1003,13 @@ def paths_stats(participants = 'all'):
         + str(std_times_after_click_agg) + ","+ str(std_times_after_undo_agg) + "," + str(std_times_after_reset_agg) + "," + str(total_moves/num_participants)\
               + "," + str(num_participants) + "," + participants
 
-        fig_file_name = LOGFILE[g]
-        fig_file_name=fig_file_name[:-4]
-        moves_data_matrics[fig_file_name[5:-6]] = move_matrix
-        first_moves_data_matrices[fig_file_name[5:-6]] = first_move_matrix
-        return (move_matrix, first_move_matrix)
+        board_name = LOGFILE[g]
+        board_name=board_name[:-4]
+        moves_data_matrics[board_name[5:-6]] = move_matrix
+        first_moves_data_matrices[board_name[5:-6]] = first_move_matrix
+    write_matrices_to_file(moves_data_matrics, 'data_matrices/avg_people_clicks_' +participants +  '.json')
+    write_matrices_to_file(first_moves_data_matrices, 'data_matrices/avg_people_first_moves_' +participants +  '.json')
+    return (move_matrix, first_move_matrix)
 
 
 # def normalize_matrix(am)
@@ -1544,6 +1564,6 @@ if __name__ == "__main__":
 
     # print stats.entropy([0.25,0.25,0.25,0.25])
     # heat_map_game(normalized=True)
-    heat_map_solution(normalized=True)
+    # heat_map_solution(normalized=True)
     # run_analysis()
     # replay()

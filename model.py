@@ -12,8 +12,7 @@ from scipy import stats
 
 
 # these are the files with user data foeach of the board
-LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv']
-           # 'logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
+LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv', 'logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
 # these are the boards starting positions (1 = X, 2 = O)
 START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
                   [[0,2,0,1,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[2,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
@@ -22,9 +21,9 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
                   [[0,1,0,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,0],[2,0,1,1,2,0],[1,0,2,2,0,0],[0,0,0,0,0,0]],
                   [[0,1,2,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,0],[2,0,1,1,2,1],[1,0,2,2,0,0],[0,0,0,0,0,0]],
                 [[0,0,0,0,1,0,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,0],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
-                  [[0,0,0,0,1,2,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]]
-                # [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
-                #  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
+                  [[0,0,0,0,1,2,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
+                [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
+                 [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
                   ]
 
 '''
@@ -174,7 +173,8 @@ def compute_scores_density(normalized=False, neighborhood_size=1, lamb=1):
         board_name = LOGFILE[g]
         board_name = board_name[:-4]
         data_matrices[board_name[5:-6]] = score_matrix
-
+    matrix_name = 'data_matrices/model_density' + '_nbr=' +str(neighborhood_size)
+    write_matrices_to_file(data_matrices, matrix_name + '.json')
     return data_matrices
 
 '''
@@ -806,8 +806,8 @@ the @exp parameter creates the non-linearity (i.e., 2 --> squared)
 @o_weight says how much weight to give for blocking O paths
 @integrate says whether to combine density and path scores (done if = True), or just use path score after the initial filtering (done if = False)
 '''
-def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density = 'guassian', lamb=None, sig=3,
-                          threshold=0.2, o_weight=0.5, integrate = False):
+def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density = 'reg', lamb=None, sig=3,
+                          threshold=0.2, o_weight=0.0, integrate = False):
     data_matrices = {}
 
     for g in range(len(LOGFILE)):
@@ -915,8 +915,16 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
 
         board_name = LOGFILE[g]
         board_name = board_name[:-4]
-        data_matrices[board_name[5:-6]] = score_matrix
 
+
+        data_matrices[board_name[5:-6]] = score_matrix
+    matrix_name = 'data_matrices/model_layers' + '_e=' + str(exp) + '_nbr=' +str(neighborhood_size) + '_o=' +str(o_weight)
+    if integrate:
+        matrix_name = matrix_name + '_integrated'
+    if density == 'guassian':
+        matrix_name = matrix_name + 'guassian'
+    # matrix_name = matrix_name+ 't=1'
+    write_matrices_to_file(data_matrices, matrix_name + '.json')
     return data_matrices
 
 '''
@@ -967,6 +975,8 @@ def read_matrices_from_file(filename):
   json1_str = json1_file.read()
   json1_data = json.loads(json1_str)
   return json1_data
+
+
 '''
 use this method to define which models to run, it will create the heatmaps and compute distances
 '''
@@ -975,7 +985,7 @@ def run_models():
     # For example, say that I want to show the layers model (just with path scores, with and without opponent,
     # and compare it to the first moves made by participants) --
     # I create model without the opponent using the layers model
-    # data_layers_reg = compute_scores_layers(normalized=False,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
+    data_layers_reg = compute_scores_layers(normalized=False,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
     # # and the model with the opponent
     # data_layers_reg_withO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
     # and then the actual distribution of moves (it's computed from another file but you don't need to edit it)
@@ -1076,5 +1086,122 @@ def run_models():
         plt.savefig(fig_file_name)
         plt.clf()
 
+
+def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index = None):
+
+    # generate the models you want to include in the heatmaps
+    # For example, say that I want to show the layers model (just with path scores, with and without opponent,
+    # and compare it to the first moves made by participants) --
+    # I create model without the opponent using the layers model
+    # data_layers_reg = compute_scores_layers(normalized=False,exp=3,neighborhood_size=2,density='reg',o_weight=0.0, integrate=False)
+    # # and the model with the opponent
+    # data_layers_reg_withO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
+    # and then the actual distribution of moves (it's computed from another file but you don't need to edit it)
+    data = []
+
+    for file in models_file_list:
+        matrices = read_matrices_from_file('data_matrices/'+file)
+        data_matrices = {}
+        for mat in matrices:
+            # for k,v in mat:
+            if mat.endswith('.json'):
+                data_matrices[mat[:-5]] = matrices[mat]
+            else:
+                data_matrices[mat] = matrices[mat]
+
+        data.append(copy.deepcopy(data_matrices))
+
+    for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
+        plt.rcParams.update({'font.size': 9})
+        fig_file_name = base_heatmap_name + '_' + board + '.png'
+        heatmaps = []
+        full = board + '_full'
+        pruned = board + '_pruned'
+        if board.startswith('6'):  # adjust sizes of heatmaps depending on size of boards
+            fig, axes = plt.subplots(2, len(data), figsize=(16,8))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            # fig, axes = plt.subplots(2, 4, figsize=(10,6))
+        else:
+            fig, axes = plt.subplots(2, len(data), figsize=(24,12)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            # fig, axes = plt.subplots(2, 4, figsize=(18,12))
+
+        fig.suptitle(board)  # add subtitle to the figure based on board name
+        i = 0  # this will be used to index into the list of heatmaps
+        print board  # just printing the board name so I know if they finish, you can remove
+
+        for j in range(len(data)):
+            matrix_name_full = models_file_list[j][:-5]
+            matrix_name_pruned = models_file_list[j][:-5]
+            if base_matrix_index != None:
+                dist_full = emd(data[j][full],data[base_matrix_index][full]) # earth mover distance for the full board
+                dist_pruned = emd(data[j][pruned],data[base_matrix_index][pruned]) # earth mover distance for the full board
+                matrix_name_full = matrix_name_full + '\n' + str(round(dist_full, 3))
+                matrix_name_pruned = matrix_name_pruned + '\n' + str(round(dist_pruned, 3))
+            heatmaps.append((data[j][full], matrix_name_full))
+
+        for j in range(len(data)):
+            matrix_name_full = models_file_list[j][:-5]
+            matrix_name_pruned = models_file_list[j][:-5]
+            if base_matrix_index != None:
+                dist_full = emd(data[j][full],data[base_matrix_index][full]) # earth mover distance for the full board
+                dist_pruned = emd(data[j][pruned],data[base_matrix_index][pruned]) # earth mover distance for the full board
+                matrix_name_full = matrix_name_full + '\n' + str(round(dist_full, 3))
+                matrix_name_pruned = matrix_name_pruned + '\n' + str(round(dist_pruned, 3))
+            heatmaps.append((data[j][pruned], matrix_name_pruned))
+
+
+
+        # this creates the actual heatmaps
+        for ax in axes.flatten():  # flatten in case you have a second row at some point
+            a = np.array(heatmaps[i][0])
+            a = np.flip(a,0)
+            img = ax.pcolormesh(a)
+            for y in range(a.shape[0]):
+                for x in range(a.shape[1]):
+                    if(a[y,x]==-1) | (a[y,x]==-0.00001):
+                        ax.text(x + 0.5, y + 0.5, 'X',
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                                 )
+                    elif((a[y,x]==-2) | (a[y,x]==-0.00002)):
+                        ax.text(x + 0.5, y + 0.5, 'O',
+                             horizontalalignment='center',
+                             verticalalignment='center',
+                             color='white'
+                        )
+                    elif(a[y,x]!=0):
+                        ax.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                                 horizontalalignment='center',
+                                 verticalalignment='center',
+                                 color='white'
+                         )
+
+            fig.colorbar(img, ax=ax)
+            # plt.colorbar(img)
+            ax.set_aspect('equal')
+            # ax.tick_params(labelsize=8)
+            ax.set_title(heatmaps[i][1])
+            i += 1
+
+        plt.savefig(fig_file_name)
+        plt.clf()
+
+
+
 if __name__ == "__main__":
-    run_models()  # calls the function that runs the models
+    # compute_scores_density(normalized=True,neighborhood_size=2)
+    # compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.5, integrate=False)
+    # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=True)
+    # # compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.0, integrate=False)
+    # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False)
+    # model_files = ['model_density_nbr=2.json','model_layers_e=1_nbr=2_o=0.5.json','model_layers_e=2_nbr=2_o=0.5.json', 'avg_people_clicks_all.json']
+    # model_files = ['avg_people_first_moves_all.json', 'avg_people_clicks_all.json']
+    # model_files = ['model_layers_e=2_nbr=2_o=0.5.json','model_layers_e=2_nbr=2_o=0.0.json', 'avg_people_clicks_all.json']
+    # # # # run_models()  # calls the function that runs the models
+    # # # # model_files = ['paths_linear_square_opp.json', 'paths_non-linear_square_opp.json', 'avg_people_clicks_solvedCorrect.json']
+    # model_files = ['model_layers_e=2_nbr=2_o=0.5.json','paths_non-linear_square_layers_opp.json', 'avg_people_clicks_all.json']
+    model_files = ['model_layers_e=2_nbr=2_o=0.5.json','paths_non-linear_square_layers_opp.json', 'avg_people_clicks_all.json']
+    run_models_from_list(model_files, 'heatmaps/cogsci/alphaBetaVsModelComparisonWithClicks',2)
+    # model_files = ['density.json','paths_linear_square_layers_opp.json','paths_non-linear_square_layers_opp.json', 'avg_people_first_moves_all.json']
+    model_files = ['model_layers_e=2_nbr=2_o=0.5.json','paths_non-linear_square_layers_opp.json', 'avg_people_first_moves_all.json']
+    run_models_from_list(model_files, 'heatmaps/cogsci/alphaBetaVsModelComparisonWithFirstMoves',2)
