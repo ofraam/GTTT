@@ -1,0 +1,135 @@
+{
+  "configs": [
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_linear_square_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_linear_full_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": true,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_linear_square_layers_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": true,
+      "exp": 1,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_linear_full_layers_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_non-linear_square_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_non-linear_full_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": true,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_non-linear_square_layers_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": true,
+      "exp": 2,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_non-linear_full_layers_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": true,
+      "prune": true,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_non-linear_square_layers_interaction_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": true,
+      "prune": true,
+      "exp": 2,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_non-linear_full_layers_interaction_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_non-linear_square_interaction_opp"
+    },
+    {
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_non-linear_full_interaction_opp"
+    },
+    {
+      "heuristic": "density",
+      "neighborhood": 2,
+      "opponent": true,
+      "interaction": true,
+      "prune": true,
+      "exp": 2,
+      "potential": "full",
+      "name": "density"
+  }
+  ]
+}
+

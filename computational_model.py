@@ -550,6 +550,10 @@ def start_game(file_path, configuration = None):
   return game
 
 
+def write_matrices_to_file(data_matrices, filename):
+  with open(filename, 'w') as fp:
+      json.dump(data_matrices, fp)
+
 def get_game_configs(config_file):
   json1_file = open(config_file)
   json1_str = json1_file.read()
@@ -635,8 +639,9 @@ if __name__ == "__main__":
 
     results = []
     header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
-    configs = get_game_configs("ab_config1.json")
+    configs = get_game_configs("ab_config.json")
     for conf in configs:
+      data_matrices = {}
       for filename in os.listdir("predefinedBoards/"):
         if filename.startswith("6"):
           file_path = "examples/board_6_4.txt"
@@ -649,7 +654,7 @@ if __name__ == "__main__":
           # if not(filename.startswith("10_hard_p")):
           #   continue
           file_path = "examples/board_10_5.txt"
-          continue
+          # continue
 
         game = start_game(file_path, conf)
         board_results = []
@@ -692,12 +697,16 @@ if __name__ == "__main__":
 
         print move_matrix
         board_results.append(copy.deepcopy(move_matrix))
+        data_matrices[filename] = move_matrix
         results.append(copy.deepcopy(board_results))
+
+
+      write_matrices_to_file(data_matrices, 'data_matrices/'+conf['name']+'.json')
 
     for i in range(len(results)):
       print results[i]
 
-    write_results('stats/alpha_beta_stats50_testOpponent.csv', results, header)
+    # write_results('stats/alpha_beta_stats100000_Opponent.csv', results, header)
 
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
       # print game.on_same_win_path

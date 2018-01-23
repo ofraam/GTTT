@@ -2,12 +2,12 @@
   "configs": [
     {
       "heuristic": "paths",
-      "interaction": false,
+      "interaction": true,
       "opponent": true,
       "prune": false,
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-       "name": "paths_non-linear_full_no_interaction"
+       "name": "paths_non-linear_full_opponent_no_interaction"
     }]
 }

@@ -6,6 +6,7 @@ from scipy import stats
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import json
 
 LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
 
@@ -1518,6 +1519,9 @@ def construct_heat_map(games, move = 1):
 
 
 
+def write_matrices_to_file(data_matrices, filename):
+  with open(filename, 'w') as fp:
+      json.dump(data_matrices, fp)
 
 
 

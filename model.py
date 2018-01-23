@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 import replay as rp
 import computational_model as cm
+import json
 from emd import emd
 # from pyemd import emd
 from scipy import stats
@@ -956,7 +957,16 @@ def makeGaussian(size, fwhm = 3, center=None):
     # return np.exp(-4*np.log(2) * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
     return np.exp(-1 * ((x-x0)**2 + (y-y0)**2) / fwhm**2)
 
+def write_matrices_to_file(data_matrices, filename):
+  with open(filename, 'w') as fp:
+      json.dump(data_matrices, fp)
 
+
+def read_matrices_from_file(filename):
+  json1_file = open(filename)
+  json1_str = json1_file.read()
+  json1_data = json.loads(json1_str)
+  return json1_data
 '''
 use this method to define which models to run, it will create the heatmaps and compute distances
 '''
@@ -969,7 +979,11 @@ def run_models():
     # # and the model with the opponent
     # data_layers_reg_withO = compute_scores_layers(normalized=True,exp=3,neighborhood_size=2,density='reg',o_weight=0.5, integrate=False)
     # and then the actual distribution of moves (it's computed from another file but you don't need to edit it)
+    data_test = read_matrices_from_file('data_matrices/computational_model.json')
     data_computational_model = cm.get_heatmaps_alpha_beta()
+
+    # write_matrices_to_file(data_computational_model, 'data_matrices/computational_model.json')
+    # return
     # data_first_moves = rp.entropy_paths()
     data_clicks = rp.entropy_board_average()
 
