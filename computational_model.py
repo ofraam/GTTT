@@ -48,7 +48,7 @@ class Game:
     self.prev_move_x = None
     self.prev_move_x_depth = 0
     self.max_depth = None
-    self.max_moves = 100000
+    self.max_moves = 50
     self.heuristic = heuristic
     self.prune = prune
     self.exp = exp
@@ -635,7 +635,7 @@ if __name__ == "__main__":
 
     results = []
     header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
-    configs = get_game_configs("ab_config.json")
+    configs = get_game_configs("ab_config1.json")
     for conf in configs:
       for filename in os.listdir("predefinedBoards/"):
         if filename.startswith("6"):
@@ -649,7 +649,7 @@ if __name__ == "__main__":
           # if not(filename.startswith("10_hard_p")):
           #   continue
           file_path = "examples/board_10_5.txt"
-          # continue
+          continue
 
         game = start_game(file_path, conf)
         board_results = []
@@ -697,7 +697,7 @@ if __name__ == "__main__":
     for i in range(len(results)):
       print results[i]
 
-    write_results('stats/alpha_beta_stats10000_fixed.csv', results, header)
+    write_results('stats/alpha_beta_stats50_testOpponent.csv', results, header)
 
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
       # print game.on_same_win_path
