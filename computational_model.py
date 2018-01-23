@@ -639,7 +639,7 @@ if __name__ == "__main__":
 
     results = []
     header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
-    configs = get_game_configs("ab_config.json")
+    configs = get_game_configs("ab_config_opp.json")
     for conf in configs:
       data_matrices = {}
       for filename in os.listdir("predefinedBoards/"):
