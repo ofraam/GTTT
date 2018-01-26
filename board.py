@@ -203,6 +203,7 @@ class Board:
     list_of_spaces = []
     list_of_occupied = []
     list_of_spaces_with_dist = []
+    list_of_spaces_with_dist2 = []
     for space in self.board:
       if self.board[space] == c.BLANK:
         list_of_spaces.append(space)
@@ -220,13 +221,18 @@ class Board:
       #   print 'pruning'
       if (free_space not in self.pruned_spaces_x) | (player == c.COMPUTER) | (not(prune)):
         if heuristic == 'paths':
-          list_of_spaces_with_dist.append((free_space,self.compute_square_score_paths_potential(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
+          list_of_spaces_with_dist.append((free_space,self.compute_square_score_paths_potential(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential='full')))
+          list_of_spaces_with_dist2.append((free_space,self.compute_square_score_paths_potential(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential='square')))
 
         else:
           list_of_spaces_with_dist.append((free_space,self.compute_square_score_density(free_space, player,remaining_turns_x=remaining_turns_x, neighborhood_size=neighborhood)))
 
     # if player==c.COMPUTER:
     sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
+    sorted_list2 = sorted(list_of_spaces_with_dist2, key=lambda x: x[1], reverse=True)
+    for i in range(len(sorted_list)):
+      if sorted_list[i][0] != sorted_list2[i][0]:
+        print 'boo'
     # else:
     #   sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=False)
     ranked_list = []
@@ -530,58 +536,59 @@ class Board:
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE.
     """
-
+    # if (square == 33) & (potential == 'square'):
+    #   print 'here'
     open_win_paths_computer = []
     open_win_paths_human = []
     max_length_path_X = 0
     # max_length_path_O = 0
     # if player == c.COMPUTER:
     for path in self.winning_paths:
-      if (square in path) | (potential == 'full'):
-        len_path = len(path)
-        c.COMPUTER_count, c.HUMAN_count = 0, 0
-        free_on_path = []
-        for space in path:
-          if self.board[space] == c.COMPUTER:
-            c.COMPUTER_count += 1
-          elif self.board[space] == c.HUMAN:
+      # if (square in path) | (potential == 'full'):
+      len_path = len(path)
+      c.COMPUTER_count, c.HUMAN_count = 0, 0
+      free_on_path = []
+      for space in path:
+        if self.board[space] == c.COMPUTER:
+          c.COMPUTER_count += 1
+        elif self.board[space] == c.HUMAN:
+          c.HUMAN_count += 1
+        elif space!=square:
+          free_on_path.append(space)
+        if space == square:
+          if player == c.HUMAN:
             c.HUMAN_count += 1
-          elif space!=square:
-            free_on_path.append(space)
-          if space == square:
-            if player == c.HUMAN:
-              c.HUMAN_count += 1
-            else:
-              c.COMPUTER_count += 1
+          else:
+            c.COMPUTER_count += 1
 
 
 
-        if c.COMPUTER_count == len_path:
-          return c.WIN_SCORE
+      if c.COMPUTER_count == len_path:
+        return c.WIN_SCORE
 
-        elif c.HUMAN_count == len_path:
-          return c.LOSE_SCORE
+      elif c.HUMAN_count == len_path:
+        return c.LOSE_SCORE
 
-        elif (c.HUMAN_count == 0):
-          # Opponent not on path, so count number of player's tokens on path
-          # score += 10*3**(c.COMPUTER_count - 1)
-          open_win_paths_computer.append((free_on_path,c.COMPUTER_count, square in path))
+      if (c.HUMAN_count == 0):
+        # Opponent not on path, so count number of player's tokens on path
+        # score += 10*3**(c.COMPUTER_count - 1)
+        open_win_paths_computer.append((free_on_path,c.COMPUTER_count, square in path))
 
-        elif (c.COMPUTER_count == 0):
-          # Player not on path, so count number of opponent's tokens on path
-          # score -= 10*3**(c.HUMAN_count - 1)
-          open_win_paths_human.append((free_on_path,c.HUMAN_count, square in path))
-          if (c.HUMAN_count > max_length_path_X):
-            max_length_path_X = c.HUMAN_count
-        else:
-          # Path cannot be won, so it has no effect on score
-          pass
+      if (c.COMPUTER_count == 0):
+        # Player not on path, so count number of opponent's tokens on path
+        # score -= 10*3**(c.HUMAN_count - 1)
+        open_win_paths_human.append((free_on_path,c.HUMAN_count, square in path))
+        if (c.HUMAN_count > max_length_path_X):
+          max_length_path_X = c.HUMAN_count
+      else:
+        # Path cannot be won, so it has no effect on score
+        pass
 
 
     streak_size = len(self.winning_paths[0])
-    if (player==c.HUMAN) & (streak_size-max_length_path_X > remaining_turns_x):
-    # if (streak_size-max_length_path_X > remaining_turns_x):
-      return -20000000
+    # if (player==c.HUMAN) & (streak_size-max_length_path_X > remaining_turns_x):
+    # # if (streak_size-max_length_path_X > remaining_turns_x):
+    #   return -20000000
     #
     # if (player==c.COMPUTER) & (streak_size-max_length_path_X > remaining_turns_x):
     # # if (streak_size-max_length_path_X > remaining_turns_x):
@@ -982,12 +989,12 @@ class Board:
 
 
 
-      elif c.HUMAN_count == 0:
+      if c.HUMAN_count == 0:
         # Opponent not on path, so count number of player's tokens on path
         # score += 10*3**(c.COMPUTER_count - 1)
         open_win_paths_computer.append((free_on_path,c.COMPUTER_count))
 
-      elif c.COMPUTER_count == 0:
+      if c.COMPUTER_count == 0:
         # Player not on path, so count number of opponent's tokens on path
         # score -= 10*3**(c.HUMAN_count - 1)
         open_win_paths_human.append((free_on_path,c.HUMAN_count))
