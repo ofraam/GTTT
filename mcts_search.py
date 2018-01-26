@@ -499,7 +499,7 @@ if __name__ == "__main__":
 
       else:
         file_path = "examples/board_10_5.txt"
-        continue
+        # continue
 
       game = start_game(file_path)
       print filename

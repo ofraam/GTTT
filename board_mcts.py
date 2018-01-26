@@ -143,7 +143,7 @@ if __name__ == "__main__":
             file_path = "examples/board_10_5.txt"
             # continue
         chosen_moves = {}
-        num_runs = 50
+        num_runs = 40
         num_correct = 0.0
         print filename
         total_nodes= 0.0
@@ -154,7 +154,7 @@ if __name__ == "__main__":
             c.WIN_DEPTH = win_depth
             root = StateNode(None,TicTactToeState(game.board,game.whos_turn,0))
 
-            best_action, num_nodes = mcts(root, n=40)
+            best_action, num_nodes = mcts(root, n=100)
 
 
             if best_action in chosen_moves.keys():

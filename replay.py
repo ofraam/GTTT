@@ -179,6 +179,7 @@ def heat_map_game(normalized = False):
 
 
 def heat_map_solution(normalized = False):
+    data_matrices = {}
     for g in range(len(LOGFILE)):
         # print g
         move_matrix = copy.deepcopy(START_POSITION[g])
@@ -220,6 +221,15 @@ def heat_map_solution(normalized = False):
                                 if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
                                     move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1.0
                                     move_count+=1.0
+                        elif (move[0] in rows):
+                            rowPos = rows.index(move[0])
+                            if(move[1] in cols):
+                                colPos = len(move_matrix)-cols.index(move[1])-1
+
+
+                                if ((move_matrix[rowPos][colPos]!='X') & (move_matrix[rowPos][colPos]!='O')):
+                                    move_matrix[rowPos][colPos] = move_matrix[rowPos][colPos]+1.0
+                                    move_count+=1.0
                     # else:
                     #     print 'bad click'
                     #
@@ -233,54 +243,59 @@ def heat_map_solution(normalized = False):
         for r in range(0,len(move_matrix)):
             for j in range(0,len(move_matrix[i])):
                 if (move_matrix[r][j]=='X'):
-                    move_matrix[r][j] = -1
+                    move_matrix[r][j] = -0.00001
                 elif (move_matrix[r][j]=='O'):
-                    move_matrix[r][j] = -2
+                    move_matrix[r][j] = -0.00002
                 #     print move_matrix[i][j]
                 # else:
                 #     print  move_matrix[i][j]
 
         if (normalized):
             for r in range(0,len(move_matrix)):
-                for j in range(0,len(move_matrix[i])):
-                    # if (move_matrix[r][j]>0):
-                    move_matrix[r][j] = move_matrix[r][j]/move_count
+                for j in range(0,len(move_matrix[r])):
+                    if (move_matrix[r][j]>0):
+                        move_matrix[r][j] = move_matrix[r][j]/move_count
                     # else:
-        #
 
-        print move_matrix
-        a = np.array(move_matrix)
-        a = np.flip(a,0)
-        print a
-        heatmap = plt.pcolor(a)
-
-        for y in range(a.shape[0]):
-            for x in range(a.shape[1]):
-                if((a[y,x]==-1) | (a[y,x]==-1.0/move_count)):
-                    plt.text(x + 0.5, y + 0.5, 'X',
-                         horizontalalignment='center',
-                         verticalalignment='center',
-                         color='white'
-                    )
-                elif((a[y,x]==-2) | (a[y,x]==-2.0/move_count)):
-                    plt.text(x + 0.5, y + 0.5, 'O',
-                         horizontalalignment='center',
-                         verticalalignment='center',
-                         color='white'
-                    )
-                elif(a[y,x]!=0):
-                    plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
-                             horizontalalignment='center',
-                             verticalalignment='center',
-                             color='white'
-                     )
-
-        fig = plt.colorbar(heatmap)
         fig_file_name = LOGFILE[g]
         fig_file_name=fig_file_name[:-4]
-        fig_file_name = fig_file_name + 'solutionHeatmap.png'
-        plt.savefig(fig_file_name)
-        plt.clf()
+        data_matrices[fig_file_name[5:-6]] = move_matrix
+
+        print move_matrix
+
+    write_matrices_to_file(data_matrices,'data_matrices/participant_solutions.json')
+        # a = np.array(move_matrix)
+        # a = np.flip(a,0)
+        # print a
+        # heatmap = plt.pcolor(a)
+        #
+        # for y in range(a.shape[0]):
+        #     for x in range(a.shape[1]):
+        #         if((a[y,x]==-1) | (a[y,x]==-1.0/move_count)):
+        #             plt.text(x + 0.5, y + 0.5, 'X',
+        #                  horizontalalignment='center',
+        #                  verticalalignment='center',
+        #                  color='white'
+        #             )
+        #         elif((a[y,x]==-2) | (a[y,x]==-2.0/move_count)):
+        #             plt.text(x + 0.5, y + 0.5, 'O',
+        #                  horizontalalignment='center',
+        #                  verticalalignment='center',
+        #                  color='white'
+        #             )
+        #         elif(a[y,x]!=0):
+        #             plt.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+        #                      horizontalalignment='center',
+        #                      verticalalignment='center',
+        #                      color='white'
+        #              )
+        #
+        # fig = plt.colorbar(heatmap)
+        # fig_file_name = LOGFILE[g]
+        # fig_file_name=fig_file_name[:-4]
+        # fig_file_name = fig_file_name + 'solutionHeatmap.png'
+        # plt.savefig(fig_file_name)
+        # plt.clf()
 
         # plt.imshow(a, cmap='hot', interpolation='nearest')
 
@@ -1546,10 +1561,11 @@ def write_matrices_to_file(data_matrices, filename):
 
 
 if __name__ == "__main__":
-    paths_stats(participants='all')
-    paths_stats(participants='solvedCorrect')
-    paths_stats(participants='wrong')
-    paths_stats(participants='validatedCorrect')
+    heat_map_solution(normalized=True)
+    # paths_stats(participants='all')
+    # paths_stats(participants='solvedCorrect')
+    # paths_stats(participants='wrong')
+    # paths_stats(participants='validatedCorrect')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

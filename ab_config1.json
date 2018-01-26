@@ -3,11 +3,20 @@
     {
       "heuristic": "paths",
       "interaction": true,
-      "opponent": true,
+      "opponent": false,
       "prune": false,
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-       "name": "paths_non-linear_full_opponent_no_interaction"
+       "name": "paths_non-linear_square_opponent_interaction"
+    },{
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": false,
+      "prune": false,
+      "exp": 2,
+      "potential": "full",
+      "neighborhood": 2,
+       "name": "paths_non-linear_full_opponent_interaction"
     }]
 }

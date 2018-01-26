@@ -646,8 +646,8 @@ if __name__ == "__main__":
         if filename.startswith("6"):
           file_path = "examples/board_6_4.txt"
           # continue
-          # if not(filename.startswith("6by6_hard")):
-          # continue
+          # if not(filename.startswith("6_easy")):
+          #   continue
 
         else:
           # if filename.startswith("10by10_easy"):
@@ -706,7 +706,7 @@ if __name__ == "__main__":
     for i in range(len(results)):
       print results[i]
 
-    # write_results('stats/alpha_beta_stats100000_Opponent.csv', results, header)
+    write_results('stats/oppNew_50.csv', results, header)
 
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
       # print game.on_same_win_path
