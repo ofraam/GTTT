@@ -926,6 +926,128 @@ class Board:
     open_win_paths_computer = []
     open_win_paths_human = []
     max_length_path_X = 0
+    max_length_path_O = 0
+
+    for path in self.winning_paths:
+      len_path = len(path)
+      c.COMPUTER_count, c.HUMAN_count = 0, 0
+      free_on_path = []
+      for space in path:
+        if self.board[space] == c.COMPUTER:
+          c.COMPUTER_count += 1
+        elif self.board[space] == c.HUMAN:
+          c.HUMAN_count += 1
+        elif space!=square:
+          free_on_path.append(space)
+
+      if c.COMPUTER_count == len_path:
+        return c.WIN_SCORE
+
+      elif c.HUMAN_count == len_path:
+        return c.LOSE_SCORE
+
+      if (c.HUMAN_count == 0) & ((c.COMPUTER_count > 0) | ((player == c.COMPUTER) & (square in path))):
+        open_win_paths_computer.append((free_on_path,c.COMPUTER_count, square in path))
+
+      if (c.COMPUTER_count == 0) & ((c.HUMAN_count > 0) | ((player == c.HUMAN) & (square in path))):
+        open_win_paths_human.append((free_on_path,c.HUMAN_count, square in path))
+
+      else:
+        # Path cannot be won, so it has no effect on score
+        pass
+
+
+    streak_size = len(self.winning_paths[0])
+
+    score = 0.0
+    score_x = 0.0
+    score_o = 0.0
+
+    # compute the score for the cell based on the potential paths
+    if (player == c.COMPUTER) | other_player:
+      for i in range(len(open_win_paths_computer)):
+        p1 = open_win_paths_computer[i]
+        if p1[2]:
+          path_length = p1[1]
+          if player == c.COMPUTER:
+            path_length += 1
+          if path_length > max_length_path_O:
+            max_length_path_O = path_length
+
+          if streak_size == path_length:
+            return c.WIN_SCORE
+          score_o += 1.0/math.pow((streak_size-(path_length)), exp)  # score for individual path
+          if interaction:
+            for j in range(i+1, len(open_win_paths_computer)):
+              p2 = open_win_paths_computer[j]
+              if p2[2]:
+                path_length2 = p2[1]
+                if player == c.COMPUTER:
+                  path_length2 += 1
+                if not(self.check_overlap(p1[0],p2[0])):  # interaction score if the paths don't overlap
+                  if (streak_size-1)*(streak_size-1) == path_length*path_length2:
+                    return c.WIN_SCORE
+                  top = 0.0 + path_length*path_length2
+                  bottom = ((streak_size-1)*(streak_size-1))-(path_length*path_length2)
+                  # score_o += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(path_length*path_length2), exp))
+                  score_o += math.pow(top/bottom, exp)
+
+    if (player == c.HUMAN) | other_player:
+      for i in range(len(open_win_paths_human)):
+        p1 = open_win_paths_human[i]
+        if p1[2]:
+          path_length = p1[1]
+          if player == c.HUMAN:
+            path_length+=1
+          if path_length > max_length_path_X:
+            max_length_path_X = path_length
+          if path_length == streak_size:
+            return  -1*c.LOSE_SCORE
+          score_x += 1.0/math.pow((streak_size-path_length), exp)  # score for individual path
+          if interaction:
+            for j in range(i+1, len(open_win_paths_human)):
+              p2 = open_win_paths_human[j]
+              if p2[2]:
+                path_length2 = p2[1]
+                if player == c.HUMAN:
+                  path_length2+=1
+                if not(self.check_overlap(p1[0],p2[0])):  # interaction score if the paths don't overlap
+                  if (streak_size-1)*(streak_size-1) == path_length*path_length2:
+                    return  -1*c.LOSE_SCORE
+                  top = 0.0 + path_length*path_length2
+                  bottom = ((streak_size-1)*(streak_size-1))-(path_length*path_length2)
+                  score_x += math.pow(top/bottom, exp)
+                  # score_x += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(path_length*path_length2), exp))
+
+
+    # if (player==c.HUMAN) & (streak_size-max_length_path_X > remaining_turns_x):  # can't win from here
+    #   return -20000000
+
+
+    if player == c.COMPUTER:
+      score = score_o
+    else:
+      score = score_x
+
+    if other_player:
+      if player == c.COMPUTER:
+        score = score + score_x
+      else:
+        score = score + score_o
+
+    return score
+
+
+
+  def compute_square_score_block_clean(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0, other_player = True, interaction = False, exp = 1, potential = "square"):
+    """ Heurisitc function to be used for the minimax search.
+    If it is a winning board for the COMPUTER, returns WIN_SCORE.
+    If it is a losing board for the COMPUTER, returns LOSE_SCORE.
+    """
+    open_win_paths_computer = []
+    open_win_paths_human = []
+    max_length_path_X = 0
+    max_length_path_O = 0
 
     for path in self.winning_paths:
       len_path = len(path)
@@ -967,7 +1089,7 @@ class Board:
     score_o = 0.0
 
     # compute the score for the cell based on the potential paths
-    if (player == c.COMPUTER) | other_player:
+    if (player == c.COMPUTER):
       for i in range(len(open_win_paths_computer)):
         p1 = open_win_paths_computer[i]
         if p1[2]:
@@ -992,7 +1114,7 @@ class Board:
                   # score_o += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(path_length*path_length2), exp))
                   score_o += math.pow(top/bottom, exp)
 
-    if (player == c.HUMAN) | other_player:
+    if (player == c.HUMAN):
       for i in range(len(open_win_paths_human)):
         p1 = open_win_paths_human[i]
         if p1[2]:
@@ -1019,8 +1141,14 @@ class Board:
 
     if player == c.COMPUTER:
       score = score_o
+      # compute top X paths that are blocked
+
+
     else:
       score = score_x
+
+
+
 
     if other_player:
       if player == c.COMPUTER:

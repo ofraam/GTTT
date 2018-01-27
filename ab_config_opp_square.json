@@ -1,12 +1,23 @@
 {
   "configs": [
     {
+      "heuristic": "density",
+      "neighborhood": 2,
+      "opponent": false,
+      "interaction": true,
+      "opponent": false,
+      "prune": true,
+      "exp": 2,
+      "potential": "square",
+      "name": "density"
+  },
+    {
       "heuristic": "paths",
       "interaction": false,
       "opponent": true,
       "prune": false,
       "exp": 1,
-      "potential": "full",
+      "potential": "square",
       "neighborhood": 2,
       "name": "paths_linear_full_opp"
     },
@@ -17,7 +28,7 @@
       "opponent": true,
       "prune": false,
       "exp": 2,
-      "potential": "full",
+      "potential": "square",
       "neighborhood": 2,
       "name": "paths_non-linear_full_opp"
     },
@@ -28,7 +39,7 @@
       "opponent": true,
       "prune": false,
       "exp": 2,
-      "potential": "full",
+      "potential": "square",
       "neighborhood": 2,
       "name": "paths_non-linear_full_interaction_opp"
     }
