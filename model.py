@@ -1416,8 +1416,8 @@ def choice(population, weights):
 
 if __name__ == "__main__":
     # compute_scores_density(normalized=True,neighborhood_size=2)
-    compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=True, dominance=False)
-    compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=False, dominance=False)
+    # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=True, dominance=False)
+    # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=False, dominance=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=True)
     # # compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.0, integrate=False)
@@ -1428,12 +1428,13 @@ if __name__ == "__main__":
     # # # # run_models()  # calls the function that runs the models
     # # # model_files = ['paths_linear_square_opp.json', 'paths_non-linear_square_opp.json', 'avg_people_clicks_solvedCorrect.json']
     # model_files = ['model_layers_e=2_nbr=2_o=0.5.json','paths_non-linear_square_layers_opp.json', 'avg_people_clicks_all.json']
-    model_files = ['model_layers_e=2_nbr=2_o=0.0_interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_clicks_all.json']
+    model_files = ['paths_linear_full_layers_opp_potentialBlock50.json','paths_non-linear_full_layers_opp_potentialBlock50.json', 'avg_people_clicks_all.json']
+    # model_files = ['model_layers_e=2_nbr=2_o=0.0_interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_clicks_all.json']
     # model_files = ['model_layers_e=1_nbr=2_o=0.5.json','model_layers_e=2_nbr=2_o=0.5.json', 'participant_solutions.json']
-    run_models_from_list(model_files, 'heatmaps/cogsci/non-linearOppVsNoOppAvgClicks',2)
+    run_models_from_list(model_files, 'heatmaps/cogsci/potentialBlockAlphaBetaVsClicks50',2)
     # model_files = ['density.json','paths_linear_square_layers_opp.json','paths_non-linear_square_layers_opp.json', 'avg_people_first_moves_all.json']
     # model_files = ['model_layers_e=2_nbr=2_o=0.5.json','paths_non-linear_square_layers_opp.json', 'participant_solutions.json']
-    model_files = ['model_layers_e=2_nbr=2_o=0.0_interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_first_moves_all.json']
-    # model_files = ['model_layers_e=2_nbr=2_o=0.5_no interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_first_moves_all.json']
-    run_models_from_list(model_files, 'heatmaps/cogsci/non-linearOppVsNoOppFirstMoves',2)
+    # model_files = ['model_layers_e=2_nbr=2_o=0.0_interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_first_moves_all.json']
+    # # model_files = ['model_layers_e=2_nbr=2_o=0.5_no interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_first_moves_all.json']
+    # run_models_from_list(model_files, 'heatmaps/cogsci/non-linearOppVsNoOppFirstMoves',2)
 

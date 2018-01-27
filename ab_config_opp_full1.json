@@ -1,0 +1,37 @@
+{
+  "configs": [
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_linear_full_opp"
+    },
+
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_non-linear_full_opp"
+    },
+
+    {
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "full",
+      "neighborhood": 2,
+      "name": "paths_non-linear_full_interaction_opp"
+    }
+  ]
+}
+

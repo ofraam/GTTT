@@ -3,7 +3,7 @@
     {
       "heuristic": "paths",
       "interaction": true,
-      "opponent": false,
+      "opponent": true,
       "prune": false,
       "exp": 1,
       "potential": "full",
