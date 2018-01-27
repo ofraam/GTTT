@@ -389,7 +389,7 @@ class Game:
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     # if ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
     #   print 'happened'
-    if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves) or ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
+    if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves) or  ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
       return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0)), other_player=True),None)
 
@@ -639,7 +639,7 @@ if __name__ == "__main__":
 
     results = []
     header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
-    configs = get_game_configs("ab_config_opp_full1.json")
+    configs = get_game_configs("ab_config1.json")
     for conf in configs:
       data_matrices = {}
       for filename in os.listdir("predefinedBoards/"):
@@ -647,12 +647,12 @@ if __name__ == "__main__":
           file_path = "examples/board_6_4.txt"
           # continue
           # if not(filename.startswith("6_easy")):
-            # continue
+          #   continue
 
         else:
           # if filename.startswith("10by10_easy"):
-          if (filename.startswith("10_medium")):
-            continue
+          # if (filename.startswith("10_medium")):
+          #   continue
           file_path = "examples/board_10_5.txt"
           # continue
 
@@ -706,7 +706,7 @@ if __name__ == "__main__":
     for i in range(len(results)):
       print results[i]
 
-    write_results('stats/potentialBlock100000_noLayersNoMediumTestBeta.csv', results, header)
+    write_results('stats/potentialBlock100000_newInteraction_opp_all_betaWithMedium.csv', results, header)
 
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
       # print game.on_same_win_path

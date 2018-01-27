@@ -5,17 +5,17 @@
       "interaction": true,
       "opponent": true,
       "prune": false,
-      "exp": 1,
-      "potential": "full",
+      "exp": 2,
+      "potential": "square",
       "neighborhood": 2,
-       "name": "paths_non-linear_full_interaction"
-    },{
+       "name": "paths_non-linear_full_interactionNew"
+    },    {
       "heuristic": "paths",
       "interaction": false,
-      "opponent": false,
+      "opponent": true,
       "prune": false,
       "exp": 2,
-      "potential": "full",
+      "potential": "square",
       "neighborhood": 2,
        "name": "paths_non-linear_full_noInteraction"
     }]

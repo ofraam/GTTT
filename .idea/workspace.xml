@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/board.py" line="869" />
+    <bookmark url="file://$PROJECT_DIR$/board.py" line="1070" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27e7977-f565-4ab6-8925-e8910730b8bd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ab_config_opp_full.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ab_config_opp_full1.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ab_config1.json" afterPath="$PROJECT_DIR$/ab_config1.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/board.py" afterPath="$PROJECT_DIR$/board.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/computational_model.py" afterPath="$PROJECT_DIR$/computational_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_interaction.json" afterPath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_interaction.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_noInteraction.json" afterPath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_noInteraction.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_interaction.json" afterPath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_interaction.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_interaction_opp_potentialBlock.json" afterPath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_interaction_opp_potentialBlock.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/testInteraction.csv" afterPath="$PROJECT_DIR$/stats/testInteraction.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/oppNew_50.csv" afterPath="$PROJECT_DIR$/stats/oppNew_50.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/potentialBlock50.csv" afterPath="$PROJECT_DIR$/stats/potentialBlock50.csv" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -26,8 +25,8 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/GTTT$model.coverage" NAME="model Coverage Results" MODIFIED="1517052181780" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$computational_model.coverage" NAME="computational_model Coverage Results" MODIFIED="1517061536706" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$model.coverage" NAME="model Coverage Results" MODIFIED="1517066773879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$computational_model.coverage" NAME="computational_model Coverage Results" MODIFIED="1517073933597" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gentictactoe.coverage" NAME="gentictactoe Coverage Results" MODIFIED="1496778985524" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_gentictactoe.coverage" NAME="Unittests in gentictactoe Coverage Results" MODIFIED="1490666924715" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittest_TicTacToeTest_test_basic_game_play.coverage" NAME="Unittest TicTacToeTest.test_basic_game_play Coverage Results" MODIFIED="1490667105400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -56,8 +55,8 @@
       <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="36.305515">
-              <caret line="1433" column="88" selection-start-line="1433" selection-start-column="88" selection-end-line="1433" selection-end-column="88" />
+            <state vertical-scroll-proportion="0.22238164">
+              <caret line="350" column="39" selection-start-line="350" selection-start-column="39" selection-end-line="350" selection-end-column="39" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -113,26 +112,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="stats_analyses.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/stats_analyses.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="14" column="9" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="computational_model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/computational_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="397" column="39" selection-start-line="397" selection-start-column="39" selection-end-line="397" selection-end-column="39" />
+            <state vertical-scroll-proportion="-6.6896553">
+              <caret line="708" column="83" selection-start-line="708" selection-start-column="83" selection-end-line="708" selection-end-column="83" />
               <folding>
                 <element signature="e#27#44#0" expanded="true" />
-                <marker date="1517061535318" expanded="true" signature="14541:14626" placeholder="..." />
+                <marker date="1517073932153" expanded="true" signature="14541:14626" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -141,8 +128,8 @@
       <file leaf-file-name="ab_config1.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ab_config1.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.2692308">
-              <caret line="5" column="22" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
+            <state vertical-scroll-proportion="-9.153846">
+              <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -151,8 +138,8 @@
       <file leaf-file-name="board.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/board.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.62069">
-              <caret line="753" column="0" selection-start-line="753" selection-start-column="0" selection-end-line="753" selection-end-column="0" />
+            <state vertical-scroll-proportion="-5.3448277">
+              <caret line="681" column="58" selection-start-line="681" selection-start-column="57" selection-end-line="681" selection-end-column="58" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -274,12 +261,12 @@
         <option value="$PROJECT_DIR$/stats_analyses.py" />
         <option value="$PROJECT_DIR$/mcts_search.py" />
         <option value="$PROJECT_DIR$/board_mcts.py" />
-        <option value="$PROJECT_DIR$/ab_config1.json" />
         <option value="$PROJECT_DIR$/ab_config_opp_full.json" />
-        <option value="$PROJECT_DIR$/board.py" />
-        <option value="$PROJECT_DIR$/model.py" />
         <option value="$PROJECT_DIR$/ab_config_opp_full1.json" />
+        <option value="$PROJECT_DIR$/ab_config1.json" />
+        <option value="$PROJECT_DIR$/board.py" />
         <option value="$PROJECT_DIR$/computational_model.py" />
+        <option value="$PROJECT_DIR$/model.py" />
       </list>
     </option>
   </component>
@@ -730,14 +717,14 @@
     <frame x="1358" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22441365" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22547974" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30186722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32883817" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24481328" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21784233" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24946696" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
@@ -874,12 +861,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>619</line>
+          <line>629</line>
           <option name="timeStamp" value="147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1107</line>
+          <line>1124</line>
           <option name="timeStamp" value="168" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -889,13 +876,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>629</line>
+          <line>639</line>
           <option name="timeStamp" value="194" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/model.py</url>
-          <line>818</line>
-          <option name="timeStamp" value="203" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board_mcts.py</url>
@@ -934,17 +916,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1021</line>
+          <line>1038</line>
           <option name="timeStamp" value="268" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1068</line>
+          <line>1085</line>
           <option name="timeStamp" value="272" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1045</line>
+          <line>1062</line>
           <option name="timeStamp" value="273" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -954,7 +936,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>1176</line>
+          <line>1377</line>
           <option name="timeStamp" value="290" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -964,17 +946,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1018</line>
+          <line>1035</line>
           <option name="timeStamp" value="353" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1013</line>
+          <line>1030</line>
           <option name="timeStamp" value="354" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1155</line>
+          <line>1172</line>
           <option name="timeStamp" value="355" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -989,26 +971,21 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>903</line>
-          <option name="timeStamp" value="361" />
+          <line>898</line>
+          <option name="timeStamp" value="414" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>908</line>
-          <option name="timeStamp" value="364" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/model.py</url>
-          <line>905</line>
-          <option name="timeStamp" value="365" />
+          <line>1408</line>
+          <option name="timeStamp" value="415" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>244</line>
-          <option name="timeStamp" value="408" />
+          <line>643</line>
+          <option name="timeStamp" value="432" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="409" />
+      <option name="time" value="435" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
@@ -1341,7 +1318,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="14" column="9" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1396,44 +1373,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="2406" column="0" selection-start-line="2406" selection-start-column="0" selection-end-line="2406" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/board_buJan27.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="16" column="36" selection-start-line="16" selection-start-column="36" selection-end-line="16" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ab_config1.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.2692308">
-          <caret line="5" column="22" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/board.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.62069">
-          <caret line="753" column="0" selection-start-line="753" selection-start-column="0" selection-end-line="753" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ab_config_opp_full.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.1454546">
-          <caret line="51" column="26" selection-start-line="51" selection-start-column="26" selection-end-line="51" selection-end-column="26" />
           <folding />
         </state>
       </provider>
@@ -1446,21 +1389,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/computational_model.py">
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="397" column="39" selection-start-line="397" selection-start-column="39" selection-end-line="397" selection-end-column="39" />
+          <caret line="1797" column="0" selection-start-line="1797" selection-start-column="0" selection-end-line="1797" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ab_config_opp_full.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.1454546">
+          <caret line="51" column="26" selection-start-line="51" selection-start-column="26" selection-end-line="51" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ab_config1.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-9.153846">
+          <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/board.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-5.3448277">
+          <caret line="681" column="58" selection-start-line="681" selection-start-column="57" selection-end-line="681" selection-end-column="58" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/computational_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.6896553">
+          <caret line="708" column="83" selection-start-line="708" selection-start-column="83" selection-end-line="708" selection-end-column="83" />
           <folding>
             <element signature="e#27#44#0" expanded="true" />
-            <marker date="1517061535318" expanded="true" signature="14541:14626" placeholder="..." />
+            <marker date="1517073932153" expanded="true" signature="14541:14626" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="36.305515">
-          <caret line="1433" column="88" selection-start-line="1433" selection-start-column="88" selection-end-line="1433" selection-end-column="88" />
+        <state vertical-scroll-proportion="0.22238164">
+          <caret line="350" column="39" selection-start-line="350" selection-start-column="39" selection-end-line="350" selection-end-column="39" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

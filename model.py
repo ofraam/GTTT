@@ -200,9 +200,11 @@ def compute_open_paths_data(row, col, board, exp=1, player = 'X', interaction=Tr
     if player == 'O':
         other_player = 'X'
 
-    threshold = 0
-    if len(board)==10:
-        threshold +=1
+
+    max_length_path = 0
+    threshold = -1
+    # if len(board)==10:
+    #     threshold +=1
 
     streak_size = 4  # how many Xs in a row you need to win
     if len(board) == 10:  # if it's a 10X10 board you need 5.
@@ -238,6 +240,8 @@ def compute_open_paths_data(row, col, board, exp=1, player = 'X', interaction=Tr
         if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
             elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares, path))
 
@@ -269,6 +273,8 @@ def compute_open_paths_data(row, col, board, exp=1, player = 'X', interaction=Tr
         if (path_length == streak_size) & (not blocked)  & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
             elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares, path))
 
@@ -302,6 +308,8 @@ def compute_open_paths_data(row, col, board, exp=1, player = 'X', interaction=Tr
         if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
             elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares, path))
 
@@ -333,6 +341,8 @@ def compute_open_paths_data(row, col, board, exp=1, player = 'X', interaction=Tr
         if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
             elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares, path))
 
@@ -348,7 +358,7 @@ def compute_open_paths_data(row, col, board, exp=1, player = 'X', interaction=Tr
                 if not(check_path_overlap(p1[1],p2[1])):  # interaction score if the paths don't overlap
                     score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[0]*p2[0]), exp))
 
-    return (score, open_paths_data)
+    return (score, open_paths_data, max_length_path)
 
 
 def compute_relative_path_score(row, col, path_data, score_matrix, lamb = 1):
@@ -381,9 +391,9 @@ def compute_open_paths(row, col, board, exp=1, player = 'X', interaction = True)
     if player == 'O':
         other_player = 'X'
 
-    threshold = 0
+    threshold = -1
     if len(board)==10:
-        threshold +=1
+        threshold = -1
 
     streak_size = 4  # how many Xs in a row you need to win
     if len(board) == 10:  # if it's a 10X10 board you need 5.
@@ -879,7 +889,14 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                     for path in x_paths[1]:
                         x_paths_data.append(path[2])
                     paths_data[r][c] = copy.deepcopy(x_paths_data)
-                    square_score_o = compute_open_paths(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+                    # square_score_0 = compute_open_paths(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+                    o_paths = compute_open_paths_data(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+                    square_score_o = o_paths[0]
+                    streak_size = 4
+                    if len(board_matrix)==10:
+                        streak_size = 5
+                    # if x_paths[2] == (streak_size-1):
+                    #     square_score_o =0
                     square_score = (1-o_weight)*square_score_x + o_weight*square_score_o
                     if integrate:
                         square_score = square_score*density_score_matrix[r][c]
@@ -943,8 +960,8 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
     else:
         matrix_name += '_noInteraction'
     if dominance:
-        matrix_name += 'dominance'
-    # matrix_name = matrix_name+ 't=1'
+        matrix_name += '_dominance'
+    matrix_name = matrix_name+ '_potential'
     write_matrices_to_file(data_matrices, matrix_name + '.json')
     return data_matrices
 
@@ -1215,9 +1232,9 @@ def compute_square_scores_dominance(board, score_matrix, n=1000):
     streak_size = 4  # how many Xs in a row you need to win
     if len(board) == 10:  # if it's a 10X10 board you need 5.
         streak_size = 5
-    threshold = 0
+    threshold = -1
     if streak_size == 5:
-        threshold = 1
+        threshold = -1
     # find open paths, compute sum score for each open path
     open_paths_data = []  # this list will hold information on all the potential paths, each path will be represented by a pair (length and empty squares, which will be used to check overlap)
     paths = []
@@ -1381,14 +1398,17 @@ def compute_square_scores_dominance(board, score_matrix, n=1000):
         paths_final.append(p[1])
 
 
-    for j in range(n):
+    for run in range(n):
         path = choice(paths_final,weights)
         # choose square from path with proportion to its score
         square_weights = []
         squares = []
         for j in range(len(path)):
             square = path[j]
-            square_weights.append(score_matrix[square[0]][square[1]]/open_paths_data[i][2])
+            if open_paths_data[j][2]!=0:
+                square_weights.append(score_matrix[square[0]][square[1]]/open_paths_data[j][2])
+            else:
+                square_weights.append(0)
             squares.append(square)
         chosen_square = choice(squares, square_weights)
         move_matrix[chosen_square[0]][chosen_square[1]] +=1
@@ -1416,7 +1436,8 @@ def choice(population, weights):
 
 if __name__ == "__main__":
     # compute_scores_density(normalized=True,neighborhood_size=2)
-    # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=True, dominance=False)
+    compute_scores_layers(normalized=True, exp=4, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=True)
+    # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=False, dominance=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=False, dominance=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.0, integrate=True)
@@ -1428,10 +1449,13 @@ if __name__ == "__main__":
     # # # # run_models()  # calls the function that runs the models
     # # # model_files = ['paths_linear_square_opp.json', 'paths_non-linear_square_opp.json', 'avg_people_clicks_solvedCorrect.json']
     # model_files = ['model_layers_e=2_nbr=2_o=0.5.json','paths_non-linear_square_layers_opp.json', 'avg_people_clicks_all.json']
-    model_files = ['paths_linear_full_layers_opp_potentialBlock50.json','paths_non-linear_full_layers_opp_potentialBlock50.json', 'avg_people_clicks_all.json']
-    # model_files = ['model_layers_e=2_nbr=2_o=0.0_interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_clicks_all.json']
-    # model_files = ['model_layers_e=1_nbr=2_o=0.5.json','model_layers_e=2_nbr=2_o=0.5.json', 'participant_solutions.json']
-    run_models_from_list(model_files, 'heatmaps/cogsci/potentialBlockAlphaBetaVsClicks50',2)
+    # model_files = ['paths_linear_full_layers_opp_potentialBlock50.json','paths_non-linear_full_layers_opp_potentialBlock50.json', 'avg_people_clicks_all.json']
+    # model_files = ['model_layers_e=1_nbr=2_o=0.5_interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_clicks_all.json']
+    # # model_files = ['model_layers_e=1_nbr=2_o=0.5.json','model_layers_e=2_nbr=2_o=0.5.json', 'participant_solutions.json']
+    # run_models_from_list(model_files, 'heatmaps/cogsci/linearVsNonLinearThreshold0Clicks',2)
+    # model_files = ['model_layers_e=2_nbr=2_o=0.5_interaction.json','model_layers_e=4_nbr=2_o=0.5_interaction_potential.json', 'avg_people_clicks_all.json']
+    # # # model_files = ['model_layers_e=1_nbr=2_o=0.5.json','model_layers_e=2_nbr=2_o=0.5.json', 'participant_solutions.json']
+    # run_models_from_list(model_files, 'heatmaps/cogsci/exp4Vsexp2clicks',2)
     # model_files = ['density.json','paths_linear_square_layers_opp.json','paths_non-linear_square_layers_opp.json', 'avg_people_first_moves_all.json']
     # model_files = ['model_layers_e=2_nbr=2_o=0.5.json','paths_non-linear_square_layers_opp.json', 'participant_solutions.json']
     # model_files = ['model_layers_e=2_nbr=2_o=0.0_interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_first_moves_all.json']
