@@ -645,8 +645,8 @@ if __name__ == "__main__":
       for filename in os.listdir("predefinedBoards/"):
         if filename.startswith("6"):
           file_path = "examples/board_6_4.txt"
-          continue
-          if not(filename.startswith("6_hard")):
+          # continue
+          if not(filename.startswith("6_easy")):
             continue
 
         else:
@@ -654,7 +654,7 @@ if __name__ == "__main__":
           if not(filename.startswith("10_easy")):
             continue
           file_path = "examples/board_10_5.txt"
-          # continue
+          continue
 
         game = start_game(file_path, conf)
         board_results = []

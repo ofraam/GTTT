@@ -5,7 +5,7 @@
       "interaction": true,
       "opponent": false,
       "prune": false,
-      "exp": 2,
+      "exp": 1,
       "potential": "full",
       "neighborhood": 2,
        "name": "paths_non-linear_full_interaction"
