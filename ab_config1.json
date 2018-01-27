@@ -8,8 +8,9 @@
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-       "name": "paths_non-linear_full_interactionNew"
-    },    {
+      "name": "paths_non-linear_interactionNew"
+    },
+    {
       "heuristic": "paths",
       "interaction": false,
       "opponent": true,
@@ -17,6 +18,7 @@
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-       "name": "paths_non-linear_full_noInteraction"
-    }]
+      "name": "paths_non-linear_noInteraction"
+    }
+  ]
 }

@@ -706,8 +706,8 @@ if __name__ == "__main__":
     for i in range(len(results)):
       print results[i]
 
-    write_results('stats/potentialBlock100000_newInteraction_opp_all_betaWithMedium.csv', results, header)
-
+    write_results('stats/paths100000_newInteraction_opp_clean.csv', results, header)
+      #
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
       # print game.on_same_win_path
       # print game.on_same_win_path/game.count_between_spaces_on_path

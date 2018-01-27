@@ -1,19 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/board.py" line="1070" />
+    <bookmark url="file://$PROJECT_DIR$/board.py" line="1204" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27e7977-f565-4ab6-8925-e8910730b8bd" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/computational_model.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/density.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/density_potentialBlock.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/density_potentialBlock50.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=1_nbr=2_o=0.0.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=1_nbr=2_o=0.0integrated.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=1_nbr=2_o=0.5.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=1_nbr=2_o=0.5_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=1_nbr=2_o=0.5_noInteraction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=1_nbr=2_o=0.5integrated.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=1_o=0.5.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=1_o=0.5_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=1_o=0.5_no interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.0.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.0_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.0_noInteraction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.0integrated.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_interactiondominance.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_no interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_noInteraction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5integrated.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=3_nbr=2_o=0.0.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=3_nbr=2_o=0.5_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=3_nbr=2_o=0.5_no interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=3_nbr=2_o=0.5integrated.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=4_nbr=2_o=0.5_interaction_potential.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/participant_solutions.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full_layers.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full_layers_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full_layers_opp_potentialBlock.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full_layers_opp_potentialBlock50.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full_opp_potentialBlock.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full_opp_potentialBlock100000.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_full_opp_potentialBlock50.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_square.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_square_layers.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_square_layers_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_linear_square_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_interaction_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_interaction_opp_potentialBlock.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_interaction_opp_potentialBlock50.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_interaction_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_interaction_opp_potentialBlock.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_interaction_opp_potentialBlock50.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_opp_potentialBlock.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_opp_potentialBlock50.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_noInteraction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_opp_potentialBlock.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_opp_potentialBlock100000.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_opp_potentialBlock50.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_opponent_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square_interaction_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square_layers.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square_layers_interaction.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square_layers_interaction_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square_layers_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square_opp.json" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_square_opponent_interaction.json" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ab_config1.json" afterPath="$PROJECT_DIR$/ab_config1.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/board.py" afterPath="$PROJECT_DIR$/board.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/computational_model.py" afterPath="$PROJECT_DIR$/computational_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_interaction.json" afterPath="$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_interaction.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_interaction_opp_potentialBlock.json" afterPath="$PROJECT_DIR$/data_matrices/paths_non-linear_full_layers_interaction_opp_potentialBlock.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/oppNew_50.csv" afterPath="$PROJECT_DIR$/stats/oppNew_50.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/potentialBlock50.csv" afterPath="$PROJECT_DIR$/stats/potentialBlock50.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/potentialBlock100000_newInteraction_opp_all_betaWithMedium.csv" afterPath="$PROJECT_DIR$/stats/potentialBlock100000_newInteraction_opp_all_betaWithMedium.csv" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,8 +92,8 @@
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/GTTT$model.coverage" NAME="model Coverage Results" MODIFIED="1517066773879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$computational_model.coverage" NAME="computational_model Coverage Results" MODIFIED="1517073933597" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$model.coverage" NAME="model Coverage Results" MODIFIED="1517075324311" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$computational_model.coverage" NAME="computational_model Coverage Results" MODIFIED="1517083404231" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gentictactoe.coverage" NAME="gentictactoe Coverage Results" MODIFIED="1496778985524" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_gentictactoe.coverage" NAME="Unittests in gentictactoe Coverage Results" MODIFIED="1490666924715" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittest_TicTacToeTest_test_basic_game_play.coverage" NAME="Unittest TicTacToeTest.test_basic_game_play Coverage Results" MODIFIED="1490667105400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -52,11 +119,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.22238164">
-              <caret line="350" column="39" selection-start-line="350" selection-start-column="39" selection-end-line="350" selection-end-column="39" />
+            <state vertical-scroll-proportion="-2.3448277">
+              <caret line="368" column="45" selection-start-line="368" selection-start-column="45" selection-end-line="368" selection-end-column="45" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -112,14 +179,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="computational_model.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="computational_model.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/computational_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-6.6896553">
-              <caret line="708" column="83" selection-start-line="708" selection-start-column="83" selection-end-line="708" selection-end-column="83" />
+            <state vertical-scroll-proportion="0.70711297">
+              <caret line="657" column="0" selection-start-line="657" selection-start-column="0" selection-end-line="657" selection-end-column="0" />
               <folding>
                 <element signature="e#27#44#0" expanded="true" />
-                <marker date="1517073932153" expanded="true" signature="14541:14626" placeholder="..." />
+                <marker date="1517083336409" expanded="true" signature="14541:14626" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -128,8 +195,8 @@
       <file leaf-file-name="ab_config1.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ab_config1.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.153846">
-              <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+            <state vertical-scroll-proportion="-6.5384617">
+              <caret line="10" column="47" selection-start-line="10" selection-start-column="47" selection-end-line="10" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -138,8 +205,8 @@
       <file leaf-file-name="board.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/board.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.3448277">
-              <caret line="681" column="58" selection-start-line="681" selection-start-column="57" selection-end-line="681" selection-end-column="58" />
+            <state vertical-scroll-proportion="-6.8965516">
+              <caret line="1019" column="0" selection-start-line="1019" selection-start-column="0" selection-end-line="1019" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -150,7 +217,7 @@
       <file leaf-file-name="ab_config_opp_full.json" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ab_config_opp_full.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.1454546">
+            <state vertical-scroll-proportion="-3.0727272">
               <caret line="51" column="26" selection-start-line="51" selection-start-column="26" selection-end-line="51" selection-end-column="26" />
               <folding />
             </state>
@@ -263,10 +330,10 @@
         <option value="$PROJECT_DIR$/board_mcts.py" />
         <option value="$PROJECT_DIR$/ab_config_opp_full.json" />
         <option value="$PROJECT_DIR$/ab_config_opp_full1.json" />
-        <option value="$PROJECT_DIR$/ab_config1.json" />
+        <option value="$PROJECT_DIR$/model.py" />
         <option value="$PROJECT_DIR$/board.py" />
         <option value="$PROJECT_DIR$/computational_model.py" />
-        <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/ab_config1.json" />
       </list>
     </option>
   </component>
@@ -717,18 +784,18 @@
     <frame x="1358" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22547974" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12473348" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30186722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32883817" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21784233" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44502074" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24946696" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46369293" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39419088" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -861,12 +928,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>629</line>
+          <line>789</line>
           <option name="timeStamp" value="147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1124</line>
+          <line>1284</line>
           <option name="timeStamp" value="168" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -876,7 +943,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>639</line>
+          <line>799</line>
           <option name="timeStamp" value="194" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -916,17 +983,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1038</line>
+          <line>1198</line>
           <option name="timeStamp" value="268" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1085</line>
+          <line>1245</line>
           <option name="timeStamp" value="272" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1062</line>
+          <line>1222</line>
           <option name="timeStamp" value="273" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -936,7 +1003,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>1377</line>
+          <line>1511</line>
           <option name="timeStamp" value="290" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -946,17 +1013,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1035</line>
+          <line>1195</line>
           <option name="timeStamp" value="353" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1030</line>
+          <line>1190</line>
           <option name="timeStamp" value="354" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1172</line>
+          <line>1332</line>
           <option name="timeStamp" value="355" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -971,21 +1038,46 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>898</line>
+          <line>1058</line>
           <option name="timeStamp" value="414" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>1408</line>
+          <line>1568</line>
           <option name="timeStamp" value="415" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/board.py</url>
-          <line>643</line>
+          <line>644</line>
           <option name="timeStamp" value="432" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>363</line>
+          <option name="timeStamp" value="435" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>885</line>
+          <option name="timeStamp" value="437" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>1030</line>
+          <option name="timeStamp" value="438" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>1019</line>
+          <option name="timeStamp" value="440" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/board.py</url>
+          <line>1028</line>
+          <option name="timeStamp" value="441" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="435" />
+      <option name="time" value="442" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
@@ -1207,14 +1299,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/computational_model.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="7" selection-start-line="0" selection-start-column="7" selection-end-line="0" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ab_config_opp.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-78.46154">
@@ -1223,58 +1307,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/density.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/paths_linear_full.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="6.3170733">
-          <caret line="0" column="7166" selection-start-line="0" selection-start-column="7166" selection-end-line="0" selection-end-column="7166" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/paths_linear_square_opp.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/paths_non-linear_square_layers_opp.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Anaconda2/Lib/site-packages/numpy/core/numeric.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="619" column="0" selection-start-line="619" selection-start-column="0" selection-end-line="619" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/paths_linear_square.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/paths_non-linear_square.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1297,14 +1333,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/participant_solutions.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="682" selection-start-line="0" selection-start-column="676" selection-end-line="0" selection-end-column="682" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Anaconda2/Lib/site-packages/bootstrapped/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1320,14 +1348,6 @@
           <folding>
             <element signature="e#0#18#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_matrices/model_layers_e=2_nbr=2_o=0.5_interactiondominance.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1397,49 +1417,57 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ab_config_opp_full.json">
+    <entry file="file://$PROJECT_DIR$/data_matrices/model_layers_e=1_nbr=2_o=0.5_interactionNew.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.1454546">
-          <caret line="51" column="26" selection-start-line="51" selection-start-column="26" selection-end-line="51" selection-end-column="26" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ab_config1.json">
+    <entry file="file://$PROJECT_DIR$/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-9.153846">
-          <caret line="14" column="22" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+        <state vertical-scroll-proportion="-2.3448277">
+          <caret line="368" column="45" selection-start-line="368" selection-start-column="45" selection-end-line="368" selection-end-column="45" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ab_config_opp_full.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.0727272">
+          <caret line="51" column="26" selection-start-line="51" selection-start-column="26" selection-end-line="51" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/board.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.3448277">
-          <caret line="681" column="58" selection-start-line="681" selection-start-column="57" selection-end-line="681" selection-end-column="58" />
+        <state vertical-scroll-proportion="-6.8965516">
+          <caret line="1019" column="0" selection-start-line="1019" selection-start-column="0" selection-end-line="1019" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/computational_model.py">
+    <entry file="file://$PROJECT_DIR$/ab_config1.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-6.6896553">
-          <caret line="708" column="83" selection-start-line="708" selection-start-column="83" selection-end-line="708" selection-end-column="83" />
-          <folding>
-            <element signature="e#27#44#0" expanded="true" />
-            <marker date="1517073932153" expanded="true" signature="14541:14626" placeholder="..." />
-          </folding>
+        <state vertical-scroll-proportion="-6.5384617">
+          <caret line="10" column="47" selection-start-line="10" selection-start-column="47" selection-end-line="10" selection-end-column="47" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model.py">
+    <entry file="file://$PROJECT_DIR$/computational_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.22238164">
-          <caret line="350" column="39" selection-start-line="350" selection-start-column="39" selection-end-line="350" selection-end-column="39" />
+        <state vertical-scroll-proportion="0.70711297">
+          <caret line="657" column="0" selection-start-line="657" selection-start-column="0" selection-end-line="657" selection-end-column="0" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#27#44#0" expanded="true" />
+            <marker date="1517083336409" expanded="true" signature="14541:14626" placeholder="..." />
           </folding>
         </state>
       </provider>
