@@ -1,0 +1,24 @@
+Row Labels,Average of correct
+block_linear,0.6
+block_linear_interaction,0.9
+block_non-linear,0.9
+block_non-linear_interaction,0.9
+density,0.1
+paths_linear,0.2
+paths_linear_interaction,0.4
+paths_non-linear,0.6
+paths_non-linear_interaction,0.6
+Grand Total,0.577777778
+,
+,
+,
+Row Labels,Average of correct
+density,0.1
+paths_linear,0.2
+paths_linear_interaction,0.4
+block_linear,0.6
+paths_non-linear,0.6
+paths_non-linear_interaction,0.6
+block_linear_interaction,0.9
+block_non-linear,0.9
+block_non-linear_interaction,0.9

@@ -1,16 +1,76 @@
 {
   "configs": [
     {
-      "heuristic": "paths",
+      "heuristic": "density",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "density"
+    },
+    {
+      "heuristic": "block",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "block_linear"
+    },
+    {
+      "heuristic": "block",
+      "interaction": true,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "block_linear_interaction"
+    },
+        {
+      "heuristic": "block",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "block_non-linear"
+    },
+        {
+      "heuristic": "block",
       "interaction": true,
       "opponent": true,
       "prune": false,
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-      "name": "paths_non-linear_interactionNew"
+      "name": "block_non-linear_interaction"
+    },
+        {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_linear"
     },
     {
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_linear_interaction"
+    },
+        {
       "heuristic": "paths",
       "interaction": false,
       "opponent": true,
@@ -18,7 +78,17 @@
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-      "name": "paths_non-linear_noInteraction"
+      "name": "paths_non-linear"
+    },
+        {
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_non-linear_interaction"
     }
   ]
 }

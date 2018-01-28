@@ -353,7 +353,7 @@ class Game:
     # or ((depth==self.max_depth-1) & (beta==c.LOSE_SCORE))
     if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0)),None)  # Terminal (the space will be picked up via recursion)
+      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0),exp=self.exp, interaction=self.interaction), None)  # Terminal (the space will be picked up via recursion)
     else:
       self.node_count += 1
       max_child = (c.NEG_INF, None)
@@ -391,7 +391,7 @@ class Game:
     #   print 'happened'
     if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves) or  ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0)), other_player=True),None)
+      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0),exp=self.exp, interaction=self.interaction),None)
 
     # if board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0)))==-20000000:
     #   # print 'cutting'
@@ -412,6 +412,7 @@ class Game:
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
       for space in moves:
+
         # if depth==8:
         #   print space
         # if space==24:
@@ -447,11 +448,15 @@ class Game:
 
           # self.prev_move_x = space
           # self.prev_move_x_depth = depth
+          # if (depth==self.max_depth) & (space ==4):
+          #   print 'space  = 4'
           score = self.minimax_max_alphabeta_DL(alpha, beta, new_board, depth - 1, prev_space_x = space)[0]
           # if depth == 8:
           #   print score
           self.move_matrix[int(row)][int(col)] += 1
           self.move_counter += 1
+          # if (depth==self.max_depth):
+          #   print str(space) + ':' + str(score)
           if score < min_child[0]:
             min_child = (score, space)
           # if min_child[0] <= alpha:
@@ -639,14 +644,14 @@ if __name__ == "__main__":
 
     results = []
     header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
-    configs = get_game_configs("ab_config_opp_square.json")
+    configs = get_game_configs("ab_config1.json")
     for conf in configs:
       data_matrices = {}
       for filename in os.listdir("predefinedBoards/"):
         if filename.startswith("6"):
           file_path = "examples/board_6_4.txt"
           # continue
-          # if not(filename.startswith("6_easy")):
+          # if not(filename.startswith("6_hard")):
           #   continue
 
         else:
@@ -706,7 +711,7 @@ if __name__ == "__main__":
     for i in range(len(results)):
       print results[i]
 
-    write_results('stats/paths50_newInteraction_opp_clean.csv', results, header)
+    write_results('stats/allHeuristics50constant.csv', results, header)
       #
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
       # print game.on_same_win_path

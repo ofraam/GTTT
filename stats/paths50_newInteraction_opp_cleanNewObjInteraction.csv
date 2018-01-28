@@ -1,0 +1,7 @@
+Average of correct,Column Labels,,,,,,,,,,
+Row Labels,10_easy_full,10_easy_pruned,10_hard_full,10_hard_pruned,10_medium_full,10_medium_pruned,6_easy_full,6_easy_pruned,6_hard_full,6_hard_pruned,Grand Total
+density,0,0,0,0,0,0,1,0,0,0,0.1
+paths_linear_full_opp,0,0,0,0,0,0,1,1,0,0,0.2
+paths_non-linear_full_interaction_opp,1,1,1,1,0,1,1,1,0,0,0.7
+paths_non-linear_full_opp,0,1,1,0,0,1,1,1,1,0,0.6
+Grand Total,0.25,0.5,0.5,0.25,0,0.5,1,0.75,0.25,0,0.4
