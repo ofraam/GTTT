@@ -142,7 +142,7 @@ class Board:
         self.pruned_spaces_x.append(spaces[i])
       # else:
       #   print 'not pruned'
-    print self.pruned_spaces_x
+    # print self.pruned_spaces_x
 
 
   def compute_square_score_density(self, space, player, neighborhood_size, remaining_turns_x=None):

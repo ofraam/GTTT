@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import random
 import utils
+import config as c
 
 NODE_COUNTER = 0
 
@@ -34,15 +35,17 @@ class MCTS(object):
             self.node_counter+=count
             self.backup(node)
         # print ()
-        return (utils.rand_max(root.children.values(), key=lambda x: x.q).action,self.node_counter)
+        return (utils.rand_max(root.children.values(), key=lambda x: x.q).action,c.NUM_NODES)
 
 
 def _expand(state_node):
     action = random.choice(state_node.untried_actions)
+    # print (action)
     return state_node.children[action].sample_state()
 
 
 def _best_child(state_node, tree_policy):
+    # print ('best')
     best_action_node = utils.rand_max(state_node.children.values(),
                                       key=tree_policy)
     return best_action_node.sample_state()
@@ -51,10 +54,11 @@ def _best_child(state_node, tree_policy):
 def _get_next_node(state_node, tree_policy):
     node_counter = 0
     while not state_node.state.is_terminal():
-        node_counter+=1
+        # print ('while')
+        c.NUM_NODES +=1
         if state_node.untried_actions:
             return (_expand(state_node),node_counter)
         else:
             state_node = _best_child(state_node, tree_policy)
-
-    return (state_node,node_counter)
+    # print (node_counter)
+    return (state_node,c.NUM_NODES)

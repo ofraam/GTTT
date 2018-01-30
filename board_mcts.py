@@ -5,6 +5,7 @@ from mcts import *
 from tree_policies import *
 from default_policies import *
 from backups import *
+# from backups import monte_carlo
 from utils import *
 from graph import *
 import config as c
@@ -13,6 +14,43 @@ from computational_model import *
 import copy
 import random
 
+class Bellman(object):
+    """
+    A dynamical programming update which resembles the Bellman equation
+    of value iteration.
+
+    See Feldman and Domshlak (2014) for reference.
+    """
+    def __init__(self, gamma):
+        self.gamma = gamma
+
+    def __call__(self, node):
+        """
+        :param node: The node to start the backups from
+        """
+        while node is not None:
+            node.n += 1
+            if isinstance(node, StateNode):
+                node.q = max([x.q for x in node.children.values()])
+            elif isinstance(node, ActionNode):
+                n = sum([x.n for x in node.children.values()])
+                node.q = sum([(self.gamma * x.q + x.reward) * x.n
+                              for x in node.children.values()]) / n
+            node = node.parent
+
+
+def monte_carlo(node):
+    """
+    A monte carlo update as in classical UCT.
+
+    See feldman amd Domshlak (2014) for reference.
+    :param node: The node to start the backup from
+    """
+    r = node.reward
+    while node is not None:
+        node.n += 1
+        node.q = ((node.n - 1)/node.n) * node.q + 1/node.n * r
+        node = node.parent
 
 class TicTacToeAction(object):
     def __init__(self, move):
@@ -45,24 +83,60 @@ class TicTactToeState(object):
         depth = self.depth+1
         return TicTactToeState(new_board, player, depth)
 
+    # def reward(self, parent, action):
+    #     # return -1*self.board.obj_interaction(self.player)
+    #     if self.board.is_terminal():
+    #         if self.board.obj(self.player) == c.LOSE_SCORE:
+    #              return 1
+    #          # if self.board.obj(self.player) == c.WIN_SCORE:
+    #         else:
+    #             return -1
+    #     elif self.board.check_possible_win(math.ceil(self.depth/2.0)):
+    #          return 0
+    #     else:
+    #          return -1
+    #     return 0
+
     def reward(self, parent, action):
         # return -1*self.board.obj_interaction(self.player)
         if self.board.is_terminal():
             if self.board.obj(self.player) == c.LOSE_SCORE:
-                return 1
-            # if self.board.obj(self.player) == c.WIN_SCORE:
+                 # print 'win'
+                 return 10000
+             # if self.board.obj(self.player) == c.WIN_SCORE:
             else:
-                return -1
-        elif self.board.check_possible_win(math.ceil(self.depth/2.0)):
-            return 0
-        else:
-            return -1
-        return 0
+                return -10000
+        # elif self.board.check_possible_win(math.ceil(self.depth/2.0)):
+        #      return -10000
+        # else:
+        #      return -10000
+        # return -1*self.board.obj_interaction(self.player, exp=2, other_player=False)
+        return -10000
+    # def reward(self, parent, action):
+    #     # return -1*self.board.obj_interaction(self.player)
+    #     if self.board.is_terminal():
+    #         if self.board.obj(self.player) == c.LOSE_SCORE:
+    #             return -1*c.LOSE_SCORE
+    #         if self.board.obj(self.player) == c.WIN_SCORE:
+    #             return -1*c.WIN_SCORE
+    #         else:
+    #             return -1*self.board.obj_interaction(player=c.HUMAN, exp=2)
+    #     # elif self.board.check_possible_win(math.ceil(self.depth/2.0)):
+    #     #     return -10000
+    #     else:
+    #         return -1*self.board.obj_interaction(player=c.HUMAN, exp=2)
+    #     # return 0
 
     def is_terminal(self):
+        # if self.depth == 7:
+        #     print 7
+        # print self.depth
         if self.board.is_terminal():
             return True
         if c.WIN_DEPTH == self.depth:
+            # print 'depth'
+            return True
+        if self.board.check_possible_win(math.ceil(self.depth/2.0)):
             return True
         # # return True
         # if (random.random()<0.05):
@@ -74,6 +148,13 @@ class TicTactToeState(object):
             return False
         for act in self.actions:
             if act not in other.actions:
+                return False
+        if self.depth!= other.depth:
+            return False
+        if self.player!=other.player:
+            return False
+        for i in range(1,len(self.board.board)+1):
+            if self.board.board[i] != other.board.board[i]:
                 return False
         return True
 
@@ -114,8 +195,12 @@ class MazeState(object):
 
     def is_terminal(self):
         # # return True
-        # if (random.random()<0.05):
+        # if se
+        # if (random.random()<0.5):
+        if (random.random()<0.01):
+            return True
         return False
+        # return True
 
     def __eq__(self, other):
         return all(self.pos == other.pos)
@@ -124,11 +209,17 @@ class MazeState(object):
         return 10 * self.pos[0] + self.pos[1]
 
 if __name__ == "__main__":
-    mcts = MCTS(tree_policy=UCB1(c=1.41),
-                default_policy=immediate_reward,
-                backup=monte_carlo)
 
+    root =  StateNode(None, MazeState(np.array([2, 2])))
+    # best_action, num_nodes = mcts(root, n=50)
+    # print best_action
+    #
+    results = []
     for filename in os.listdir("predefinedBoards/"):
+        mcts = MCTS(tree_policy=UCB1(c=1.41),
+                    default_policy=random_terminal_roll_out,
+                    # default_policy=immediate_reward,
+                    backup=monte_carlo)
         # print filename
         if filename.startswith("6"):
             file_path = "examples/board_6_4.txt"
@@ -141,9 +232,9 @@ if __name__ == "__main__":
             # if not(filename.startswith("10by10_easy")):
             #   continue
             file_path = "examples/board_10_5.txt"
-            # continue
+            continue
         chosen_moves = {}
-        num_runs = 40
+        num_runs = 100
         num_correct = 0.0
         print filename
         total_nodes= 0.0
@@ -154,7 +245,8 @@ if __name__ == "__main__":
             c.WIN_DEPTH = win_depth
             root = StateNode(None,TicTactToeState(game.board,game.whos_turn,0))
 
-            best_action, num_nodes = mcts(root, n=100)
+            best_action, num_nodes = mcts(root, n=10)
+            # print best_action
 
 
             if best_action in chosen_moves.keys():
@@ -166,9 +258,11 @@ if __name__ == "__main__":
                 num_correct += 1
             total_nodes += num_nodes
 
-        print num_nodes/num_runs
+        print total_nodes/num_runs
         print chosen_moves
         print num_correct/num_runs
+        results.append(num_correct/num_runs)
+    print results
 
 
 
