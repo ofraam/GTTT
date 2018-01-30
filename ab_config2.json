@@ -1,14 +1,14 @@
 {
   "configs": [
         {
-      "heuristic": "block",
-      "interaction": true,
+      "heuristic": "paths",
+      "interaction": false,
       "opponent": true,
       "prune": false,
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-      "name": "block_non-linear_interaction"
+      "name": "paths_non-linear_Infinity"
     }
   ]
 }

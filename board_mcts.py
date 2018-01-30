@@ -223,7 +223,7 @@ if __name__ == "__main__":
         # print filename
         if filename.startswith("6"):
             file_path = "examples/board_6_4.txt"
-            # continue
+            continue
             # if not(filename.startswith("6by6_easy")):
             #     continue
 
@@ -232,36 +232,53 @@ if __name__ == "__main__":
             # if not(filename.startswith("10by10_easy")):
             #   continue
             file_path = "examples/board_10_5.txt"
-            continue
+            # continue
         chosen_moves = {}
         num_runs = 100
         num_correct = 0.0
         print filename
+
         total_nodes= 0.0
-        for i in range(0,num_runs):
-            game = start_game(file_path)
+        success = 0.0
+        n = 20
+        game = start_game(file_path)
 
-            win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
-            c.WIN_DEPTH = win_depth
-            root = StateNode(None,TicTactToeState(game.board,game.whos_turn,0))
+        win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
+        while (success < c.SOLVED):
+            n += 5
+            print n
+            total_nodes= 0.0
+            for i in range(0,num_runs):
+                game = start_game(file_path)
 
-            best_action, num_nodes = mcts(root, n=10)
-            # print best_action
+                win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
+                c.WIN_DEPTH = win_depth
+                root = StateNode(None,TicTactToeState(game.board,game.whos_turn,0))
+
+                best_action, num_nodes = mcts(root, n=n)
+                # print best_action
 
 
-            if best_action in chosen_moves.keys():
-                chosen_moves[best_action] += 1
-            else:
-                chosen_moves[best_action] = 1
+                if best_action in chosen_moves.keys():
+                    chosen_moves[best_action] += 1
+                else:
+                    chosen_moves[best_action] = 1
 
-            if best_action in c.WIN_MOVES:
-                num_correct += 1
-            total_nodes += num_nodes
+                if best_action in c.WIN_MOVES:
+                    num_correct += 1
+                total_nodes += num_nodes
 
+            # print total_nodes/num_runs
+            # print chosen_moves
+            # print num_correct/num_runs
+            success = num_correct/num_runs
+            results.append(num_correct/num_runs)
+        print '----------'
+        print n
         print total_nodes/num_runs
-        print chosen_moves
         print num_correct/num_runs
-        results.append(num_correct/num_runs)
+        print chosen_moves
+        print '----------'
     print results
 
 

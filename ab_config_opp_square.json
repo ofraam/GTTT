@@ -1,17 +1,6 @@
 {
   "configs": [
     {
-      "heuristic": "density",
-      "neighborhood": 2,
-      "opponent": false,
-      "interaction": false,
-      "opponent": false,
-      "prune": false,
-      "exp": 1,
-      "potential": "square",
-      "name": "density"
-  },
-    {
       "heuristic": "paths",
       "interaction": false,
       "opponent": true,

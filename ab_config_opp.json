@@ -14,26 +14,6 @@
       "heuristic": "paths",
       "interaction": false,
       "opponent": true,
-      "prune": false,
-      "exp": 1,
-      "potential": "full",
-      "neighborhood": 2,
-      "name": "paths_linear_full_opp"
-    },
-    {
-      "heuristic": "paths",
-      "interaction": false,
-      "opponent": true,
-      "prune": true,
-      "exp": 1,
-      "potential": "square",
-      "neighborhood": 2,
-      "name": "paths_linear_square_layers_opp"
-    },
-    {
-      "heuristic": "paths",
-      "interaction": false,
-      "opponent": true,
       "prune": true,
       "exp": 1,
       "potential": "full",

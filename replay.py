@@ -858,6 +858,8 @@ def paths_stats(participants = 'all'):
                                 pk_uniform.append(1.0/len(pk))
 
                             ent_moves_norm_max = ent/stats.entropy(pk_uniform)
+                            condition = LOGFILE[g][5:-10].replace("_",",")
+                            print condition + ',' + curr_user + ',' + str(ent_moves_norm_max) + ',' + participant_answer
                             entropy_values_clicks.append(ent_moves_norm_max)
 
                             # normalize move matrices
@@ -972,6 +974,8 @@ def paths_stats(participants = 'all'):
         avg_ent = sum(entropy_values)/len(entropy_values)
         avg_ent_subpaths = sum(entropy_values_subpaths)/len(entropy_values_subpaths)
         avg_ent_moves = sum(entropy_values_clicks)/len(entropy_values_clicks)
+        # print 'entropy_values_clicks'
+        # print entropy_values_clicks
         avg_ent_first_moves = sum(entropy_values_first_moves)/len(entropy_values_first_moves)
         # avg_times_after_click_agg = sum(avg_times_after_click)/len(avg_times_after_click)
         avg_times_after_click_agg = np.median(avg_times_after_click)
@@ -1013,17 +1017,17 @@ def paths_stats(participants = 'all'):
 
         condition = LOGFILE[g][5:-10].replace("_",",")
 
-        print condition + "," + str(avg_ent_moves) + "," +str(avg_ent_first_moves) + "," + str(avg_ent) + ","+ str(avg_ent_subpaths) + ","\
-              + str(avg_times_after_click_agg) + ","+ str(avg_times_after_undo_agg) + "," + str(avg_times_after_reset_agg) + "," \
-        + str(std_times_after_click_agg) + ","+ str(std_times_after_undo_agg) + "," + str(std_times_after_reset_agg) + "," + str(total_moves/num_participants)\
-              + "," + str(num_participants) + "," + participants
+        # print condition + "," + str(avg_ent_moves) + "," +str(avg_ent_first_moves) + "," + str(avg_ent) + ","+ str(avg_ent_subpaths) + ","\
+        #       + str(avg_times_after_click_agg) + ","+ str(avg_times_after_undo_agg) + "," + str(avg_times_after_reset_agg) + "," \
+        # + str(std_times_after_click_agg) + ","+ str(std_times_after_undo_agg) + "," + str(std_times_after_reset_agg) + "," + str(total_moves/num_participants)\
+        #       + "," + str(num_participants) + "," + participants
 
         board_name = LOGFILE[g]
         board_name=board_name[:-4]
         moves_data_matrics[board_name[5:-6]] = move_matrix
         first_moves_data_matrices[board_name[5:-6]] = first_move_matrix
-    write_matrices_to_file(moves_data_matrics, 'data_matrices/avg_people_clicks_' +participants +  '.json')
-    write_matrices_to_file(first_moves_data_matrices, 'data_matrices/avg_people_first_moves_' +participants +  '.json')
+    # write_matrices_to_file(moves_data_matrics, 'data_matrices/avg_people_clicks_' +participants +  '.json')
+    # write_matrices_to_file(first_moves_data_matrices, 'data_matrices/avg_people_first_moves_' +participants +  '.json')
     return (move_matrix, first_move_matrix)
 
 
@@ -1561,11 +1565,11 @@ def write_matrices_to_file(data_matrices, filename):
 
 
 if __name__ == "__main__":
-    heat_map_solution(normalized=True)
+    # heat_map_solution(normalized=True)
     # paths_stats(participants='all')
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
-    # paths_stats(participants='validatedCorrect')
+    paths_stats(participants='all')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)
