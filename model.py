@@ -563,7 +563,7 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
                 blocked = True
             elif board[square_row][square_col] == player:
                 path_x_count += 1
-            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+            elif ((square_col != col) | (square_row != row)):
                 empty_squares.append([square_row,square_col])
             path.append([square_row,square_col])
             square_row += 1
@@ -596,14 +596,14 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
                 blocked = True
             elif board[square_row][square_col] == player:
                 path_x_count += 1
-            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+            elif ((square_col != col) | (square_row != row)):
                 empty_squares.append([square_row,square_col])
             path.append([square_row,square_col])
             square_row += 1
             square_col -= 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)): # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares, path))
                 if (path_x_count+1) > max_length_path:
@@ -629,7 +629,7 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
                 blocked = True
             elif board[square_row][square_col] == player:
                 path_x_count += 1
-            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+            elif ((square_col != col) | (square_row != row)):
                 empty_squares.append([square_row,square_col])
 
             path.append([square_row,square_col])
@@ -638,7 +638,7 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
 
 
 
-        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)): # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares, path))
                 if (path_x_count+1) > max_length_path:
@@ -664,14 +664,14 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
                 blocked = True
             elif board[square_row][square_col] == player:
                 path_x_count += 1
-            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+            elif ((square_col != col) | (square_row != row)):
                 empty_squares.append([square_row, square_col])
 
             path.append([square_row, square_col])
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)):  # add the path if it's not blocked and if there is already at least one X on it
             if other_player == 'O':
                 open_paths_data.append((path_x_count+1,empty_squares, path))
                 if (path_x_count+1) > max_length_path:
@@ -1566,7 +1566,9 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
         for r in range(len(board_matrix)):
             for c in range(len(board_matrix[r])):
                 if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free & passed threshold
-                    x_paths = compute_open_paths_data(r, c, board_matrix,exp=exp,interaction=interaction)  # check open paths for win
+                    # x_paths = compute_open_paths_data(r, c, board_matrix,exp=exp,interaction=interaction)  # check open paths for win
+
+                    x_paths = compute_open_paths_data_interaction(r, c, board_matrix,exp=exp,interaction=interaction)
                     square_score_x = x_paths[0]
                     x_paths_data = []
                     for path in x_paths[1]:
@@ -1574,7 +1576,8 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                     paths_data[r][c] = copy.deepcopy(x_paths_data)
                     # square_score_0 = compute_open_paths(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
 
-                    o_paths = compute_open_paths_data(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+                    # o_paths = compute_open_paths_data(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+                    o_paths = compute_open_paths_data_interaction(r, c, board_matrix,player = 'O', exp=exp,interaction=interaction)
                     square_score_o = o_paths[0]
 
 
@@ -2128,7 +2131,7 @@ def choice(population, weights):
 
 if __name__ == "__main__":
     # compute_scores_density(normalized=True,neighborhood_size=2)
-    compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=True)
+    compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=True, dominance=False, block=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=True)
     # compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=False)
@@ -2159,10 +2162,10 @@ if __name__ == "__main__":
     # model_files = ['model_layers_e=2_nbr=2_o=0.5.json','paths_non-linear_square_layers_opp.json', 'participant_solutions.json']
     # model_files = ['model_layers_e=2_nbr=2_o=0.0_interaction.json','model_layers_e=2_nbr=2_o=0.5_interaction.json', 'avg_people_first_moves_all.json']
     # model_files = ['model_layers_e=1_nbr=2_o=0.5_interactionNew.json','model_layers_e=2_nbr=2_o=0.5_interactionNew.json', 'avg_people_first_moves_all.json']
-    model_files = ['model_layers_e=2_nbr=2_o=0.5_interaction_block.json','model_layers_e=2_nbr=2_o=0.5_interaction_block_oInteraction.json', 'avg_people_first_moves_all.json']
-    run_models_from_list(model_files, 'heatmaps/cogsci/BlockFirstMoves_oInteractionVsNot1',2)
-    # model_files = ['model_layers_e=1_nbr=2_o=0.5_interactionNew.json','model_layers_e=2_nbr=2_o=0.5_interactionNew.json', 'avg_people_clicks_all.json']
-    model_files = ['model_layers_e=2_nbr=2_o=0.5_interaction_block.json','model_layers_e=2_nbr=2_o=0.5_interaction_block_oInteraction.json', 'avg_people_clicks_all.json']
-
-    run_models_from_list(model_files, 'heatmaps/cogsci/BlockClicks_oInteractionVsNot1',2)
+    # model_files = ['model_layers_e=2_nbr=2_o=0.5_interaction_block.json','model_layers_e=2_nbr=2_o=0.5_interaction_block_oInteraction.json', 'avg_people_first_moves_all.json']
+    # run_models_from_list(model_files, 'heatmaps/cogsci/BlockFirstMoves_oInteractionVsNot1',2)
+    # # model_files = ['model_layers_e=1_nbr=2_o=0.5_interactionNew.json','model_layers_e=2_nbr=2_o=0.5_interactionNew.json', 'avg_people_clicks_all.json']
+    # model_files = ['model_layers_e=2_nbr=2_o=0.5_interaction_block.json','model_layers_e=2_nbr=2_o=0.5_interaction_block_oInteraction.json', 'avg_people_clicks_all.json']
+    #
+    # run_models_from_list(model_files, 'heatmaps/cogsci/BlockClicks_oInteractionVsNot1',2)
 

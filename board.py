@@ -1450,8 +1450,130 @@ class Board:
     return score
 
 
+  def compute_square_score_pathsJan31(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0, other_player = True, interaction = False, exp = 1, potential = "square", reduce_opponent = True):
+    open_win_paths_computer = []
+    open_win_paths_human = []
+    max_length_path_X = 0
+    max_length_path_O = 0
+    for path in self.winning_paths:
+      len_path = len(path)
+      c.COMPUTER_count, c.HUMAN_count = 0, 0
+      free_on_path = []
+      for space in path:
+        if self.board[space] == c.COMPUTER:
+          c.COMPUTER_count += 1
+        elif self.board[space] == c.HUMAN:
+          c.HUMAN_count += 1
+        elif space!=square:
+          free_on_path.append(space)
 
-  def compute_square_score_paths_clean2(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0, other_player = True, interaction = False, exp = 1, potential = "square"):
+      if c.COMPUTER_count == len_path:
+        return c.WIN_SCORE
+
+      elif c.HUMAN_count == len_path:
+        return c.LOSE_SCORE
+
+      if (c.HUMAN_count == 0) & (c.COMPUTER_count > 0):
+        if (square in path):
+          open_win_paths_computer.append((free_on_path,c.COMPUTER_count+1, square in path, path))
+          if (c.COMPUTER_count+1) > max_length_path_O:
+            max_length_path_O = c.COMPUTER_count+1
+        else:
+          open_win_paths_computer.append((free_on_path,c.COMPUTER_count, square in path, path))
+          if (c.COMPUTER_count) > max_length_path_O:
+            max_length_path_O = c.COMPUTER_count
+
+      if (c.COMPUTER_count == 0) & (c.HUMAN_count > 0):
+        if (square in path):
+          open_win_paths_human.append((free_on_path,c.HUMAN_count+1, square in path, path))
+          if (c.HUMAN_count+1) > max_length_path_X:
+            max_length_path_X = c.HUMAN_count+1
+        else:
+          open_win_paths_computer.append((free_on_path,c.COMPUTER_count, square in path, path))
+          if (c.HUMAN_count) > max_length_path_X:
+            max_length_path_X = c.HUMAN_count
+
+      else:
+        # Path cannot be won, so it has no effect on score
+        pass
+
+
+    streak_size = len(self.winning_paths[0])
+
+    score = 0.0
+    score_x = 0.0
+    score_o = 0.0
+
+    # compute the score for the cell based on the potential paths
+    if (player == c.COMPUTER) | other_player:
+      for i in range(len(open_win_paths_computer)):
+        p1 = open_win_paths_computer[i]
+        if p1[2]:
+          path_length = p1[1]
+          if reduce_opponent & (player == c.COMPUTER):
+            path_length -= 1
+          if streak_size == path_length:
+            if player == c.COMPUTER:
+              return c.WIN_SCORE
+            else:
+              return c.OPPONENT_THREAT
+          score_o += 1.0/math.pow((streak_size-(path_length)), exp)  # score for individual path
+          if interaction:
+            for j in range(i+1, len(open_win_paths_computer)):
+              p2 = open_win_paths_computer[j]
+              if self.check_overlap(p1[3], p2[3]):
+                path_length2 = p2[1]
+                if reduce_opponent & (player == c.COMPUTER):
+                  path_length2 -= 1
+
+                if (not(self.check_overlap(p1[0],p2[0]))):  # interaction score if the paths can't be blocked by same square
+                  if (streak_size-1)*(streak_size-1) == path_length*path_length2:
+                    if player == c.COMPUTER:
+                      return c.WIN_SCORE
+                    else:
+                      return c.OPPONENT_THREAT
+
+                  else:
+                    top = 0.0 + path_length*path_length2
+                    bottom = ((streak_size-1)*(streak_size-1))-(path_length*path_length2)
+                    score_o += math.pow(top/bottom, exp)
+
+    if (player == c.HUMAN) | other_player:
+      for i in range(len(open_win_paths_human)):
+        p1 = open_win_paths_human[i]
+        if p1[2]:
+          path_length = p1[1]
+          if reduce_opponent & (player == c.HUMAN):
+            path_length -= 1
+          if path_length == streak_size:
+            if player == c.COMPUTER:
+              return -1*c.LOSE_SCORE
+            else:
+              return c.OPPONENT_THREAT
+
+          score_x += 1.0/math.pow((streak_size-path_length), exp)  # score for individual path
+          if interaction:
+            for j in range(i+1, len(open_win_paths_human)):
+              p2 = open_win_paths_human[j]
+              if self.check_overlap(p1[3], p2[3]):
+                path_length2 = p2[1]
+                if reduce_opponent & (player == c.HUMAN):
+                  path_length2 -= 1
+                if (not(self.check_overlap(p1[0],p2[0]))):  # interaction score if the paths can't be blocked by same square
+                  if (streak_size-1)*(streak_size-1) == path_length*path_length2:
+                    if player == c.COMPUTER:
+                      return -1*c.LOSE_SCORE
+                    else:
+                      return c.OPPONENT_THREAT
+                  else:
+                    top = 0.0 + path_length*path_length2
+                    bottom = ((streak_size-1)*(streak_size-1))-(path_length*path_length2)
+                    score_x += math.pow(top/bottom, exp)
+
+    return score
+
+
+  def compute_square_score_paths_reducedO(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0, other_player = True, interaction = False, exp = 1, potential = "square"):
     open_win_paths_computer = []
     open_win_paths_human = []
     max_length_path_X = 0
