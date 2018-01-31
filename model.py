@@ -29,6 +29,9 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
                   ]
 
+INFINITY_O = 10
+IMMEDIATE_THREAT_SCORE = 20
+
 '''
 computes the density score for a cell
 @neighborhood_size: how many cells around the square to look at
@@ -364,6 +367,507 @@ def compute_open_paths_data(row, col, board, exp=1, player = 'X', interaction=Tr
                     score += math.pow(top/bottom, exp)
 
     return (score, open_paths_data, max_length_path)
+
+
+def compute_open_paths_data_interaction_potential(row, col, board, exp=1, player = 'X', interaction=True):
+    other_player = 'O'
+    if player == 'O':
+        other_player = 'X'
+
+
+    max_length_path = 0
+    threshold = 0
+    # if len(board)==10:
+    #     threshold +=1
+
+    streak_size = 4  # how many Xs in a row you need to win
+    if len(board) == 10:  # if it's a 10X10 board you need 5.
+        streak_size = 5
+
+    open_paths_data = []  # this list will hold information on all the potential paths, each path will be represented by a pair (length and empty squares, which will be used to check overlap)
+    paths = []
+    # check right-down diagonal (there is a more efficient way to look at all the paths, but it was easier for me to debug when separating them :)
+    for i in range(streak_size):
+        r = row - i
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif (square_col != col) | (square_row != row):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count+1>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+            open_paths_data.append((path_x_count+1,empty_squares, path))
+            if (path_x_count+1) > max_length_path:
+                max_length_path = path_x_count+1
+
+
+    # check left-down diagonal
+    for i in range(streak_size):
+        r = row - i
+        c = col + i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif (square_col != col) | (square_row != row):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col -= 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count+1>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+            open_paths_data.append((path_x_count+1,empty_squares, path))
+            if (path_x_count+1) > max_length_path:
+                max_length_path = path_x_count+1
+
+    # check vertical
+    for i in range(streak_size):
+        r = row - i
+        c = col
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif (square_col != col) | (square_row != row):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count+1>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+            open_paths_data.append((path_x_count+1,empty_squares, path))
+            if (path_x_count+1) > max_length_path:
+                max_length_path = path_x_count+1
+
+
+    # check horizontal
+    for i in range(streak_size):
+        r = row
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif (square_col != col) | (square_row != row):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count+1>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+            open_paths_data.append((path_x_count+1,empty_squares, path))
+            if (path_x_count+1) > max_length_path:
+                max_length_path = path_x_count+1
+
+    score = 0.0
+    # compute the score for the cell based on the potential paths
+    for i in range(len(open_paths_data)):
+        p1 = open_paths_data[i]
+        score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
+        if interaction:
+            for j in range(i+1, len(open_paths_data)):
+                p2 = open_paths_data[j]
+                if check_path_overlap(p2[2],p1[2]):
+                    if (not(check_path_overlap(p1[1],p2[1]))):  # interaction score if the paths don't overlap
+                        if ((streak_size-1)*(streak_size-1)) == (p1[0]*p2[0]):
+                            score = INFINITY_O
+                        else:
+                            top = 0.0 +p1[0]*p2[0]
+                            bottom = ((streak_size-1)*(streak_size-1))-(p1[0]*p2[0])
+                            score += math.pow(top/bottom, exp)
+
+    return (score, open_paths_data, max_length_path)
+
+
+def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', interaction=True):
+    other_player = 'O'
+    if player == 'O':
+        other_player = 'X'
+
+
+    max_length_path = 0
+    threshold = 0
+    # if len(board)==10:
+    #     threshold +=1
+
+    streak_size = 4  # how many Xs in a row you need to win
+    if len(board) == 10:  # if it's a 10X10 board you need 5.
+        streak_size = 5
+
+    open_paths_data = []  # this list will hold information on all the potential paths, each path will be represented by a pair (length and empty squares, which will be used to check overlap)
+    paths = []
+    # check right-down diagonal (there is a more efficient way to look at all the paths, but it was easier for me to debug when separating them :)
+    for i in range(streak_size):
+        r = row - i
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)):  # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check left-down diagonal
+    for i in range(streak_size):
+        r = row - i
+        c = col + i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col -= 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check vertical
+    for i in range(streak_size):
+        r = row - i
+        c = col
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+
+            path.append([square_row,square_col])
+            square_row += 1
+            path_length += 1
+
+
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check horizontal
+    for i in range(streak_size):
+        r = row
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row, square_col])
+
+            path.append([square_row, square_col])
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+
+    score = 0.0
+    # compute the score for the cell based on the potential paths
+    for i in range(len(open_paths_data)):
+        p1 = open_paths_data[i]
+        score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
+        if interaction:
+            for j in range(i+1, len(open_paths_data)):
+                p2 = open_paths_data[j]
+                if check_path_overlap(p2[2],p1[2]):
+                    if (not(check_path_overlap(p1[1],p2[1]))):  # interaction score if the paths don't overlap
+                        top = 0.0 +p1[0]*p2[0]
+                        bottom = ((streak_size-1)*(streak_size-1))-(p1[0]*p2[0])
+                        score += math.pow(top/bottom, exp)
+
+    return (score, open_paths_data, max_length_path)
+
+
+
+def compute_open_paths_data_potential(row, col, board, exp=1, player = 'X', interaction=True):
+    other_player = 'O'
+    if player == 'O':
+        other_player = 'X'
+
+
+    max_length_path = 0
+    threshold = 0
+    # if len(board)==10:
+    #     threshold +=1
+
+    streak_size = 4  # how many Xs in a row you need to win
+    if len(board) == 10:  # if it's a 10X10 board you need 5.
+        streak_size = 5
+
+    open_paths_data = []  # this list will hold information on all the potential paths, each path will be represented by a pair (length and empty squares, which will be used to check overlap)
+    paths = []
+    # check right-down diagonal (there is a more efficient way to look at all the paths, but it was easier for me to debug when separating them :)
+    for i in range(streak_size):
+        r = row - i
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)):  # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            else:
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+
+    # check left-down diagonal
+    for i in range(streak_size):
+        r = row - i
+        c = col + i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col -= 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            else:
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+
+    # check vertical
+    for i in range(streak_size):
+        r = row - i
+        c = col
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row,square_col])
+
+            path.append([square_row,square_col])
+            square_row += 1
+            path_length += 1
+
+
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold): # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            else:
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+
+    # check horizontal
+    for i in range(streak_size):
+        r = row
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)) | (other_player=='X'):
+                empty_squares.append([square_row, square_col])
+
+            path.append([square_row, square_col])
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & (path_x_count>threshold):  # add the path if it's not blocked and if there is already at least one X on it
+            if other_player == 'O':
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            else:
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+
+
+    score = 0.0
+    # compute the score for the cell based on the potential paths
+    for i in range(len(open_paths_data)):
+        p1 = open_paths_data[i]
+        score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
+        if interaction:
+            for j in range(i+1, len(open_paths_data)):
+                p2 = open_paths_data[j]
+                if (not(check_path_overlap(p1[1],p2[1]))):  # interaction score if the paths don't overlap
+                    # score += 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[0]*p2[0]), exp))
+                    old_interaction = 1.0/(math.pow(((streak_size-1)*(streak_size-1))-(p1[0]*p2[0]), exp))
+                    top = 0.0 +p1[0]*p2[0]
+                    bottom = ((streak_size-1)*(streak_size-1))-(p1[0]*p2[0])
+                    new_interaction = math.pow(top/bottom, exp)
+                    score += math.pow(top/bottom, exp)
+
+    return (score, open_paths_data, max_length_path)
+
 
 
 def compute_block_o_score(board, player = 'O', n = 3, interaction = True, exp = 2):
@@ -1079,7 +1583,8 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
                         streak_size = 5
 
                     if block & (x_paths[2] == (streak_size-1)):  # give score for blocking O
-                        square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
+                        # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
+                        square_score_o = INFINITY_O
                     # if x_paths[2] == (streak_size-1):
                     #     square_score_o =0
                     square_score = (1-o_weight)*square_score_x + o_weight*square_score_o

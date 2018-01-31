@@ -13,6 +13,8 @@
     "winMove": [53],
     "turn":1,
     "win_depth":6,
-  "solved": 0.628
+  "solved": 0.628,
+      "sim": 140
+
 }
 

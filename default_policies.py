@@ -62,5 +62,6 @@ def _roll_out(state_node, stopping_criterion):
             print 'problme'
         state = parent.perform(action)
         c.NUM_NODES+=1.0
+        # print c.NUM_NODES
 
     return reward

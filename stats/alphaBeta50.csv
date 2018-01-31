@@ -1,0 +1,11 @@
+scoring,success rate,condition
+Density,0.2,full
+Blocking,0.6,full
+Linear,0.2,full
+Interaction,0.2,full
+Non-linear,0.6,full
+Density,0,truncated
+Blocking,1,truncated
+Linear,0.2,truncated
+Interaction,0.8,truncated
+Non-linear,0.6,truncated

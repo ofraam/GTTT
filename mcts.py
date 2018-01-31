@@ -31,6 +31,7 @@ class MCTS(object):
 
         for _ in range(n):
             (node,count) = _get_next_node(root, self.tree_policy)
+            # c.NUM_NODES +=1
             node.reward = self.default_policy(node)
             self.node_counter+=count
             self.backup(node)
@@ -41,6 +42,7 @@ class MCTS(object):
 def _expand(state_node):
     action = random.choice(state_node.untried_actions)
     # print (action)
+    c.NUM_NODES +=1
     return state_node.children[action].sample_state()
 
 

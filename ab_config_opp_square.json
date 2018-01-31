@@ -8,7 +8,7 @@
       "exp": 1,
       "potential": "square",
       "neighborhood": 2,
-      "name": "paths_linear_square_opp"
+      "name": "paths_linear_square_opp_10"
     },
 
     {
@@ -19,7 +19,7 @@
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-      "name": "paths_non-linear_square_opp"
+      "name": "paths_non-linear_square_opp_10"
     },
 
     {
@@ -30,7 +30,7 @@
       "exp": 2,
       "potential": "square",
       "neighborhood": 2,
-      "name": "paths_non-linear_square_interaction_opp"
+      "name": "paths_non-linear_square_interaction_opp_10"
     }
   ]
 }

@@ -13,6 +13,7 @@ import os
 from computational_model import *
 import copy
 import random
+import csv
 
 class Bellman(object):
     """
@@ -136,8 +137,8 @@ class TicTactToeState(object):
         if c.WIN_DEPTH == self.depth:
             # print 'depth'
             return True
-        if self.board.check_possible_win(math.ceil(self.depth/2.0)):
-            return True
+        # if self.board.check_possible_win(math.ceil(self.depth/2.0)):
+        #     return True
         # # return True
         # if (random.random()<0.05):
         return False
@@ -223,8 +224,8 @@ if __name__ == "__main__":
         # print filename
         if filename.startswith("6"):
             file_path = "examples/board_6_4.txt"
-            continue
-            # if not(filename.startswith("6by6_easy")):
+            # continue
+            # if not(filename.startswith("6_easy")):
             #     continue
 
         else:
@@ -234,51 +235,69 @@ if __name__ == "__main__":
             file_path = "examples/board_10_5.txt"
             # continue
         chosen_moves = {}
-        num_runs = 100
+        num_runs = 50
         num_correct = 0.0
         print filename
 
         total_nodes= 0.0
         success = 0.0
-        n = 20
+        # n = 10
         game = start_game(file_path)
 
         win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
-        while (success < c.SOLVED):
-            n += 5
-            print n
-            total_nodes= 0.0
-            for i in range(0,num_runs):
-                game = start_game(file_path)
+        # while (success < c.SOLVED):
+        #     n += 5
+        #     print n
+        #     total_nodes= 0.0
+        for i in range(0,num_runs):
+            game = start_game(file_path)
 
-                win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
-                c.WIN_DEPTH = win_depth
-                root = StateNode(None,TicTactToeState(game.board,game.whos_turn,0))
+            win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
+            c.WIN_DEPTH = win_depth
 
-                best_action, num_nodes = mcts(root, n=n)
-                # print best_action
+            root = StateNode(None,TicTactToeState(game.board,game.whos_turn,0))
+            # print c.SIM
+            best_action, num_nodes = mcts(root, n=c.SIM)
+
+            # print num_nodes
+            # print num_nodes
+            # print best_action
 
 
-                if best_action in chosen_moves.keys():
-                    chosen_moves[best_action] += 1
-                else:
-                    chosen_moves[best_action] = 1
+            if best_action in chosen_moves.keys():
+                chosen_moves[best_action] += 1
+            else:
+                chosen_moves[best_action] = 1
+            correct = 0
+            if best_action in c.WIN_MOVES:
+                num_correct += 1
+                correct = 1
+            total_nodes += num_nodes
+            res = []
+            res.append(filename[:-5])
+            res.append(best_action)
+            res.append(correct)
+            res.append(num_nodes)
+            # print num_nodes
+            c.NUM_NODES = 0
+            results.append(res)
 
-                if best_action in c.WIN_MOVES:
-                    num_correct += 1
-                total_nodes += num_nodes
+        # print total_nodes/num_runs
+        # print chosen_moves
+        # print num_correct/num_runs
+        success = num_correct/num_runs
+        # results.append(num_correct/num_runs)
+        # print '----------'
+        # print n
+        # print total_nodes/num_runs
+        # print num_correct/num_runs
+        # print chosen_moves
+        # print '----------'
 
-            # print total_nodes/num_runs
-            # print chosen_moves
-            # print num_correct/num_runs
-            success = num_correct/num_runs
-            results.append(num_correct/num_runs)
-        print '----------'
-        print n
-        print total_nodes/num_runs
-        print num_correct/num_runs
-        print chosen_moves
-        print '----------'
+        dataFile = open('stats/mctsRuns.csv', 'wb')
+        dataWriter = csv.writer(dataFile, delimiter=',')
+        for res in results:
+            dataWriter.writerow(res)
     print results
 
 
