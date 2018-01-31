@@ -199,6 +199,45 @@ class Board:
     return density_score
 
 
+  def get_free_spaces_ranked_heuristic_with_scores(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True):
+    ''' Return a list of unoccupied spaces. '''
+    list_of_spaces = []
+    list_of_occupied = []
+    list_of_spaces_with_dist = []
+    list_of_spaces_with_dist2 = []
+    for space in self.board:
+      if self.board[space] == c.BLANK:
+        list_of_spaces.append(space)
+      else:
+        list_of_occupied.append(space)
+    if player is None:
+      print 'problem'
+
+    forced_move = self.win_or_forced_move(player)
+    if forced_move:
+      return forced_move
+
+    for free_space in list_of_spaces:
+      # if (free_space not in self.pruned_spaces_x):
+      #   print 'pruning'
+      if (free_space not in self.pruned_spaces_x) | (player == c.COMPUTER) | (not(prune)):
+        if heuristic == 'paths':
+          # list_of_spaces_with_dist.append((free_space,self.compute_square_score_paths_clean2(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
+          list_of_spaces_with_dist.append((free_space,self.compute_square_score_pathsJan31(free_space, player=player,reduced_opponent=reduced_opponent,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
+          # list_of_spaces_with_dist2.append((free_space,self.compute_square_score_paths_potential(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential='full')))
+        elif heuristic == 'block':
+          # list_of_spaces_with_dist.append((free_space,self.compute_square_score_block_clean(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
+          list_of_spaces_with_dist.append((free_space,self.compute_square_score_blockJan31(free_space, player=player,reduced_opponent=reduced_opponent,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
+
+        else:
+          list_of_spaces_with_dist.append((free_space,self.compute_square_score_density(free_space, player,remaining_turns_x=remaining_turns_x, neighborhood_size=neighborhood)))
+
+    # if player==c.COMPUTER:
+    sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
+
+    return sorted_list
+
+
   def get_free_spaces_ranked_heuristic(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []

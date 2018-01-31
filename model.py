@@ -4,10 +4,13 @@ import matplotlib.pyplot as plt
 import math
 import replay as rp
 import computational_model as cm
+import config as c
 import json
 from emd import emd
 import random
 import bisect
+import os
+import board as b
 import collections
 # from pyemd import emd
 from scipy import stats
@@ -695,7 +698,6 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
                         score += math.pow(top/bottom, exp)
 
     return (score, open_paths_data, max_length_path)
-
 
 
 def compute_open_paths_data_potential(row, col, board, exp=1, player = 'X', interaction=True):
@@ -1920,6 +1922,33 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
         plt.clf()
 
 
+
+def compute_distances_for_boards(models_file_list, base_matrix_index):
+    data = []
+    for file in models_file_list:
+        matrices = read_matrices_from_file('data_matrices/cogsci/'+file)
+        data_matrices = {}
+        for mat in matrices:
+            # for k,v in mat:
+            if mat.endswith('.json'):
+                data_matrices[mat[:-5]] = matrices[mat]
+            else:
+                data_matrices[mat] = matrices[mat]
+
+        data.append(copy.deepcopy(data_matrices))
+
+    for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
+        full = board + '_full'
+        pruned = board + '_pruned'
+        for j in range(len(data)):
+            matrix_name_full = models_file_list[j][:-5]
+            matrix_name_pruned = models_file_list[j][:-5]
+            if base_matrix_index != None:
+                dist_full = emd(data[j][full],data[base_matrix_index][full]) # earth mover distance for the full board
+                dist_pruned = emd(data[j][pruned],data[base_matrix_index][pruned]) # earth mover distance for the full board
+            print matrix_name_full + ',' + str(round(dist_full, 3))
+            print matrix_name_pruned + ',' + str(round(dist_pruned, 3))
+
 def compute_square_scores_dominance(board, score_matrix, n=1000):
     player = 'X'
     other_player = 'O'
@@ -2129,9 +2158,141 @@ def choice(population, weights):
     return population[idx]
 
 
+
+def compute_square_scores_layers_from_matrix(density_matrix, scoring_matrix, threshold = 0.2):
+    density_scores = read_matrices_from_file(density_matrix)
+    model_scores = read_matrices_from_file(scoring_matrix)
+
+    data_matrices = {}
+
+    for board in ['6_easy_full','6_easy_pruned','6_hard_full','6_hard_pruned','10_easy_full','10_easy_pruned','10_hard_full','10_hard_pruned','10_medium_full','10_medium_pruned']:
+        density_score_matrix = density_scores[board]
+        model_score_matrix = model_scores[board]
+        score_matrix = copy.deepcopy(model_score_matrix)
+       # compute maximal density score for filtering
+        max_density_score = -1000000
+        for r in range(len(density_score_matrix)):
+            for j in range(len(density_score_matrix[r])):
+                # score_matrix[r][c] = score_matrix[r][c]/sum_scores
+                if (density_score_matrix[r][j]!='X') & (density_score_matrix[r][j]!='O'):
+                    if density_score_matrix[r][j] > max_density_score:
+                        max_density_score = density_score_matrix[r][j]
+
+        for r in range(len(density_score_matrix)):
+            for j in range(len(density_score_matrix[r])):
+                if (score_matrix[r][j]!=-0.00001) & (score_matrix[r][j]!=-0.00002):
+                    if score_matrix[r][j] <= (0.2*density_score_matrix[r][j]):
+                        score_matrix[r][j] = 0
+
+        sum_scores = 0.0
+        for row in range(len(score_matrix)):
+            for col in range(len(score_matrix[row])):
+                if (score_matrix[row][col]!=-0.00001) & (score_matrix[row][col]!=-0.00002):
+                    sum_scores += score_matrix[row][col]
+
+        #re-normalize
+        for row in range(len(score_matrix)):
+            for col in range(len(score_matrix[row])):
+                if (score_matrix[row][col]!=-0.00001) & (score_matrix[row][col]!=-0.00002):
+                    score_matrix[row][col] = score_matrix[row][col]/sum_scores
+
+        data_matrices[board] = score_matrix
+
+    filename = scoring_matrix[:-5] + '_layers.json'
+    write_matrices_to_file(data_matrices, filename)
+
+
+
+def get_alpha_beta_scores():
+    data_matrices = {}
+    game_configs_file = "model_config_opp.json"
+    configs = cm.get_game_configs(game_configs_file)
+    dimension = 6
+
+
+    for conf in configs:
+        data_matrices = {}
+        for filename in os.listdir("predefinedBoards/"):
+            if filename.startswith("6"):
+                file_path = "examples/board_6_4.txt"
+                dimension = 6
+                # continue
+                # if not(filename.startswith("6_easy")):
+                #   continue
+
+            else:
+                # continue
+                # if filename.startswith("10by10_easy"):
+                # if (filename.startswith("10_medium")):
+                #   continue
+                file_path = "examples/board_10_5.txt"
+                dimension = 10
+
+
+            game = cm.start_game(file_path, conf)
+
+            print filename
+
+            score_matrix = []
+
+            win_depth = cm.fill_board_from_file("predefinedBoards/"+filename,game)
+            board = game.board
+            square_scores = board.get_free_spaces_ranked_heuristic_with_scores(player=c.HUMAN,reduced_opponent=game.reduced_opponent, heuristic=game.heuristic, interaction=game.interaction, other_player=game.opponent, prune=game.prune, exp=game.exp, neighborhood=game.neighborhood_size, potential=game.potential)
+
+            for row in range(dimension):
+                score_matrix.append([])
+                for col in range(dimension):
+                    score_matrix[row].append(0)
+
+            for row in range(dimension):
+                for col in range(dimension):
+                    position = row*dimension + col+1
+
+                    if board.board[position] == 1:
+                        score_matrix[row][col] = 'X'
+                    elif board.board[position] == 2:
+                        score_matrix[row][col] = 'O'
+
+            sum_scores = 0.0
+            for i in range(len(square_scores)):
+                pos = square_scores[i][0]
+                score = square_scores[i][1]
+                col = ((pos - 1) % dimension)
+                row = (float(pos)/float(dimension))-1
+                row = int(math.ceil(row))
+                score_matrix[row][col] = score
+                sum_scores += score
+
+            for row in range(0,len(score_matrix)):
+                for col in range(0,len(score_matrix[row])):
+                    if (score_matrix[row][col]=='X'):
+                        score_matrix[row][col] = -0.00001
+                    elif (score_matrix[row][col]=='O'):
+                        score_matrix[row][col] = -0.00002
+
+
+            for row in range(len(score_matrix)):
+                for col in range(len(score_matrix[row])):
+                    if (score_matrix[row][col]!=-0.00001) & (score_matrix[row][col]!=-0.00002):
+                        score_matrix[row][col] = score_matrix[row][col]/sum_scores
+
+            data_matrices[filename[:-5]] = copy.deepcopy(score_matrix)
+
+        output_name = 'data_matrices/cogsci/' + game_configs_file[:-5] + '_' +conf['name'] + '.json'
+        cm.write_matrices_to_file(data_matrices, output_name)
+
 if __name__ == "__main__":
+
+    models_files = ['model_density_nbr=2.json', 'avg_people_first_moves_all.json']
+    # models_files = ['model_config_opp_linear_layers.json', 'model_config_opp_non-linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json', 'model_config_opp_blocking_layers.json', 'avg_people_first_moves_all.json']
+    compute_distances_for_boards(models_files,1)
+    get_alpha_beta_scores()
+    # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_blocking.json', threshold=0.2)
+    # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_non-linear.json', threshold=0.2)
+    # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_non-linear_interaction.json', threshold=0.2)
+    # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_linear.json', threshold=0.2)
     # compute_scores_density(normalized=True,neighborhood_size=2)
-    compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=True, dominance=False, block=False)
+    # compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=True, dominance=False, block=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=True)
     # compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=False)
