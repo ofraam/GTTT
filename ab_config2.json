@@ -1,13 +1,14 @@
 {
   "configs": [
         {
-      "heuristic": "paths",
+      "heuristic": "block",
       "interaction": true,
       "opponent": true,
       "prune": false,
-      "exp": 2,
+      "exp": 1,
       "potential": "square",
       "neighborhood": 2,
+          "reduced_opponent": false,
       "name": "paths_non-linear_interaction_intFix"
     }
   ]

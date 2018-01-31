@@ -1,0 +1,40 @@
+{
+  "configs": [
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": false,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "reduced_opponent": false,
+      "name": "paths_linear_noOpp"
+    },
+
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": false,
+      "prune": false,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "reduced_opponent": false,
+      "name": "paths_non-linear_noOpp"
+    },
+
+    {
+      "heuristic": "paths",
+      "interaction": true,
+      "opponent": false,
+      "prune": false,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "reduced_opponent": false,
+      "name": "paths_non-linear_interaction_noOpp"
+    }
+  ]
+}
+
