@@ -1,0 +1,15 @@
+{
+  "configs": [
+      {
+      "heuristic": "block",
+      "interaction": true,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "reduced_opponent": true,
+      "name": "blocking"
+    }
+  ]
+}

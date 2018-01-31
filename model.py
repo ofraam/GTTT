@@ -2205,7 +2205,7 @@ def compute_square_scores_layers_from_matrix(density_matrix, scoring_matrix, thr
 
 def get_alpha_beta_scores():
     data_matrices = {}
-    game_configs_file = "model_config_opp.json"
+    game_configs_file = "model_config_blocking50.json"
     configs = cm.get_game_configs(game_configs_file)
     dimension = 6
 
@@ -2283,11 +2283,11 @@ def get_alpha_beta_scores():
 
 if __name__ == "__main__":
 
-    models_files = ['model_density_nbr=2.json', 'avg_people_first_moves_all.json']
-    # models_files = ['model_config_opp_linear_layers.json', 'model_config_opp_non-linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json', 'model_config_opp_blocking_layers.json', 'avg_people_first_moves_all.json']
+    models_files = ['model_config_blocking50_blocking.json', 'avg_people_first_moves_all.json']
+    # # # models_files = ['model_config_opp_linear_layers.json', 'model_config_opp_non-linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json', 'model_config_opp_blocking_layers.json', 'avg_people_first_moves_all.json']
     compute_distances_for_boards(models_files,1)
-    get_alpha_beta_scores()
-    # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_blocking.json', threshold=0.2)
+    # get_alpha_beta_scores()
+    # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_blocking50_blocking.json', threshold=0.2)
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_non-linear.json', threshold=0.2)
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_non-linear_interaction.json', threshold=0.2)
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_linear.json', threshold=0.2)
