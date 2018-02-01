@@ -1,0 +1,6 @@
+scoring,percent correct
+density,10
+linear,20
+non-linear-interaction,50
+non-linear,60
+blocking,90

@@ -216,39 +216,49 @@ if __name__ == "__main__":
     # print best_action
     #
     results = []
+    data_matrices = {}
     for filename in os.listdir("predefinedBoards/"):
-        mcts = MCTS(tree_policy=UCB1(c=1.41),
-                    default_policy=random_terminal_roll_out,
-                    # default_policy=immediate_reward,
-                    backup=monte_carlo)
+
         # print filename
         if filename.startswith("6"):
             file_path = "examples/board_6_4.txt"
-            # continue
+            continue
             # if not(filename.startswith("6_easy")):
             #     continue
 
         else:
             # if filename.startswith("10by10_easy"):
-            # if not(filename.startswith("10by10_easy")):
-            #   continue
+            if filename.startswith("10_easy"):
+              continue
             file_path = "examples/board_10_5.txt"
             # continue
         chosen_moves = {}
-        num_runs = 50
+        num_runs = 30
         num_correct = 0.0
         print filename
 
         total_nodes= 0.0
         success = 0.0
-        # n = 10
+        n = 10
         game = start_game(file_path)
 
         win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
-        # while (success < c.SOLVED):
-        #     n += 5
-        #     print n
-        #     total_nodes= 0.0
+
+        mcts = MCTS(tree_policy=UCB1(c=1.41),
+                    default_policy=random_terminal_roll_out,
+                    # default_policy=immediate_reward,
+                    backup=monte_carlo)
+        # while (success < 0.95):
+            # n += 200
+            # print n
+        total_nodes= 0.0
+        move_matrix_aggregate = copy.deepcopy(mcts.move_matrix)
+        for r in range(0,len(move_matrix_aggregate)):
+            for j in range(0,len(move_matrix_aggregate[r])):
+                if (move_matrix_aggregate[r][j]=='X'):
+                    move_matrix_aggregate[r][j] = -0.00001
+                elif (move_matrix_aggregate[r][j]=='O'):
+                    move_matrix_aggregate[r][j] = -0.00002
         for i in range(0,num_runs):
             game = start_game(file_path)
 
@@ -258,34 +268,71 @@ if __name__ == "__main__":
             root = StateNode(None,TicTactToeState(game.board,game.whos_turn,0))
             # print c.SIM
             best_action, num_nodes = mcts(root, n=c.SIM)
+            move_matrix = mcts.move_matrix
+
+            move_count = 0.0
+            for r in range(0,len(move_matrix)):
+                for j in range(0,len(move_matrix[r])):
+                    if (move_matrix[r][j]=='X'):
+                        move_matrix[r][j] = -0.00001
+                    elif (move_matrix[r][j]=='O'):
+                        move_matrix[r][j] = -0.00002
+                    else:
+                        move_count += move_matrix[r][j]
+                    #     print move_matrix[i][j]
+                    # else:
+                    #     print  move_matrix[i][j]
+
+            for r in range(0,len(move_matrix)):
+                for j in range(0,len(move_matrix[r])):
+                    if (move_matrix[r][j]>0):
+                        move_matrix[r][j] = move_matrix[r][j]/move_count
+                        move_matrix_aggregate[r][j] += move_matrix[r][j]
+
+            # print move_matrix_aggregate
+
+        for r in range(0,len(move_matrix_aggregate)):
+            for j in range(0,len(move_matrix_aggregate[r])):
+                if (move_matrix_aggregate[r][j]>0):
+                    move_matrix_aggregate[r][j] = move_matrix_aggregate[r][j]/num_runs
+
+        data_matrices[filename[:-5]] = copy.deepcopy(move_matrix_aggregate)
+        print move_matrix_aggregate
+        print 'done board'
+
+    write_matrices_to_file(data_matrices, 'data_matrices/cogsci/mctsPeoplePerformance.json')
 
             # print num_nodes
             # print num_nodes
             # print best_action
 
 
-            if best_action in chosen_moves.keys():
-                chosen_moves[best_action] += 1
-            else:
-                chosen_moves[best_action] = 1
-            correct = 0
-            if best_action in c.WIN_MOVES:
-                num_correct += 1
-                correct = 1
-            total_nodes += num_nodes
-            res = []
-            res.append(filename[:-5])
-            res.append(best_action)
-            res.append(correct)
-            res.append(num_nodes)
-            # print num_nodes
-            c.NUM_NODES = 0
-            results.append(res)
-
-        # print total_nodes/num_runs
-        # print chosen_moves
-        # print num_correct/num_runs
-        success = num_correct/num_runs
+        #     if best_action in chosen_moves.keys():
+        #         chosen_moves[best_action] += 1
+        #     else:
+        #         chosen_moves[best_action] = 1
+        #     correct = 0
+        #     if best_action in c.WIN_MOVES:
+        #         num_correct += 1
+        #         correct = 1
+        #     total_nodes += num_nodes
+        #     res = []
+        #     res.append(filename[:-5])
+        #     res.append(best_action)
+        #     res.append(correct)
+        #     res.append(num_nodes)
+        #     # print num_nodes
+        #     # print num_nodes
+        #     c.NUM_NODES = 0
+        #     results.append(res)
+        #
+        # # print total_nodes/num_runs
+        # # print chosen_moves
+        # # print num_correct/num_runs
+        # success = num_correct/num_runs
+        # print success
+        # if success > 0.95:
+        #     print num_nodes
         # results.append(num_correct/num_runs)
         # print '----------'
         # print n
@@ -294,11 +341,11 @@ if __name__ == "__main__":
         # print chosen_moves
         # print '----------'
 
-        dataFile = open('stats/mctsRuns.csv', 'wb')
-        dataWriter = csv.writer(dataFile, delimiter=',')
-        for res in results:
-            dataWriter.writerow(res)
-    print results
+    #     dataFile = open('stats/mctsRuns.csv', 'wb')
+    #     dataWriter = csv.writer(dataFile, delimiter=',')
+    #     for res in results:
+    #         dataWriter.writerow(res)
+    # print results
 
 
 

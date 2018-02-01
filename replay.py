@@ -756,6 +756,8 @@ def check_participant_answer(userid):
 
 def paths_stats(participants = 'all'):
     moves_data_matrics = {}
+    data_first_moves = {}
+
     first_moves_data_matrices = {}
     for g in range(len(LOGFILE)):
         # print g
@@ -784,6 +786,8 @@ def paths_stats(participants = 'all'):
 
 
         with open(LOGFILE[g], 'rb') as csvfile:
+            first_moves_values = []
+            data_first_moves_board = {}
             log_reader = csv.DictReader(csvfile)
             paths = []
             paths_counts = []
@@ -859,7 +863,7 @@ def paths_stats(participants = 'all'):
 
                             ent_moves_norm_max = ent/stats.entropy(pk_uniform)
                             condition = LOGFILE[g][5:-10].replace("_",",")
-                            print condition + ',' + curr_user + ',' + str(ent_moves_norm_max) + ',' + participant_answer
+                            # print condition + ',' + curr_user + ',' + str(ent_moves_norm_max) + ',' + participant_answer
                             entropy_values_clicks.append(ent_moves_norm_max)
 
                             # normalize move matrices
@@ -886,6 +890,7 @@ def paths_stats(participants = 'all'):
                             if len(curr_times_after_undo) > 0:
                                avg_times_after_undo.append(sum(curr_times_after_undo)/len(curr_times_after_undo))
 
+                            data_first_moves_board[curr_user] = copy.deepcopy(first_moves_values)
                             total_moves += move_counter
                             num_participants += 1.0
 
@@ -906,6 +911,7 @@ def paths_stats(participants = 'all'):
                     curr_times_after_reset = []
                     prev_time = None
                     prev_action = None
+                    first_moves_values = []
 
 
 
@@ -922,6 +928,7 @@ def paths_stats(participants = 'all'):
                         curr_path.append([rowPos,colPos,player])
                         if len(curr_path) == 1:
                             curr_first_move_matrix[rowPos][colPos] +=1
+                            first_moves_values.append((rowPos,colPos))
                             first_move_counter += 1.0
                     time_between = 0
                     if prev_time == None:
@@ -1015,7 +1022,11 @@ def paths_stats(participants = 'all'):
                 elif first_move_matrix[i][j] == 'O':
                     first_move_matrix[i][j]  = -0.00002
 
+
+        # data_first_moves[condition] =
         condition = LOGFILE[g][5:-10].replace("_",",")
+        # print condition
+        # print first_moves_values
 
         # print condition + "," + str(avg_ent_moves) + "," +str(avg_ent_first_moves) + "," + str(avg_ent) + ","+ str(avg_ent_subpaths) + ","\
         #       + str(avg_times_after_click_agg) + ","+ str(avg_times_after_undo_agg) + "," + str(avg_times_after_reset_agg) + "," \
@@ -1026,9 +1037,11 @@ def paths_stats(participants = 'all'):
         board_name=board_name[:-4]
         moves_data_matrics[board_name[5:-6]] = move_matrix
         first_moves_data_matrices[board_name[5:-6]] = first_move_matrix
+        data_first_moves[board_name[5:-6]] = copy.deepcopy(data_first_moves_board)
     # write_matrices_to_file(moves_data_matrics, 'data_matrices/avg_people_clicks_' +participants +  '.json')
     # write_matrices_to_file(first_moves_data_matrices, 'data_matrices/avg_people_first_moves_' +participants +  '.json')
-    return (move_matrix, first_move_matrix)
+    write_matrices_to_file(data_first_moves, 'data_matrices/people_first_moves_values_byParticipant_' +participants +  '.json')
+    return (move_matrix, first_move_matrix, first_moves_values)
 
 
 # def normalize_matrix(am)
@@ -1569,7 +1582,7 @@ if __name__ == "__main__":
     # paths_stats(participants='all')
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
-    paths_stats(participants='all')
+    paths_stats(participants='validatedCorrect')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

@@ -1946,8 +1946,8 @@ def compute_distances_for_boards(models_file_list, base_matrix_index):
             if base_matrix_index != None:
                 dist_full = emd(data[j][full],data[base_matrix_index][full]) # earth mover distance for the full board
                 dist_pruned = emd(data[j][pruned],data[base_matrix_index][pruned]) # earth mover distance for the full board
-            print matrix_name_full + ',' + str(round(dist_full, 3))
-            print matrix_name_pruned + ',' + str(round(dist_pruned, 3))
+            print matrix_name_full + ',' + full+ ',' + str(round(dist_full, 3))
+            print matrix_name_pruned + ',' + pruned+ ',' + str(round(dist_pruned, 3))
 
 def compute_square_scores_dominance(board, score_matrix, n=1000):
     player = 'X'
@@ -2281,11 +2281,100 @@ def get_alpha_beta_scores():
         output_name = 'data_matrices/cogsci/' + game_configs_file[:-5] + '_' +conf['name'] + '.json'
         cm.write_matrices_to_file(data_matrices, output_name)
 
-if __name__ == "__main__":
+def likelihood(values_file, models_file_list):
+    data = []
+    for file in models_file_list:
+        matrices = read_matrices_from_file('data_matrices/cogsci/'+file)
+        data_matrices = {}
+        for mat in matrices:
+            # for k,v in mat:
+            if mat.endswith('.json'):
+                data_matrices[mat[:-5]] = matrices[mat]
+            else:
+                data_matrices[mat] = matrices[mat]
 
-    models_files = ['model_config_blocking50_blocking.json', 'avg_people_first_moves_all.json']
-    # # # models_files = ['model_config_opp_linear_layers.json', 'model_config_opp_non-linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json', 'model_config_opp_blocking_layers.json', 'avg_people_first_moves_all.json']
-    compute_distances_for_boards(models_files,1)
+        data.append(copy.deepcopy(data_matrices))
+
+    epsilon = 0.00000001
+
+    values = read_matrices_from_file(values_file)
+
+
+
+    for board in ['6_easy_full','6_hard_full','10_easy_full','10_hard_full','10_medium_full','6_easy_pruned','6_hard_pruned','10_easy_pruned','10_hard_pruned','10_medium_pruned']:
+
+
+
+        for j in range(len(data)):
+            model_name = models_file_list[j][:-5]
+            probability_dist = data[j]
+            first_moves_board = values[board]
+            prob_dist = probability_dist[board]
+            # probability_dist = read_matrices_from_file(probability_dist_file)
+            comm_prob = 1.0
+
+            sum_user_likelihoods = 0.0
+            sum_user_log_likelihoods = 0.0
+            num_users = 0.0
+            num_moves = 0.0
+            for user in first_moves_board.keys():
+                # print user
+                first_moves_user = first_moves_board[user]
+                for move in first_moves_user:
+                    comm_prob = 1.0
+                    # for move in first_moves_user:
+                    # move = first_moves_user[0]
+                    row = move[0]
+                    col = move[1]
+                    prob  = prob_dist[row][col]
+                    if (prob == 0):
+                        prob = epsilon
+                    # print prob
+                    comm_prob = prob * comm_prob
+                    # print comm_prob
+                    sum_user_likelihoods += comm_prob
+                    sum_user_log_likelihoods += math.log(comm_prob)
+                    num_moves += 1
+                num_users += 1
+
+
+            avg_likelihood_borad = sum_user_likelihoods/num_moves
+            avg_log_likelihood_board = sum_user_log_likelihoods/num_moves
+            print model_name +"," + board + ',' + str(avg_log_likelihood_board)
+            # print avg_likelihood_borad
+            # print avg_log_likelihood_board
+
+
+def generate_uniform_dist_for_boards(matrix_file):
+    data_matrices = {}
+    matrices = read_matrices_from_file('data_matrices/cogsci/' + matrix_file)
+    for board in ['6_easy_full','6_hard_full','10_easy_full','10_hard_full','10_medium_full','6_easy_pruned','6_hard_pruned','10_easy_pruned','10_hard_pruned','10_medium_pruned']:
+        matrix = matrices[board]
+        uniform_matrix = copy.deepcopy(matrix)
+        free_spaces = 0.0
+        for row in range(len(matrix)):
+            for col in range(len(matrix)):
+                if (matrix[row][col]!=-0.00001) & (matrix[row][col]!=-0.00002):
+                    free_spaces += 1
+
+        for row in range(len(matrix)):
+            for col in range(len(matrix)):
+                if (matrix[row][col]!=-0.00001) & (matrix[row][col]!=-0.00002):
+                    uniform_matrix[row][col] = 1.0/free_spaces
+
+        data_matrices[board] = copy.deepcopy(uniform_matrix)
+    write_matrices_to_file(data_matrices, 'data_matrices/cogsci/chance.json')
+
+
+
+
+if __name__ == "__main__":
+    # generate_uniform_dist_for_boards('model_config_opp_non-linear_interaction.json')
+    # models_files = ['model_config_blocking50_blocking.json', 'avg_people_first_moves_all.json']
+    models_files = ['model_config_blocking10_blocking_layers.json', 'model_config_opp_non-linear_layers.json','model_config_opp_linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json','model_density_nbr=2.json','avg_people_first_moves_all.json']
+    # likelihood('data_matrices/cogsci/people_first_moves_values_byParticipant_validatedCorrect.json',models_files)
+    # # # # models_files = ['model_config_opp_linear_layers.json', 'model_config_opp_non-linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json', 'model_config_opp_blocking_layers.json', 'avg_people_first_moves_all.json']
+    compute_distances_for_boards(models_files,5)
     # get_alpha_beta_scores()
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_blocking50_blocking.json', threshold=0.2)
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_non-linear.json', threshold=0.2)

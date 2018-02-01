@@ -504,6 +504,7 @@ def fill_board_from_file(json_file,game):
   json1_data = json.loads(json1_str)
   board_positions = json1_data['position']
   game.whos_turn = int(json1_data['turn'])
+  c.BOARD = copy.deepcopy(board_positions)
   # board_size = len(board_positions)*len(board_positions)
   space = 1
   for row in range(len(board_positions)):
