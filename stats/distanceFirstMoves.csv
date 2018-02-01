@@ -49,3 +49,13 @@ non-linear-interaction,10 DC full,0.067
 non-linear-interaction,10 DC truncated,0.08
 density,10 DC full,0.084
 density,10 DC truncated,0.092
+mcts,6 MC full,0.096
+mcts,6 MC truncated,0.12
+mcts,6 HC full,0.122
+mcts,6 HC truncated,0.123
+mcts,10 MC full,0.067
+mcts,10 MC truncated,0.065
+mcts,10 HC full,0.086
+mcts,10 HC truncated,0.078
+mcts,10 DC full,0.09
+mcts,10 DC truncated,0.097

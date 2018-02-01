@@ -131,22 +131,20 @@ if __name__== "__main__":
     # plt.legend(loc='best')
 
     #heatmap distance----
+    ax = sns.factorplot(x="board", y="distance", scale= 0.5, hue="scoring", data=distances, hue_order=['mcts','density', 'linear', 'non-linear','non-linear-interaction','blocking'],  order=['6 MC full', '6 MC truncated','10 MC full','10 MC truncated','6 HC full', '6 HC truncated','10 HC full','10 HC truncated', '10 DC full','10 DC truncated'],  markers=["s","8","1","2","3","4"], legend_out=False, legend=False)
+    # ax = sns.factorplot(x="board", y="moves",  data=alphaBetaFull, hue="heuristic_name", n_boot=1000, order=['6 MC full', '6 MC truncated','10 MC full','10 MC truncated','6 HC full', '6 HC truncated','10 HC full','10 HC truncated', '10 DC full','10 DC truncated'],  markers=["<","1","2","3","4","*"],linestyles=["-","-","-","-","-", "--"], legend_out=False, legend=False)
+    # ax.fig.get_axes()[0].set_yscale('log')
+    # # print alphaBetaFull['moves']
+    # # ax.ax.show()
+    # plt.ylim(0, 200000)
+    # sns.plt.xlim(0, None)
 
-    # alpha beta and participant actions figure-----
-    # ax = sns.factorplot(x="board", y="distance", scale= 0.5, hue="scoring", data=distances, hue_order=['density', 'linear', 'non-linear','non-linear-interaction','blocking'],  order=['6 MC full', '6 MC truncated','10 MC full','10 MC truncated','6 HC full', '6 HC truncated','10 HC full','10 HC truncated', '10 DC full','10 DC truncated'],  markers=["8","1","2","3","4"], legend_out=False, legend=False)
-    # # ax = sns.factorplot(x="board", y="moves",  data=alphaBetaFull, hue="heuristic_name", n_boot=1000, order=['6 MC full', '6 MC truncated','10 MC full','10 MC truncated','6 HC full', '6 HC truncated','10 HC full','10 HC truncated', '10 DC full','10 DC truncated'],  markers=["<","1","2","3","4","*"],linestyles=["-","-","-","-","-", "--"], legend_out=False, legend=False)
-    # # ax.fig.get_axes()[0].set_yscale('log')
-    # # # print alphaBetaFull['moves']
-    # # # ax.ax.show()
-    # # plt.ylim(0, 200000)
-    # # sns.plt.xlim(0, None)
-    #
-    #
-    # ax.set(xlabel='Board', ylabel='Distance From Participants First Moves')
-    # lw = ax.ax.lines[0].get_linewidth()
-    # plt.setp(ax.ax.lines,linewidth=lw)
-    # plt.legend(loc='best')
-    # plt.show()
+
+    ax.set(xlabel='Board', ylabel='Distance From Participants First Moves')
+    lw = ax.ax.lines[0].get_linewidth()
+    plt.setp(ax.ax.lines,linewidth=lw)
+    plt.legend(loc='best')
+    plt.show()
 
     #heatmap distance----
 
@@ -292,8 +290,8 @@ if __name__== "__main__":
     # --- full vs truncated accuracy and num of actions end
 
     # success rates and number of moves participants
-    print bs_compare.difference(wrong.mean(), correct.mean())
-    print bs.bootstrap_ab(wrong.as_matrix(), correct.as_matrix(), bs_stats.mean, bs_compare.difference)
+    # print bs_compare.difference(wrong.mean(), correct.mean())
+    # print bs.bootstrap_ab(wrong.as_matrix(), correct.as_matrix(), bs_stats.mean, bs_compare.difference)
     #
     # bootstrap_t_pvalue(easy_full_6['solutionAndValidationCorrect'].values, easy_pruned_6['solutionAndValidationCorrect'].values)
 

@@ -222,14 +222,14 @@ if __name__ == "__main__":
         # print filename
         if filename.startswith("6"):
             file_path = "examples/board_6_4.txt"
-            continue
+            # continue
             # if not(filename.startswith("6_easy")):
             #     continue
 
         else:
             # if filename.startswith("10by10_easy"):
-            if filename.startswith("10_easy"):
-              continue
+            # if not(filename.startswith("10_easy")):
+            #   continue
             file_path = "examples/board_10_5.txt"
             # continue
         chosen_moves = {}

@@ -10,6 +10,7 @@ from emd import emd
 import random
 import bisect
 import os
+from scipy.optimize import minimize
 import board as b
 import collections
 # from pyemd import emd
@@ -2295,7 +2296,7 @@ def likelihood(values_file, models_file_list):
 
         data.append(copy.deepcopy(data_matrices))
 
-    epsilon = 0.00000001
+    epsilon = 0.00001
 
     values = read_matrices_from_file(values_file)
 
@@ -2366,15 +2367,70 @@ def generate_uniform_dist_for_boards(matrix_file):
     write_matrices_to_file(data_matrices, 'data_matrices/cogsci/chance.json')
 
 
+def distancePredictionPeople(population):
+    base_dir = 'data_matrices/cogsci/'
+    people_all = read_matrices_from_file(base_dir+'avg_people_first_moves_all.json')
+    sum_distances = 0.0
+    for board in ['6_easy_full','6_hard_full','10_easy_full','10_hard_full','10_medium_full','6_easy_pruned','6_hard_pruned','10_easy_pruned','10_hard_pruned','10_medium_pruned']:
+        people = people_all[board]
+        models = []
+        density = read_matrices_from_file(base_dir+'model_density_nbr=2.json')
+        linear = read_matrices_from_file(base_dir+'model_config_opp_linear_layers.json')
+        non_linear = read_matrices_from_file(base_dir+'model_config_opp_non-linear_layers.json')
+        non_linear_interaction = read_matrices_from_file(base_dir+'model_config_opp_non-linear_interaction_layers.json')
+        blocking = read_matrices_from_file(base_dir+'model_config_blocking10_blocking_layers.json')
+        models.append(density[board])
+        models.append(linear[board])
+        models.append(non_linear[board])
+        models.append(non_linear_interaction[board])
+        models.append(blocking[board])
+        joint_matrix = copy.deepcopy(people)
+
+        for row in range(len(joint_matrix)):
+            for col in range(len(joint_matrix)):
+                if (joint_matrix[row][col]!=-0.00001) & (joint_matrix[row][col]!=-0.00002):
+                    agg_score = 0.0
+                    for i in range (len(models)):
+                        model = models[i]
+                        agg_score+=model[row][col]*population[i]
+                    joint_matrix[row][col] = agg_score
+
+        sum_distances+=emd(joint_matrix,people)
+    # print joint_matrix
+    # print emd(joint_matrix,people)
+    return sum_distances
+
+
+
+def constraint1(x):
+    return sum(x) == 1
+
+def constraint2(x):
+    for x_val in x:
+        if (x<0) | (x>1):
+            return False
+    return True
+
+
 
 
 if __name__ == "__main__":
+    # distancePredictionPeople([0.1,0.1,0.3,0.3,0.2], '6_easy_full')
+    x0 = [0.2,0.2,0.2,0.2,0.2]
+    b = (0.0,1.0)
+    bnds = (b,b,b,b,b)
+    con1 = {'type':'eq','fun':constraint1}
+    cons = [con1]
+    res = minimize(distancePredictionPeople,x0,method='SLSQP',bounds = bnds, constraints=cons)
+    print res
+    print '---'
+    print res.x
     # generate_uniform_dist_for_boards('model_config_opp_non-linear_interaction.json')
     # models_files = ['model_config_blocking50_blocking.json', 'avg_people_first_moves_all.json']
-    models_files = ['model_config_blocking10_blocking_layers.json', 'model_config_opp_non-linear_layers.json','model_config_opp_linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json','model_density_nbr=2.json','avg_people_first_moves_all.json']
+    # models_files = ['model_config_blocking10_blocking_layers.json', 'model_config_opp_non-linear_layers.json','model_config_opp_linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json','model_density_nbr=2.json','avg_people_first_moves_all.json']
     # likelihood('data_matrices/cogsci/people_first_moves_values_byParticipant_validatedCorrect.json',models_files)
     # # # # models_files = ['model_config_opp_linear_layers.json', 'model_config_opp_non-linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json', 'model_config_opp_blocking_layers.json', 'avg_people_first_moves_all.json']
-    compute_distances_for_boards(models_files,5)
+    # compute_distances_for_boards(models_files,1)
     # get_alpha_beta_scores()
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_blocking50_blocking.json', threshold=0.2)
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_non-linear.json', threshold=0.2)
