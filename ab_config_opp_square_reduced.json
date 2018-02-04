@@ -1,6 +1,17 @@
 {
   "configs": [
     {
+      "heuristic": "density",
+      "interaction": false,
+      "opponent": false,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "reduced_opponent": false,
+      "name": "density"
+    },
+    {
       "heuristic": "paths",
       "interaction": false,
       "opponent": true,
@@ -9,7 +20,7 @@
       "potential": "square",
       "neighborhood": 2,
       "reduced_opponent": true,
-      "name": "paths_linear_opp_reduced"
+      "name": "linear"
     },
 
     {
@@ -21,7 +32,7 @@
       "potential": "square",
       "neighborhood": 2,
       "reduced_opponent": true,
-      "name": "paths_non-linear_opp_reduced"
+      "name": "non-linear"
     },
 
     {
@@ -33,7 +44,7 @@
       "potential": "square",
       "neighborhood": 2,
       "reduced_opponent": true,
-      "name": "paths_non-linear_interaction_opp_reduced"
+      "name": "non-linear-interaction"
     },
 
     {
@@ -45,7 +56,7 @@
       "potential": "square",
       "neighborhood": 2,
       "reduced_opponent": true,
-      "name": "blocks_opp_reduced"
+      "name": "blocking"
     }
   ]
 }

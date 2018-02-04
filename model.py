@@ -11,6 +11,9 @@ import random
 import bisect
 import os
 from scipy.optimize import minimize
+from mpl_toolkits.axes_grid1 import AxesGrid
+
+
 import board as b
 import collections
 # from pyemd import emd
@@ -35,6 +38,8 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
 
 INFINITY_O = 10
 IMMEDIATE_THREAT_SCORE = 20
+
+BOARDS_MINUS_1 =[]
 
 '''
 computes the density score for a cell
@@ -1836,7 +1841,7 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
     data = []
 
     for file in models_file_list:
-        matrices = read_matrices_from_file('data_matrices/'+file)
+        matrices = read_matrices_from_file('data_matrices/cogsci/'+file)
         data_matrices = {}
         for mat in matrices:
             # for k,v in mat:
@@ -1849,12 +1854,13 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
 
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
         plt.rcParams.update({'font.size': 9})
-        fig_file_name = base_heatmap_name + '_' + board + '.png'
+        fig_file_name = base_heatmap_name + '_' + board + '.pdf'
         heatmaps = []
         full = board + '_full'
         pruned = board + '_pruned'
         if board.startswith('6'):  # adjust sizes of heatmaps depending on size of boards
-            fig, axes = plt.subplots(2, len(data), figsize=(16,8))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            fig, axes = plt.subplots(2, len(data), figsize=(6,6))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            # fig, axes = plt.subplots(1, len(data), figsize=(16,8))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
             # fig, axes = plt.subplots(2, 4, figsize=(10,6))
         else:
             fig, axes = plt.subplots(2, len(data), figsize=(24,12)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
@@ -1866,6 +1872,10 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
 
         for j in range(len(data)):
             matrix_name_full = models_file_list[j][:-5]
+            if matrix_name_full.startswith('model'):
+                matrix_name_full = 'Blocking'
+            else:
+                matrix_name_full = 'Participants First Moves'
             matrix_name_pruned = models_file_list[j][:-5]
             if base_matrix_index != None:
                 dist_full = emd(data[j][full],data[base_matrix_index][full]) # earth mover distance for the full board
@@ -1875,8 +1885,14 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
             heatmaps.append((data[j][full], matrix_name_full))
 
         for j in range(len(data)):
+            # matrix_name_full = models_file_list[j][:-5]
+            # matrix_name_pruned = models_file_list[j][:-5]
             matrix_name_full = models_file_list[j][:-5]
             matrix_name_pruned = models_file_list[j][:-5]
+            if matrix_name_pruned.startswith('model'):
+                matrix_name_pruned = 'Blocking'
+            else:
+                matrix_name_pruned = 'Participants First Moves'
             if base_matrix_index != None:
                 dist_full = emd(data[j][full],data[base_matrix_index][full]) # earth mover distance for the full board
                 dist_pruned = emd(data[j][pruned],data[base_matrix_index][pruned]) # earth mover distance for the full board
@@ -2337,11 +2353,12 @@ def likelihood(values_file, models_file_list):
                     sum_user_log_likelihoods += math.log(comm_prob)
                     num_moves += 1
                 num_users += 1
+                print board + ',' + model_name + ',' + values_file[:-5] + ',' + str(comm_prob) + ',' + str(math.log(comm_prob))
 
 
             avg_likelihood_borad = sum_user_likelihoods/num_moves
             avg_log_likelihood_board = sum_user_log_likelihoods/num_moves
-            print model_name +"," + board + ',' + str(avg_log_likelihood_board)
+            # print model_name +"," + board + ',' + str(avg_log_likelihood_board)
             # print avg_likelihood_borad
             # print avg_log_likelihood_board
 
@@ -2367,23 +2384,75 @@ def generate_uniform_dist_for_boards(matrix_file):
     write_matrices_to_file(data_matrices, 'data_matrices/cogsci/chance.json')
 
 
-def distancePredictionPeople(population):
+def distancePredictionPeopleLOO():
     base_dir = 'data_matrices/cogsci/'
     people_all = read_matrices_from_file(base_dir+'avg_people_first_moves_all.json')
     sum_distances = 0.0
-    for board in ['6_easy_full','6_hard_full','10_easy_full','10_hard_full','10_medium_full','6_easy_pruned','6_hard_pruned','10_easy_pruned','10_hard_pruned','10_medium_pruned']:
+    boards = ['6_easy_full','6_hard_full','10_easy_full','10_hard_full','10_medium_full','6_easy_pruned','6_hard_pruned','10_easy_pruned','10_hard_pruned','10_medium_pruned']
+    sum_distances = 0.0
+    for i in range(len(boards)):
+        boardsMinus1 = copy.deepcopy(boards)
+        del boardsMinus1[i]
+        c.BOARDS_MINUS_1 = copy.deepcopy(boardsMinus1)
+        x0 = [0.25,0.25,0.25,0.25]
+        b = (0.0,1.0)
+        bnds = (b,b,b,b)
+        con1 = {'type':'eq','fun':constraint1}
+        cons = [con1]
+        res = minimize(distancePredictionPeople,x0,method='SLSQP',bounds = bnds, constraints=cons)
+        population = res.x
+        pop_str = ''
+        for p in population:
+            pop_str += str(p) + ','
+        print pop_str
+
+        board = boards[i]
+        dist = 0.0
         people = people_all[board]
         models = []
         density = read_matrices_from_file(base_dir+'model_density_nbr=2.json')
         linear = read_matrices_from_file(base_dir+'model_config_opp_linear_layers.json')
         non_linear = read_matrices_from_file(base_dir+'model_config_opp_non-linear_layers.json')
         non_linear_interaction = read_matrices_from_file(base_dir+'model_config_opp_non-linear_interaction_layers.json')
-        blocking = read_matrices_from_file(base_dir+'model_config_blocking10_blocking_layers.json')
+        # blocking = read_matrices_from_file(base_dir+'model_config_blocking10_blocking_layers.json')
         models.append(density[board])
         models.append(linear[board])
         models.append(non_linear[board])
         models.append(non_linear_interaction[board])
-        models.append(blocking[board])
+        # models.append(blocking[board])
+        joint_matrix = copy.deepcopy(people)
+
+        for row in range(len(joint_matrix)):
+            for col in range(len(joint_matrix)):
+                if (joint_matrix[row][col]!=-0.00001) & (joint_matrix[row][col]!=-0.00002):
+                    agg_score = 0.0
+                    for i in range (len(models)):
+                        model = models[i]
+                        agg_score+=model[row][col]*population[i]
+                    joint_matrix[row][col] = agg_score
+
+        sum_distances += emd(joint_matrix,people)
+    # print joint_matrix
+    # print emd(joint_matrix,people)
+    return sum_distances
+
+def distancePredictionPeople(population):
+    base_dir = 'data_matrices/cogsci/'
+    people_all = read_matrices_from_file(base_dir+'avg_people_first_moves_all.json')
+    sum_distances = 0.0
+    for board in c.BOARDS_MINUS_1:
+        people = people_all[board]
+        models = []
+        density = read_matrices_from_file(base_dir+'model_density_nbr=2.json')
+        linear = read_matrices_from_file(base_dir+'model_config_opp_linear_layers.json')
+        non_linear = read_matrices_from_file(base_dir+'model_config_opp_non-linear_layers.json')
+        non_linear_interaction = read_matrices_from_file(base_dir+'model_config_opp_non-linear_interaction_layers.json')
+        # blocking = read_matrices_from_file(base_dir+'model_config_blocking10_blocking_layers.json')
+        models.append(density[board])
+        models.append(linear[board])
+        models.append(non_linear[board])
+        models.append(non_linear_interaction[board])
+        # models.append(blocking[board])
         joint_matrix = copy.deepcopy(people)
 
         for row in range(len(joint_matrix)):
@@ -2416,19 +2485,33 @@ def constraint2(x):
 
 if __name__ == "__main__":
     # distancePredictionPeople([0.1,0.1,0.3,0.3,0.2], '6_easy_full')
-    x0 = [0.2,0.2,0.2,0.2,0.2]
+    # x0 = [0.2,0.2,0.2,0.2,0.2]
+    x0 = [0.25,0.25,0.25,0.25]
     b = (0.0,1.0)
-    bnds = (b,b,b,b,b)
+    bnds = (b,b,b,b)
     con1 = {'type':'eq','fun':constraint1}
     cons = [con1]
-    res = minimize(distancePredictionPeople,x0,method='SLSQP',bounds = bnds, constraints=cons)
-    print res
-    print '---'
-    print res.x
+
+    # c.BOARDS_MINUS_1 = ['6_easy_full','6_hard_full','10_easy_full','10_hard_full','10_medium_full','6_easy_pruned','6_hard_pruned','10_easy_pruned','10_hard_pruned','10_medium_pruned']
+    # res = minimize(distancePredictionPeople,x0,method='SLSQP',bounds = bnds, constraints=cons)
+    # print res
+    # print '---'
+    # print res.x
+
+    # distancePredictionPeopleLOO()
+
     # generate_uniform_dist_for_boards('model_config_opp_non-linear_interaction.json')
     # models_files = ['model_config_blocking50_blocking.json', 'avg_people_first_moves_all.json']
     # models_files = ['model_config_blocking10_blocking_layers.json', 'model_config_opp_non-linear_layers.json','model_config_opp_linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json','model_density_nbr=2.json','avg_people_first_moves_all.json']
-    # likelihood('data_matrices/cogsci/people_first_moves_values_byParticipant_validatedCorrect.json',models_files)
+    models_files = ['model_config_blocking10_blocking.json', 'model_config_opp_non-linear.json','model_config_opp_linear.json', 'model_config_opp_non-linear_interaction.json','model_density_nbr=2.json','chance.json']
+
+    likelihood('data_matrices/cogsci/people_first_moves_values_byParticipant_wrong.json',models_files)
+
+    # model_files = ['mcts.json','model_config_blocking10_blocking.json','avg_people_first_moves_all.json']
+    # model_files = ['model_config_blocking10_blocking_layers.json','avg_people_first_moves_all.json']
+    # run_models_from_list(model_files, 'heatmaps/cogsci/cogsci6MCblockingLayers')
+
+
     # # # # models_files = ['model_config_opp_linear_layers.json', 'model_config_opp_non-linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json', 'model_config_opp_blocking_layers.json', 'avg_people_first_moves_all.json']
     # compute_distances_for_boards(models_files,1)
     # get_alpha_beta_scores()

@@ -1582,7 +1582,7 @@ if __name__ == "__main__":
     # paths_stats(participants='all')
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
-    paths_stats(participants='validatedCorrect')
+    paths_stats(participants='wrong')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

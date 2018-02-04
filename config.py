@@ -26,4 +26,6 @@ TIME = '000'
 
 BOARD = None
 
+BOARDS_MINUS_1 = []
+
 PATH = "boardsFilled/"

@@ -48,7 +48,7 @@ class Game:
     self.prev_move_x = None
     self.prev_move_x_depth = 0
     self.max_depth = None
-    self.max_moves = 100000
+    self.max_moves = 35
     self.heuristic = heuristic
     self.prune = prune
     self.exp = exp
@@ -650,7 +650,7 @@ if __name__ == "__main__":
 
     results = []
     header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
-    game_configs_file = "ab_config_opp_square_fullOpp.json"
+    game_configs_file = "ab_config1.json"
     configs = get_game_configs(game_configs_file)
     for conf in configs:
       data_matrices = {}
@@ -718,7 +718,7 @@ if __name__ == "__main__":
     for i in range(len(results)):
       print results[i]
 
-    output_name = 'stats/' + game_configs_file[:-5] + '_' + str(game.max_moves) + '.csv'
+    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_' + str(game.max_moves) + '.csv'
     write_results(output_name, results, header)
       #
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
