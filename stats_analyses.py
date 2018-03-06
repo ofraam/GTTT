@@ -98,28 +98,31 @@ if __name__== "__main__":
     distances = pd.read_csv("stats/distanceFirstMoves.csv")
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
+    dynamics = pd.read_csv("stats/dynamics.csv")
 
 
     # log-likelhood
-    density = likelihood.loc[likelihood['heuristic'] == 'density']
-    linear = likelihood.loc[likelihood['heuristic'] == 'linear']
-    nonLinear = likelihood.loc[likelihood['heuristic'] == 'non-linear']
-    nonLinearInteraction  = likelihood.loc[likelihood['heuristic'] == 'non-linear_interaction']
-    blocking = likelihood.loc[likelihood['heuristic'] == 'blocking']
-    chance = likelihood.loc[likelihood['heuristic'] == 'chance']
+    # density = likelihood.loc[likelihood['heuristic'] == 'density']
+    # linear = likelihood.loc[likelihood['heuristic'] == 'linear']
+    # nonLinear = likelihood.loc[likelihood['heuristic'] == 'non-linear']
+    # nonLinearInteraction  = likelihood.loc[likelihood['heuristic'] == 'non-linear_interaction']
+    # blocking = likelihood.loc[likelihood['heuristic'] == 'blocking']
+    # chance = likelihood.loc[likelihood['heuristic'] == 'chance']
+    #
+    # densityCorrect = density.loc[density['participants'] == 'correct']
+    # densityWrong = density.loc[density['participants'] == 'wrong']
+    # linearCorrect = linear.loc[linear['participants'] == 'correct']
+    # linearWrong = linear.loc[linear['participants'] == 'wrong']
+    # nonLinearCorrect = nonLinear.loc[nonLinear['participants'] == 'correct']
+    # nonLinearWrong = nonLinear.loc[nonLinear['participants'] == 'wrong']
+    # nonLinearInteractionCorrect = nonLinearInteraction.loc[nonLinearInteraction['participants'] == 'correct']
+    # nonLinearInteractionWrong = nonLinearInteraction.loc[nonLinearInteraction['participants'] == 'wrong']
+    # blockingCorrect = blocking.loc[blocking['participants'] == 'correct']
+    # blockingWrong = blocking.loc[blocking['participants'] == 'wrong']
+    #
+    # print bs.bootstrap(data['timeMinutes'].values, stat_func=bs_stats.mean, is_pivotal=False)
 
-    densityCorrect = density.loc[density['participants'] == 'correct']
-    densityWrong = density.loc[density['participants'] == 'wrong']
-    linearCorrect = linear.loc[linear['participants'] == 'correct']
-    linearWrong = linear.loc[linear['participants'] == 'wrong']
-    nonLinearCorrect = nonLinear.loc[nonLinear['participants'] == 'correct']
-    nonLinearWrong = nonLinear.loc[nonLinear['participants'] == 'wrong']
-    nonLinearInteractionCorrect = nonLinearInteraction.loc[nonLinearInteraction['participants'] == 'correct']
-    nonLinearInteractionWrong = nonLinearInteraction.loc[nonLinearInteraction['participants'] == 'wrong']
-    blockingCorrect = blocking.loc[blocking['participants'] == 'correct']
-    blockingWrong = blocking.loc[blocking['participants'] == 'wrong']
 
-    print bs.bootstrap(data['timeMinutes'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bootstrap_t_pvalue(wrong['actionsSolution'].values, correct['actionsSolution'].values)
     # print bs.bootstrap(density['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(linear['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
@@ -157,6 +160,29 @@ if __name__== "__main__":
     # ax = sns.factorplot(x="board", y="solutionAndValidationCorrect", hue="condition", data=data, n_boot=1000, order=['6_easy', '10_easy', '6_hard', '10_hard', '10_medium'], markers=['o','^'], linestyles=["-", "--"], legend=False)
     sns.set(style="whitegrid")
 
+    # dynamics analysis
+    # dynamics_filtered = dynamics.loc[(dynamics['move_number_in_path'] < 11) & (dynamics['move_number_in_path'] > 1) & (dynamics['player'] == 2)]
+    dynamics_filtered = dynamics.loc[(dynamics['userid']=='41bad9a2')]
+    # ax = sns.(x="time_rel_sec", y="time_between", scale= 0.5, data=dynamics_filtered, n_boot=1000)
+    ax = sns.tsplot(time='time_rel_sec', value='time_between', unit='userid', data=dynamics_filtered)
+    # ax = sns.barplot(x="prev_action", y="time_between", hue="solved", data=dynamics, n_boot=1000)
+    resets = dynamics_filtered.loc[dynamics_filtered['prev_action'] == 'reset']
+
+    for index, event in resets.iterrows():
+        time_reset = int(event['time_rel_sec'])-int(event['time_between'])
+        print time_reset
+        plt.axvline(time_reset, color="red", linestyle="--");
+
+    undos = dynamics_filtered.loc[dynamics_filtered['prev_action'] == 'undo']
+
+    for index, event in undos.iterrows():
+        time_undo = int(event['time_rel_sec'])-int(event['time_between'])
+        print time_undo
+        plt.axvline(time_undo, color="purple", linestyle="--");
+    # plt.plot([0, 2.2], [5,2.2], linewidth=1,linestyle="--")
+    # plt.axvline(x=2, color="k", linestyle="--");
+    plt.show()
+
     # participant actions figure-----
     # ax = sns.factorplot(x="board", y="actionsSolution", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 medium', '10 medium', '6 hard', '10 hard', '10 CV'],  markers=['o','^'], legend_out=False, legend=False)
     #
@@ -166,24 +192,24 @@ if __name__== "__main__":
     # plt.legend(loc='best')
 
     # participant actions figure-----
-    alphaBetaFull['heuristic_name'] = alphaBetaFull['heuristic_name'].map({'density':'density', 'linear':  'linear','non-linear':'non-linear', 'non-linear-interaction': 'interaction','blocking':'blocking', 'participants':'participants'})
-    # alpha beta and participant actions figure-----
-    # ax = sns.factorplot(x="board", y="moves",, hue="heuristic_name", data=alphaBetaFull, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=["1","2","3","4","8","o"], legend_out=False, legend=False)
-    # data['board'] = data['board'].map({'6 MC full': 'MC6 full','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
-    alphaBetaFull['board'] = alphaBetaFull['board'].map({'6 MC full': 'MC6 full', '6 MC truncated': 'MC6 truncated','10 MC full': 'MC10 full','10 MC truncated':'MC10 truncated','6 HC full': 'HC6 full', '6 HC truncated':'HC6 truncated','10 HC full':'HC10 full','10 HC truncated':'HC10 truncated', '10 DC full': 'DC10 full','10 DC truncated':'DC10 truncated'})
-    ax = sns.factorplot(x="board", y="moves",  scale= 0.5, data=alphaBetaFull, hue="heuristic_name", n_boot=1000, order=['MC6 full', 'MC6 truncated','MC10 full','MC10 truncated','HC6 full', 'HC6 truncated','HC10 full','HC10 truncated', 'DC10 full','DC10 truncated'],  markers=["<","1","2","3","4","*"],linestyles=["-","-","-","-","-", "--"], legend_out=False, legend=False)
-    ax.fig.get_axes()[0].set_yscale('log')
+    # alphaBetaFull['heuristic_name'] = alphaBetaFull['heuristic_name'].map({'density':'density', 'linear':  'linear','non-linear':'non-linear', 'non-linear-interaction': 'interaction','blocking':'blocking', 'participants':'participants'})
+    # # alpha beta and participant actions figure-----
+    # # ax = sns.factorplot(x="board", y="moves",, hue="heuristic_name", data=alphaBetaFull, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=["1","2","3","4","8","o"], legend_out=False, legend=False)
+    # # data['board'] = data['board'].map({'6 MC full': 'MC6 full','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
+    # alphaBetaFull['board'] = alphaBetaFull['board'].map({'6 MC full': 'MC6 full', '6 MC truncated': 'MC6 truncated','10 MC full': 'MC10 full','10 MC truncated':'MC10 truncated','6 HC full': 'HC6 full', '6 HC truncated':'HC6 truncated','10 HC full':'HC10 full','10 HC truncated':'HC10 truncated', '10 DC full': 'DC10 full','10 DC truncated':'DC10 truncated'})
+    # ax = sns.factorplot(x="board", y="moves",  scale= 0.5, data=alphaBetaFull, hue="heuristic_name", n_boot=1000, order=['MC6 full', 'MC6 truncated','MC10 full','MC10 truncated','HC6 full', 'HC6 truncated','HC10 full','HC10 truncated', 'DC10 full','DC10 truncated'],  markers=["<","1","2","3","4","*"],linestyles=["-","-","-","-","-", "--"], legend_out=False, legend=False)
+    # ax.fig.get_axes()[0].set_yscale('log')
     # # print alphaBetaFull['moves']
     # # ax.ax.show()
     # plt.ylim(0, 200000)
     # sns.plt.xlim(0, None)
 
 
-    ax.set(xlabel='Board', ylabel='Number of Moves')
-    lw = ax.ax.lines[0].get_linewidth()
-    plt.setp(ax.ax.lines,linewidth=lw)
-    plt.legend(loc='best')
-    plt.show()
+    # ax.set(xlabel='Board', ylabel='Number of Moves')
+    # lw = ax.ax.lines[0].get_linewidth()
+    # plt.setp(ax.ax.lines,linewidth=lw)
+    # plt.legend(loc='best')
+    # plt.show()
     #heatmap distance----
     # distances['scoring'] = distances['scoring'].map({'mcts':'mcts','density':'density', 'linear':  'linear','non-linear':'non-linear', 'non-linear-interaction': 'non-linear'+'\n'+'interaction','blocking':'blocking'})
     # ax = sns.barplot(x="scoring", y="distance", data=distances, order=['mcts','density', 'linear', 'non-linear','non-linear'+'\n'+'interaction','blocking'])
@@ -207,13 +233,13 @@ if __name__== "__main__":
     # # change_width(ax, .35)
     # plt.show()
 
-    mcts = distances.loc[distances['scoring'] == 'mcts']
-    density = distances.loc[distances['scoring'] == 'density']
-    linear = distances.loc[distances['scoring'] == 'linear']
-    nonlinear = distances.loc[distances['scoring'] == 'non-linear']
-    nonlinearInteraction = distances.loc[distances['scoring'] == 'non-linear-interaction']
-    blocking = distances.loc[distances['scoring'] == 'blocking']
-    density = distances.loc[distances['scoring'] == 'density']
+    # mcts = distances.loc[distances['scoring'] == 'mcts']
+    # density = distances.loc[distances['scoring'] == 'density']
+    # linear = distances.loc[distances['scoring'] == 'linear']
+    # nonlinear = distances.loc[distances['scoring'] == 'non-linear']
+    # nonlinearInteraction = distances.loc[distances['scoring'] == 'non-linear-interaction']
+    # blocking = distances.loc[distances['scoring'] == 'blocking']
+    # density = distances.loc[distances['scoring'] == 'density']
     # print bootstrap_t_pvalue(blocking['distance'].values, mcts['distance'].values)
     # print bootstrap_t_pvalue(blocking['distance'].values, density['distance'].values)
     # print bootstrap_t_pvalue(blocking['distance'].values, linear['distance'].values)
@@ -270,8 +296,8 @@ if __name__== "__main__":
     # ax.axes[0][0].legend(loc=1)
     # ax = sns.factorplot(x="size_type", y="entropyNormalized",col="condition", hue="solutionAndValidationCorrect", data=dataEntropy, n_boot=1000, order=['6_easy', '10_easy', '6_hard', '10_hard', '10_medium'])
     # ax = sns.factorplot(x="solutionAndValidationCorrect", y="actionsSolution", data=data, n_boot=1000)
-    correct = data.loc[data['solutionAndValidationCorrect'] == 1]
-    wrong = data.loc[data['solutionAndValidationCorrect'] == 0]
+    # correct = data.loc[data['solutionAndValidationCorrect'] == 1]
+    # wrong = data.loc[data['solutionAndValidationCorrect'] == 0]
     # print bs.bootstrap(correct['timeMinutes'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(wrong['timeMinutes'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bootstrap_t_pvalue(wrong['timeMinutes'].values, correct['timeMinutes'].values)
@@ -280,46 +306,46 @@ if __name__== "__main__":
     # print bs.bootstrap(wrong['timePerMove'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bootstrap_t_pvalue(wrong['timePerMove'].values, correct['timePerMove'].values)
 
-    densityPop = population.loc[population['heuristic'] == 'density']
-    linearPop = population.loc[population['heuristic'] == 'linear']
-    nonLinearPop = population.loc[population['heuristic'] == 'non-linear']
-    nonLinearInteractionPop = population.loc[population['heuristic'] == 'non-linear-interaction']
-    blockingPop = population.loc[population['heuristic'] == 'blocking']
-    # print bootstrap_t_pvalue(wrong['actionsSolution'].values, correct['actionsSolution'].values)
-    print bs.bootstrap(densityPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(linearPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(nonLinearPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(nonLinearInteractionPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print bs.bootstrap(blockingPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print bs.bootstrap(wrong['actionsSolution'].values, stat_func=bs_stats.mean, is_pivotal=False)
-
-    correct = correct['actionsSolution']
-    wrong = wrong['actionsSolution']
-
-
+    # densityPop = population.loc[population['heuristic'] == 'density']
+    # linearPop = population.loc[population['heuristic'] == 'linear']
+    # nonLinearPop = population.loc[population['heuristic'] == 'non-linear']
+    # nonLinearInteractionPop = population.loc[population['heuristic'] == 'non-linear-interaction']
+    # blockingPop = population.loc[population['heuristic'] == 'blocking']
+    # # print bootstrap_t_pvalue(wrong['actionsSolution'].values, correct['actionsSolution'].values)
+    # print bs.bootstrap(densityPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(linearPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(nonLinearPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(nonLinearInteractionPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # print bs.bootstrap(blockingPop['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # print bs.bootstrap(wrong['actionsSolution'].values, stat_func=bs_stats.mean, is_pivotal=False)
     #
-    easy_full_6 = data.loc[(data['board_size'] == 6) &(data['board_type'] == 'medium') & (data['condition'] == 'full')]
-    easy_pruned_6 = data.loc[(data['board_size'] == 6) &(data['board_type'] == 'medium') & (data['condition'] == 'truncated')]
-    hard_full_6 = data.loc[(data['board_size'] == 6) &(data['board_type'] == 'hard') & (data['condition'] == 'full')]
-    hard_pruned_6 = data.loc[(data['board_size'] == 6) &(data['board_type'] == 'hard') & (data['condition'] == 'truncated')]
-    easy_full_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'medium') & (data['condition'] == 'full')]
-    easy_pruned_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'medium') & (data['condition'] == 'truncated')]
-    hard_full_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'hard') & (data['condition'] == 'full')]
-    hard_pruned_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'hard') & (data['condition'] == 'truncated')]
-    medium_full_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'CV') & (data['condition'] == 'full')]
-    medium_pruned_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'CV') & (data['condition'] == 'truncated')]
+    # correct = correct['actionsSolution']
+    # wrong = wrong['actionsSolution']
     #
-    easy_full = data.loc[(data['board_type'] == 'medium') & (data['condition'] == 'full')]
-    hard_full = data.loc[(data['board_type'] == 'hard') & (data['condition'] == 'full')]
-
-    full_boards1 =  data.loc[data['condition'] == 'full']
-    # print bs.bootstrap(full_boards1['actionsSolution'].values, stat_func=bs_stats.mean, is_pivotal=False)
-
-    easy_6 = data.loc[(data['board_size'] == 6) & (data['board_type'] == 'medium')]
-    hard_6 = data.loc[(data['board_size'] == 6) & (data['board_type'] == 'hard')]
-
-    easy_10 = data.loc[(data['board_size'] == 10) & (data['board_type'] == 'medium')]
-    hard_10 = data.loc[(data['board_size'] == 10) & (data['board_type'] == 'hard')]
+    #
+    # #
+    # easy_full_6 = data.loc[(data['board_size'] == 6) &(data['board_type'] == 'medium') & (data['condition'] == 'full')]
+    # easy_pruned_6 = data.loc[(data['board_size'] == 6) &(data['board_type'] == 'medium') & (data['condition'] == 'truncated')]
+    # hard_full_6 = data.loc[(data['board_size'] == 6) &(data['board_type'] == 'hard') & (data['condition'] == 'full')]
+    # hard_pruned_6 = data.loc[(data['board_size'] == 6) &(data['board_type'] == 'hard') & (data['condition'] == 'truncated')]
+    # easy_full_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'medium') & (data['condition'] == 'full')]
+    # easy_pruned_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'medium') & (data['condition'] == 'truncated')]
+    # hard_full_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'hard') & (data['condition'] == 'full')]
+    # hard_pruned_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'hard') & (data['condition'] == 'truncated')]
+    # medium_full_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'CV') & (data['condition'] == 'full')]
+    # medium_pruned_10 = data.loc[(data['board_size'] == 10) &(data['board_type'] == 'CV') & (data['condition'] == 'truncated')]
+    # #
+    # easy_full = data.loc[(data['board_type'] == 'medium') & (data['condition'] == 'full')]
+    # hard_full = data.loc[(data['board_type'] == 'hard') & (data['condition'] == 'full')]
+    #
+    # full_boards1 =  data.loc[data['condition'] == 'full']
+    # # print bs.bootstrap(full_boards1['actionsSolution'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #
+    # easy_6 = data.loc[(data['board_size'] == 6) & (data['board_type'] == 'medium')]
+    # hard_6 = data.loc[(data['board_size'] == 6) & (data['board_type'] == 'hard')]
+    #
+    # easy_10 = data.loc[(data['board_size'] == 10) & (data['board_type'] == 'medium')]
+    # hard_10 = data.loc[(data['board_size'] == 10) & (data['board_type'] == 'hard')]
 
 
     #mcts----

@@ -760,6 +760,7 @@ def moves_stats(output_file):
     data_first_moves = {}
 
     first_moves_data_matrices = {}
+    results_table = []
     for g in range(len(LOGFILE)):
         # print g
         initial_board = copy.deepcopy(START_POSITION[g])
@@ -786,7 +787,7 @@ def moves_stats(output_file):
         curr_first_move_matrix = copy.deepcopy(move_matrix)
 
 
-        results_table = []
+
         with open(LOGFILE[g], 'rb') as csvfile:
             print LOGFILE[g]
             condition = LOGFILE[g][5:-10].replace("_",",")
@@ -799,6 +800,7 @@ def moves_stats(output_file):
             curr_user = ''
             prev_time = None
             prev_action = None
+            initial_time = None
             for row in log_reader:
                 curr_data = {}
                 if curr_user == '':
@@ -816,6 +818,7 @@ def moves_stats(output_file):
                     move_number = 1
                     curr_path = []
                     move_stack = []
+                    curr_user = row['userid']
 
                 elif row['key'] == 'clickPos':
                     rowPos = int(row['value'][0])
@@ -837,13 +840,13 @@ def moves_stats(output_file):
                         if prev_row != None:
                             # print 'why'
                             prev_time = prev_row['time']
+                            initial_time = int(prev_row['time'])
                     if prev_time == None:
                         print row
                     time_between = int(row['time']) - int(prev_time)
                     time_between = time_between/1000.0
 
-                    prev_action = 'click'
-                    prev_time = row['time']
+
 
                     curr_data['userid'] = curr_user
                     curr_data['condition'] = condition
@@ -852,23 +855,29 @@ def moves_stats(output_file):
                     curr_data['player'] = player
                     curr_data['position'] = str(rowPos) + '_' + str(colPos)
                     curr_data['time'] = row['time']
+                    curr_data['time_rel'] = int(row['time']) - initial_time
                     curr_data['time_prev_move'] = prev_time
                     curr_data['time_between'] = time_between
                     curr_data['prev_action'] = prev_action
                     curr_data['first_move_in_path'] = first_move
                     curr_data['move_number'] = move_number
-                    results_table.append(curr_data)
+                    curr_data['move_number_in_path'] = len(curr_path)
+                    results_table.append(copy.deepcopy(curr_data))
                     move_number += 1
+                    prev_action = 'click'
+                    prev_time = row['time']
 
                 elif row['key'] == 'reset':
                     curr_move_matrix = copy.deepcopy(initial_board)
                     prev_action = 'reset'
                     prev_time = row['time']
+                    curr_path = []
 
                 elif row['key'] == 'undo':
                     if len(move_stack) > 0:
                         undo_move = move_stack.pop()
                         curr_move_matrix[undo_move[0]][undo_move[1]] = 0
+                        curr_path = curr_path[:-1]
                     else:
                         print 'problem undo'
 
@@ -878,8 +887,8 @@ def moves_stats(output_file):
                 #     prev_time = row['time']
 
                 prev_row = copy.deepcopy(row)
-
-    dataWriter = csv.DictWriter(output_file, fieldnames=results_table[0].keys(), delimiter=',')
+    dataFile = open(output_file, 'wb')
+    dataWriter = csv.DictWriter(dataFile, fieldnames=results_table[0].keys(), delimiter=',')
     dataWriter.writeheader()
     for record in results_table:
         dataWriter.writerow(record)
@@ -1716,7 +1725,7 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/testMovesStats.csv')
+    moves_stats('stats/testMovesStats3.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)
