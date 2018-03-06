@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import json
+from model import *
 
 LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
 
@@ -755,6 +756,25 @@ def check_participant_answer(userid):
         return 'wrong'
 
 
+def get_scores(score_matrix, row, col):
+    top_score = -10000
+    second_score = -10000
+    chosen_score = score_matrix[row][col]
+    all_scores = []
+    for r in range(len(score_matrix)):
+        for c in range(len(score_matrix[r])):
+            if score_matrix[r][c] > 0:
+                all_scores.append(score_matrix[r][c])
+
+    sorted_scores = sorted(all_scores, reverse=True)
+    i = 0
+    while(chosen_score<sorted_scores[i]):
+        i+=1
+
+    return (chosen_score, i, sorted_scores[0], sorted_scores[1])
+
+
+
 def moves_stats(output_file):
     moves_data_matrics = {}
     data_first_moves = {}
@@ -769,16 +789,16 @@ def moves_stats(output_file):
         path_counter_subpaths = 0.0
         taken_cells = 0.0
 
-        for i in range(len(initial_board)):
-            for j in range(len(initial_board[i])):
-                if ((initial_board[i][j]!=1) & (initial_board[i][j]!=2)):
-                    initial_board[i][j] = int(initial_board[i][j])
-                elif (initial_board[i][j]==1):
-                    initial_board[i][j]='X'
-                    taken_cells+=1
-                elif (initial_board[i][j]==2):
-                    initial_board[i][j]='O'
-                    taken_cells+=1
+        # for i in range(len(initial_board)):
+        #     for j in range(len(initial_board[i])):
+        #         if ((initial_board[i][j]!=1) & (initial_board[i][j]!=2)):
+        #             initial_board[i][j] = int(initial_board[i][j])
+        #         elif (initial_board[i][j]==1):
+        #             initial_board[i][j]='X'
+        #             taken_cells+=1
+        #         elif (initial_board[i][j]==2):
+        #             initial_board[i][j]='O'
+        #             taken_cells+=1
 
         move_matrix = copy.deepcopy(initial_board)
         first_move_matrix = copy.deepcopy(initial_board)
@@ -819,6 +839,7 @@ def moves_stats(output_file):
                     curr_path = []
                     move_stack = []
                     curr_user = row['userid']
+                    initial_time = None
 
                 elif row['key'] == 'clickPos':
                     rowPos = int(row['value'][0])
@@ -826,6 +847,10 @@ def moves_stats(output_file):
                     move_stack.append((rowPos, colPos))
                     player = int(row['value'][4])
                     first_move = False
+
+                    # scores computation
+                    scores = compute_scores_layers_for_matrix(curr_move_matrix,normalized=True,o_weight=0.5, exp=2, neighborhood_size=2)
+                    get_scores(scores, rowPos, colPos)
                     # print rowPos
                     # print colPos
                     # print move_matrix[rowPos][colPos]
@@ -855,6 +880,7 @@ def moves_stats(output_file):
                     curr_data['player'] = player
                     curr_data['position'] = str(rowPos) + '_' + str(colPos)
                     curr_data['time'] = row['time']
+
                     curr_data['time_rel'] = int(row['time']) - initial_time
                     curr_data['time_prev_move'] = prev_time
                     curr_data['time_between'] = time_between
@@ -885,7 +911,9 @@ def moves_stats(output_file):
                     prev_time = row['time']
                 # else:
                 #     prev_time = row['time']
-
+                elif row['key'] == 'start':
+                    prev_time = row['time']
+                    initial_time = int(prev_row['time'])
                 prev_row = copy.deepcopy(row)
     dataFile = open(output_file, 'wb')
     dataWriter = csv.DictWriter(dataFile, fieldnames=results_table[0].keys(), delimiter=',')
@@ -1725,7 +1753,7 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/testMovesStats3.csv')
+    moves_stats('stats/testMovesStatsStart.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

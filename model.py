@@ -701,7 +701,10 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
                     if (not(check_path_overlap(p1[1],p2[1]))):  # interaction score if the paths don't overlap
                         top = 0.0 +p1[0]*p2[0]
                         bottom = ((streak_size-1)*(streak_size-1))-(p1[0]*p2[0])
-                        score += math.pow(top/bottom, exp)
+                        if bottom == 0:
+                            score = 100000
+                        else:
+                            score += math.pow(top/bottom, exp)
 
     return (score, open_paths_data, max_length_path)
 
@@ -1667,6 +1670,156 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
     matrix_name += '_oInteraction'
     write_matrices_to_file(data_matrices, matrix_name + '.json')
     return data_matrices
+
+
+
+'''
+computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
+the @exp parameter creates the non-linearity (i.e., 2 --> squared)
+@density says which density function to use
+@neighborhood size is for density score computation when using neighbors
+@sig is for guassians when using guassian density
+@threshold says how much to prune (0.2 means we will remove cells that have score<0.2*maxScore)
+@o_weight says how much weight to give for blocking O paths
+@integrate says whether to combine density and path scores (done if = True), or just use path score after the initial filtering (done if = False)
+'''
+def compute_scores_layers_for_matrix(board_mat, normalized=False, exp=1, neighborhood_size=1, density = 'reg', lamb=None, sig=3,
+                          threshold=0.2, o_weight=0.0, integrate = False, interaction = True, dominance = False, block = False):
+    data_matrices = {}
+    board_matrix = copy.deepcopy(board_mat)
+    for i in range(len(board_matrix)):
+        for j in range(len(board_matrix[i])):
+            if ((board_matrix[i][j]!=1) & (board_matrix[i][j]!=2)):
+                board_matrix[i][j] = int(board_matrix[i][j])
+            elif (board_matrix[i][j]==1):
+                board_matrix[i][j]='X'
+            elif (board_matrix[i][j]==2):
+                board_matrix[i][j]='O'
+
+    # print board_matrix
+
+    sum_scores = 0.0
+    sum_scores_exp = 0.0
+    density_score_matrix = copy.deepcopy(board_matrix)
+
+    if density=='guassian':
+        # create guassians for each X square
+        guassian_kernel = []
+        for r in range(len(board_matrix)):
+            for c in range(len(board_matrix[r])):
+                if board_matrix[r][c] == 'X':
+                    guassian_kernel.append(makeGaussian(len(board_matrix),fwhm=sig,center=[r,c]))
+
+    for r in range(len(board_matrix)):
+        for c in range(len(board_matrix[r])):
+            if board_matrix[r][c] == 0:  # only check if free
+                if density == 'guassian':
+                    square_score = compute_density_guassian(r, c, board_matrix, guassian_kernel)  # check neighborhood
+                else:
+                    square_score = compute_density(r, c, board_matrix, neighborhood_size)  # check neighborhood
+                density_score_matrix[r][c] = square_score
+                sum_scores += square_score
+                # if lamb!=None:
+                #     sum_scores_exp += math.pow(math.e,lamb*square_score)
+
+    # compute maximal density score for filtering
+    max_density_score = -1000000
+    for r in range(len(density_score_matrix)):
+        for c in range(len(density_score_matrix[r])):
+            # score_matrix[r][c] = score_matrix[r][c]/sum_scores
+            if (density_score_matrix[r][c]!='X') & (density_score_matrix[r][c]!='O'):
+                density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores
+                if density_score_matrix[r][c] > max_density_score:
+                    max_density_score = density_score_matrix[r][c]
+                # score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
+
+    # run path score on remaining squares
+    sum_scores = 0.0
+    sum_scores_exp = 0.0
+    score_matrix = copy.deepcopy(board_matrix)
+
+    paths_data = copy.deepcopy(board_matrix)
+
+    for r in range(len(board_matrix)):
+        for c in range(len(board_matrix[r])):
+            if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free & passed threshold
+                # x_paths = compute_open_paths_data(r, c, board_matrix,exp=exp,interaction=interaction)  # check open paths for win
+
+                x_paths = compute_open_paths_data_interaction(r, c, board_matrix,exp=exp,interaction=interaction)
+                square_score_x = x_paths[0]
+                x_paths_data = []
+                for path in x_paths[1]:
+                    x_paths_data.append(path[2])
+                paths_data[r][c] = copy.deepcopy(x_paths_data)
+                # square_score_0 = compute_open_paths(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+
+                # o_paths = compute_open_paths_data(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+                o_paths = compute_open_paths_data_interaction(r, c, board_matrix,player = 'O', exp=exp,interaction=interaction)
+                square_score_o = o_paths[0]
+
+
+                streak_size = 4
+                if len(board_matrix)==10:
+                    streak_size = 5
+
+                if block & (x_paths[2] == (streak_size-1)):  # give score for blocking O
+                    # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
+                    square_score_o = INFINITY_O
+                # if x_paths[2] == (streak_size-1):
+                #     square_score_o =0
+                square_score = (1-o_weight)*square_score_x + o_weight*square_score_o
+                if integrate:
+                    square_score = square_score*density_score_matrix[r][c]
+                score_matrix[r][c] = square_score
+                sum_scores += square_score
+                if lamb!=None:
+                    score_matrix[r][c] = math.pow(math.e,lamb*square_score)
+                    sum_scores_exp += math.pow(math.e,lamb*square_score)
+
+    # x_paths_data = []
+    # for path in x_paths[1]:
+    #     x_paths_data.append(path[2])
+    # sum_scores = 0.0
+    # absolute_score_matrix = copy.deepcopy(score_matrix)
+    # for r in range(len(board_matrix)):
+    #     for c in range(len(board_matrix[r])):
+    #         if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free
+    #             score_matrix[r][c] = compute_relative_path_score(r,c,paths_data[r][c],absolute_score_matrix)
+    #             sum_scores+=score_matrix[r][c]
+
+    if dominance:
+        score_matrix = compute_square_scores_dominance(board_matrix, score_matrix)
+        sum_scores = 0.0
+        for r in range(0,len(score_matrix)):
+            for j in range(0,len(score_matrix[r])):
+                if (score_matrix[r][j]!='X') & (score_matrix[r][j]!='O'):
+                    sum_scores += score_matrix[r][j]
+
+
+
+    # heatmaps
+    for r in range(0,len(score_matrix)):
+        for j in range(0,len(score_matrix[r])):
+            if (score_matrix[r][j]=='X'):
+                score_matrix[r][j] = -0.00001
+            elif (score_matrix[r][j]=='O'):
+                score_matrix[r][j] = -0.00002
+
+    if normalized:
+        for r in range(len(score_matrix)):
+            for c in range(len(score_matrix[r])):
+                # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
+                if (score_matrix[r][c]>0):
+                    if lamb is None:
+                        score_matrix[r][c] = score_matrix[r][c]/sum_scores
+                    else:
+                        score_matrix[r][c] = score_matrix[r][c]/sum_scores_exp
+
+
+    return score_matrix
+
+
+
 
 '''
 auxilary function, you can ignore
