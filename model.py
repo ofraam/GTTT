@@ -45,7 +45,7 @@ BOARDS_MINUS_1 =[]
 computes the density score for a cell
 @neighborhood_size: how many cells around the square to look at
 '''
-def compute_density(row, col, board, neighborhood_size):
+def compute_density(row, col, board, neighborhood_size, player = 'X'):
     x_count = 0.0
     density_score = 0.0
     for i in range(-1*neighborhood_size,neighborhood_size+1):
@@ -56,7 +56,7 @@ def compute_density(row, col, board, neighborhood_size):
                 if (r < len(board)) & (r >= 0) & (c < len(board)) & (c >= 0):
                     # print r
                     # print c
-                    if board[r][c] == 'X':
+                    if board[r][c] == player:
                         x_count += 1.0
                         density_score += 1.0/(8*max(abs(i), abs(j)))
 
@@ -693,7 +693,11 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
     # compute the score for the cell based on the potential paths
     for i in range(len(open_paths_data)):
         p1 = open_paths_data[i]
-        score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
+
+        if streak_size == p1[0]:
+            score = 10000
+        else:
+            score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
         if interaction:
             for j in range(i+1, len(open_paths_data)):
                 p2 = open_paths_data[j]
@@ -1683,7 +1687,7 @@ the @exp parameter creates the non-linearity (i.e., 2 --> squared)
 @o_weight says how much weight to give for blocking O paths
 @integrate says whether to combine density and path scores (done if = True), or just use path score after the initial filtering (done if = False)
 '''
-def compute_scores_layers_for_matrix(board_mat, normalized=False, exp=1, neighborhood_size=1, density = 'reg', lamb=None, sig=3,
+def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, exp=1, neighborhood_size=1, density = 'reg', lamb=None, sig=3,
                           threshold=0.2, o_weight=0.0, integrate = False, interaction = True, dominance = False, block = False):
     data_matrices = {}
     board_matrix = copy.deepcopy(board_mat)
@@ -1716,7 +1720,7 @@ def compute_scores_layers_for_matrix(board_mat, normalized=False, exp=1, neighbo
                 if density == 'guassian':
                     square_score = compute_density_guassian(r, c, board_matrix, guassian_kernel)  # check neighborhood
                 else:
-                    square_score = compute_density(r, c, board_matrix, neighborhood_size)  # check neighborhood
+                    square_score = compute_density(r, c, board_matrix, neighborhood_size, player=player)  # check neighborhood
                 density_score_matrix[r][c] = square_score
                 sum_scores += square_score
                 # if lamb!=None:
@@ -1768,6 +1772,8 @@ def compute_scores_layers_for_matrix(board_mat, normalized=False, exp=1, neighbo
                 # if x_paths[2] == (streak_size-1):
                 #     square_score_o =0
                 square_score = (1-o_weight)*square_score_x + o_weight*square_score_o
+                if player == 'O':
+                    square_score = -1*square_score
                 if integrate:
                     square_score = square_score*density_score_matrix[r][c]
                 score_matrix[r][c] = square_score
@@ -1808,8 +1814,8 @@ def compute_scores_layers_for_matrix(board_mat, normalized=False, exp=1, neighbo
     if normalized:
         for r in range(len(score_matrix)):
             for c in range(len(score_matrix[r])):
-                # if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
-                if (score_matrix[r][c]>0):
+                if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
+                # if (score_matrix[r][c]>0):
                     if lamb is None:
                         score_matrix[r][c] = score_matrix[r][c]/sum_scores
                     else:

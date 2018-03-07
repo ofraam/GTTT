@@ -763,15 +763,23 @@ def get_scores(score_matrix, row, col):
     all_scores = []
     for r in range(len(score_matrix)):
         for c in range(len(score_matrix[r])):
-            if score_matrix[r][c] > 0:
+            if (score_matrix[r][c] != -0.00001) & (score_matrix[r][c] != -0.00002):
                 all_scores.append(score_matrix[r][c])
 
     sorted_scores = sorted(all_scores, reverse=True)
+    if len(sorted_scores) == 0:
+        print 'oo'
     i = 0
-    while(chosen_score<sorted_scores[i]):
-        i+=1
+    if len(sorted_scores)>1:
+        while(chosen_score<sorted_scores[i]):
+            i+=1
+            if i == len(sorted_scores):
+                break
 
-    return (chosen_score, i, sorted_scores[0], sorted_scores[1])
+        return (chosen_score, i, sorted_scores[0], sorted_scores[1], len(sorted_scores))
+
+    else:
+        return (chosen_score, i, sorted_scores[0], sorted_scores[0], len(sorted_scores))
 
 
 
@@ -840,6 +848,7 @@ def moves_stats(output_file):
                     move_stack = []
                     curr_user = row['userid']
                     initial_time = None
+                    curr_move_matrix = copy.deepcopy(initial_board)
 
                 elif row['key'] == 'clickPos':
                     rowPos = int(row['value'][0])
@@ -847,19 +856,25 @@ def moves_stats(output_file):
                     move_stack.append((rowPos, colPos))
                     player = int(row['value'][4])
                     first_move = False
+                    player_type = 'X'
+                    if player == 2:
+                        player_type = 'O'
+
 
                     # scores computation
-                    scores = compute_scores_layers_for_matrix(curr_move_matrix,normalized=True,o_weight=0.5, exp=2, neighborhood_size=2)
-                    get_scores(scores, rowPos, colPos)
+                    scores = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2)
+                    scores_data = get_scores(scores, rowPos, colPos)
                     # print rowPos
                     # print colPos
                     # print move_matrix[rowPos][colPos]
-                    if (curr_move_matrix[rowPos][colPos]!='X') & (curr_move_matrix[rowPos][colPos]!='O'):
+                    if (curr_move_matrix[rowPos][colPos]!=1) & (curr_move_matrix[rowPos][colPos]!=2):
                         curr_move_matrix[rowPos][colPos] = player
                         curr_path.append([rowPos, colPos, player])
 
                         if len(curr_path) == 1:
                             first_move = True
+                    else:
+                        print 'weird'
                     time_between = 0
                     if prev_time == None:
                         if prev_row != None:
@@ -876,6 +891,13 @@ def moves_stats(output_file):
                     curr_data['userid'] = curr_user
                     curr_data['condition'] = condition
                     curr_data['board_name'] = board_name
+
+                    curr_data['score_move'] = scores_data[0]
+                    curr_data['move_ranking'] = scores_data[1]
+                    curr_data['top_score'] = scores_data[2]
+                    curr_data['second_score'] = scores_data[3]
+                    curr_data['possible_moves'] = scores_data[4]
+
                     curr_data['solved'] = participant_answer
                     curr_data['player'] = player
                     curr_data['position'] = str(rowPos) + '_' + str(colPos)
@@ -1753,7 +1775,7 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/testMovesStatsStart.csv')
+    moves_stats('stats/testMovesStatsScores.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

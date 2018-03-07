@@ -162,26 +162,42 @@ if __name__== "__main__":
 
     # dynamics analysis
     # dynamics_filtered = dynamics.loc[(dynamics['move_number_in_path'] < 11) & (dynamics['move_number_in_path'] > 1) & (dynamics['player'] == 2)]
-    dynamics_filtered = dynamics.loc[(dynamics['userid']=='41bad9a2')]
-    # ax = sns.(x="time_rel_sec", y="time_between", scale= 0.5, data=dynamics_filtered, n_boot=1000)
-    ax = sns.tsplot(time='time_rel_sec', value='time_between', unit='userid', data=dynamics_filtered)
-    # ax = sns.barplot(x="prev_action", y="time_between", hue="solved", data=dynamics, n_boot=1000)
-    resets = dynamics_filtered.loc[dynamics_filtered['prev_action'] == 'reset']
+    userids = ['31b4fc9e','d4cbca4e','e9bbf006','2fd101b0','3ab7160d','4ecfea32','8defd34b','f7ebbfe9','31f6a576','41bad9a2']
 
-    for index, event in resets.iterrows():
-        time_reset = int(event['time_rel_sec'])-int(event['time_between'])
-        print time_reset
-        plt.axvline(time_reset, color="red", linestyle="--");
+    for user in userids:
+        dynamics_filtered = dynamics.loc[(dynamics['userid']==user) & (dynamics['player'] == 1)]
 
-    undos = dynamics_filtered.loc[dynamics_filtered['prev_action'] == 'undo']
+        # ax = sns.FacetGrid(dynamics_filtered, row="userid")
+        # ax = ax.map_dataframe(sns.tsplot, time='time_rel_sec', value='time_between', unit='userid', data=dynamics_filtered, interpolate=False)
 
-    for index, event in undos.iterrows():
-        time_undo = int(event['time_rel_sec'])-int(event['time_between'])
-        print time_undo
-        plt.axvline(time_undo, color="purple", linestyle="--");
-    # plt.plot([0, 2.2], [5,2.2], linewidth=1,linestyle="--")
-    # plt.axvline(x=2, color="k", linestyle="--");
-    plt.show()
+        ax = sns.tsplot(time='time_rel_sec', value='score_move', unit='userid', data=dynamics_filtered, interpolate=False)
+        ax2 = sns.tsplot(time='time_rel_sec', value='top_score', unit='userid', data=dynamics_filtered, interpolate=False, color='orange')
+
+
+        resets = dynamics_filtered.loc[dynamics_filtered['prev_action'] == 'reset']
+
+        for index, event in resets.iterrows():
+            time_reset = int(event['time_rel_sec'])-int(event['time_between'])
+            print time_reset
+            plt.axvline(time_reset, color="red", linestyle="--");
+            solved = event['solved']
+            board_name = event['board_name']
+
+        undos = dynamics_filtered.loc[dynamics_filtered['prev_action'] == 'undo']
+
+        for index, event in undos.iterrows():
+            time_undo = int(event['time_rel_sec'])-int(event['time_between'])
+            print time_undo
+            plt.axvline(time_undo, color="purple", linestyle="--");
+
+        ax.set(yscale="log")
+        # plt.show()
+        title = user + '_' + solved + '_' + board_name
+        plt.title(title)
+        plt.ylabel('scores: chosen move vs. best move')
+        # plt.show()
+        plt.savefig("dynamics/moveScoresTopVs.Chosen_"+ title +".png", format='png')
+        plt.clf()
 
     # participant actions figure-----
     # ax = sns.factorplot(x="board", y="actionsSolution", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 medium', '10 medium', '6 hard', '10 hard', '10 CV'],  markers=['o','^'], legend_out=False, legend=False)
