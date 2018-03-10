@@ -950,6 +950,9 @@ def explore_exploit(output_file):
 
     first_moves_data_matrices = {}
     results_table = []
+    user_counter = 0
+    reset_count = 0
+    reseted = False
     for g in range(len(LOGFILE)):
         # print g
         initial_board = copy.deepcopy(START_POSITION[g])
@@ -994,6 +997,8 @@ def explore_exploit(output_file):
             exploit_time_start = None
             explore_time_end = None
             exploit_time_end = None
+            time_before_reset = None
+            time_before_undo = None
 
             for row in log_reader:
                 curr_data = {}
@@ -1002,6 +1007,7 @@ def explore_exploit(output_file):
                     participant_answer = check_participant_answer(curr_user)
 
                 if row['userid'] != curr_user:
+                    user_counter += 1
                     participant_answer = check_participant_answer(curr_user)
 
                     # reset all values for next user
@@ -1019,6 +1025,11 @@ def explore_exploit(output_file):
                     exploit_time_start = None
                     explore_time_end = None
                     exploit_time_end = None
+                    time_before_reset = None
+                    time_before_undo = None
+                    if reseted:
+                        reset_count += 1
+                    reseted = False
 
                 elif row['key'] == 'clickPos':
                     rowPos = int(row['value'][0])
@@ -1085,7 +1096,11 @@ def explore_exploit(output_file):
                     prev_time = row['time']
 
                 elif row['key'] == 'reset':
+                    reseted = True
                     curr_move_matrix = copy.deepcopy(initial_board)
+                    time_before_reset = int(row['time']) - int(prev_time)
+                    # curr_data['time_before'] = time_before_reset
+                    # results_table.append(copy.deepcopy(curr_data))
                     prev_action = 'reset'
                     prev_time = row['time']
                     curr_path = []
@@ -1099,7 +1114,7 @@ def explore_exploit(output_file):
                         curr_data['solved'] = participant_answer
                         curr_data['explore_time'] = explore_time
                         curr_data['exploit_time'] = exploit_time
-                        results_table.append(copy.deepcopy(curr_data))
+                        # results_table.append(copy.deepcopy(curr_data))
                         curr_data = {}
 
 
@@ -1108,6 +1123,8 @@ def explore_exploit(output_file):
                     exploit_time_start = None
                     exploit_time_end = None
                     explore_time_end = None
+
+
 
                 elif row['key'] == 'undo':
                     if len(move_stack) > 0:
@@ -1118,7 +1135,11 @@ def explore_exploit(output_file):
                         print 'problem undo'
 
                     prev_action = 'undo'
+                    time_before_undo = int(row['time']) - int(prev_time)
+                    curr_data['time_before'] = time_before_undo
+                    results_table.append(copy.deepcopy(curr_data))
                     prev_time = row['time']
+
 
                     # if (exploit_time_start != None) & (explore_time_start != None):
                     #     exploit_time = exploit_time_end - exploit_time_start
@@ -1142,11 +1163,13 @@ def explore_exploit(output_file):
                     prev_time = row['time']
                     initial_time = int(prev_row['time'])
                 prev_row = copy.deepcopy(row)
-    dataFile = open(output_file, 'wb')
-    dataWriter = csv.DictWriter(dataFile, fieldnames=results_table[0].keys(), delimiter=',')
-    dataWriter.writeheader()
-    for record in results_table:
-        dataWriter.writerow(record)
+    # dataFile = open(output_file, 'wb')
+    # dataWriter = csv.DictWriter(dataFile, fieldnames=results_table[0].keys(), delimiter=',')
+    # dataWriter.writeheader()
+    # for record in results_table:
+    #     dataWriter.writerow(record)
+    print user_counter
+    print reset_count
 
 
 
@@ -1979,8 +2002,8 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    # moves_stats('stats/testMovesStatsScores.csv')
-    explore_exploit('stats/exploreExploitNoUndo.csv')
+    moves_stats('stats/testMovesStatsScoresFixed.csv')
+    # explore_exploit('stats/timeBeforeUndo.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

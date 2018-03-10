@@ -99,10 +99,11 @@ if __name__== "__main__":
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     dynamics = pd.read_csv("stats/dynamics.csv")
-    exploreExploit = pd.read_csv("stats/exploreExploitData.csv")
-    exploreExploit2 = pd.read_csv("stats/exploreExploitData2.csv")
+    # exploreExploit = pd.read_csv("stats/exploreExploitData.csv")
+    # exploreExploit2 = pd.read_csv("stats/exploreExploitData2.csv")
     exploreExploit2 = pd.read_csv("stats/exploreExploitDataNoUndo.csv")
-
+    timeResets = pd.read_csv("stats/timeBeforeReset.csv")
+    timeUndos = pd.read_csv("stats/timeBeforeUndo.csv")
 
     # log-likelhood
     # density = likelihood.loc[likelihood['heuristic'] == 'density']
@@ -164,13 +165,31 @@ if __name__== "__main__":
     sns.set(style="whitegrid")
 
     # --------------dynamics analysis----------------
-    print stats.spearmanr(exploreExploit2['explore_time'], exploreExploit2['exploit_time'])
-    exploreExploit_filtered = exploreExploit2.loc[(exploreExploit2['explore_time'] < 100) & (exploreExploit2['exploit_time'] < 100)]
+    # print stats.spearmanr(exploreExploit2['explore_time'], exploreExploit2['exploit_time'])
+    exploreExploit_filtered1 = exploreExploit2.loc[(exploreExploit2['explore_time'] < 100) & (exploreExploit2['exploit_time'] < 100) & (exploreExploit2['solved']=='validatedCorrect') & (exploreExploit2['board_name']=='6_hard_full')]
     # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
-    ax = sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered, n_boot=1000, marker='+')
+    print stats.spearmanr(exploreExploit_filtered1['explore_time'], exploreExploit_filtered1['exploit_time'])
+    ax = sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered1, n_boot=1000, marker='+', color='green')
+
+    # plt.xlim(0,100)
+    # plt.ylim(0,100)
+    # plt.show()
+
+    exploreExploit_filtered2 = exploreExploit2.loc[(exploreExploit2['explore_time'] < 100) & (exploreExploit2['exploit_time'] < 100) & (exploreExploit2['solved']=='wrong') & (exploreExploit2['board_name']=='6_hard_full')]
+    print stats.spearmanr(exploreExploit_filtered2['explore_time'], exploreExploit_filtered2['exploit_time'])
+    # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+    ax = sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered2, n_boot=1000, color='red')
     plt.xlim(0,100)
     plt.ylim(0,100)
     plt.show()
+
+    # reset and undo distributions
+    # ax = sns.distplot(timeResets['time_before_sec'])
+    # timeUndos_filtered = timeUndos.loc[(timeUndos['time_before_sec'] < 10)]
+    # timeResets_filtered = timeResets.loc[(timeResets['time_before_sec'] < 10)]
+    # # ax = sns.distplot(timeUndos_filtered['time_before_sec'])
+    # ax = sns.distplot(timeResets_filtered['time_before_sec'])
+    # plt.show()
 
 
     # dynamics_filtered = dynamics.loc[(dynamics['move_number_in_path'] < 11) & (dynamics['move_number_in_path'] > 1) & (dynamics['player'] == 2)]

@@ -11,6 +11,7 @@ import random
 import bisect
 import os
 from scipy.optimize import minimize
+from board import *
 from mpl_toolkits.axes_grid1 import AxesGrid
 
 
@@ -706,7 +707,183 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
                         top = 0.0 +p1[0]*p2[0]
                         bottom = ((streak_size-1)*(streak_size-1))-(p1[0]*p2[0])
                         if bottom == 0:
-                            score = 100000
+                            score = 10000
+                        else:
+                            score += math.pow(top/bottom, exp)
+
+    return (score, open_paths_data, max_length_path)
+
+
+def compute_open_paths_data_interaction_new(row, col, board, exp=1, player = 'X', player_turn=True, interaction=True):
+    other_player = 'O'
+    if player == 'O':
+        other_player = 'X'
+
+
+    max_length_path = 0
+    threshold = 0
+    # if len(board)==10:
+    #     threshold +=1
+
+    streak_size = 4  # how many Xs in a row you need to win
+    if len(board) == 10:  # if it's a 10X10 board you need 5.
+        streak_size = 5
+
+    open_paths_data = []  # this list will hold information on all the potential paths, each path will be represented by a pair (length and empty squares, which will be used to check overlap)
+    paths = []
+    # check right-down diagonal (there is a more efficient way to look at all the paths, but it was easier for me to debug when separating them :)
+    for i in range(streak_size):
+        r = row - i
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)):  # add the path if it's not blocked and if there is already at least one X on it
+            if player_turn:
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check left-down diagonal
+    for i in range(streak_size):
+        r = row - i
+        c = col + i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)):
+                empty_squares.append([square_row,square_col])
+            path.append([square_row,square_col])
+            square_row += 1
+            square_col -= 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)): # add the path if it's not blocked and if there is already at least one X on it
+            if player_turn:
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check vertical
+    for i in range(streak_size):
+        r = row - i
+        c = col
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)):
+                empty_squares.append([square_row,square_col])
+
+            path.append([square_row,square_col])
+            square_row += 1
+            path_length += 1
+
+
+
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)): # add the path if it's not blocked and if there is already at least one X on it
+            if player_turn:
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+    # check horizontal
+    for i in range(streak_size):
+        r = row
+        c = col - i
+        if (r > len(board)-1) | (r < 0) | (c > len(board)-1) | (c < 0):
+            continue
+        blocked = False
+        path_length = 0
+        path_x_count = 0
+        empty_squares = []
+        path = []
+        square_row = r
+        square_col = c
+        while (not blocked) & (path_length < streak_size) & (square_row < len(board)) & (square_row >= 0) & (square_col < len(board)) & (square_col >= 0):
+            if board[square_row][square_col] == other_player:
+                blocked = True
+            elif board[square_row][square_col] == player:
+                path_x_count += 1
+            elif ((square_col != col) | (square_row != row)):
+                empty_squares.append([square_row, square_col])
+
+            path.append([square_row, square_col])
+            square_col += 1
+            path_length += 1
+
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)):  # add the path if it's not blocked and if there is already at least one X on it
+            if player_turn:
+                open_paths_data.append((path_x_count+1,empty_squares, path))
+                if (path_x_count+1) > max_length_path:
+                    max_length_path = path_x_count+1
+            elif (path_x_count>threshold):
+                open_paths_data.append((path_x_count,empty_squares, path))
+
+
+    score = 0.0
+    # compute the score for the cell based on the potential paths
+    for i in range(len(open_paths_data)):
+        p1 = open_paths_data[i]
+
+        if streak_size == p1[0]:
+            score = 10000
+        else:
+            score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
+        if interaction:
+            for j in range(i+1, len(open_paths_data)):
+                p2 = open_paths_data[j]
+                if check_path_overlap(p2[2],p1[2]):
+                    if (not(check_path_overlap(p1[1],p2[1]))):  # interaction score if the paths don't overlap
+                        top = 0.0 +p1[0]*p2[0]
+                        bottom = ((streak_size-1)*(streak_size-1))-(p1[0]*p2[0])
+                        if bottom == 0:
+                            score = 10000
                         else:
                             score += math.pow(top/bottom, exp)
 
@@ -1676,6 +1853,50 @@ def compute_scores_layers(normalized=False, exp=1, neighborhood_size=1, density 
     return data_matrices
 
 
+def convert_matrix_to_board_obj(board_matrix):
+    board_dict = {}
+    i = 1
+    for row in range(len(board_matrix)):
+        for col in range(len(board_matrix[row])):
+            board_dict[i] = 0
+            if board_matrix[row][col] == 'X':
+                board_dict[i] = 1
+            elif board_matrix[row][col] == 'O':
+                board_dict[i] = 2
+            i += 1
+    if len(board_matrix) ==  6:
+        file_path = "examples/board_6_4.txt"
+    else:
+        file_path = "examples/board_10_5.txt"
+    try:
+        input_file = open(file_path ,'r')
+    except:
+        raise Exception("File not found!!! Make sure you didn't make a spelling error.")
+    num_spaces = int(input_file.readline())
+    winning_paths = []
+    for line in input_file:
+        path = map(int, line.split())
+        winning_paths.append(path)
+
+    game_board = Board(num_spaces,winning_paths,board=board_dict)
+    return game_board
+
+
+def check_immediate_win(board_matrix, player):
+    if player == 'X':
+        p = 1
+    else:
+        p = 2
+    b = convert_matrix_to_board_obj(board_matrix)
+    winning_moves = b.immediate_threats(p)
+    return winning_moves
+
+
+def convert_position(pos, dimension):
+    col = ((pos - 1) % dimension)
+    row = (float(pos)/float(dimension))-1
+    row = int(math.ceil(row))
+    return row, col
 
 '''
 computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
@@ -1744,12 +1965,20 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
 
     paths_data = copy.deepcopy(board_matrix)
 
+    x_turn = True
+    o_turn = False
+    if player == 'O':
+        x_turn = False
+        o_turn = True
+
     for r in range(len(board_matrix)):
         for c in range(len(board_matrix[r])):
             if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free & passed threshold
                 # x_paths = compute_open_paths_data(r, c, board_matrix,exp=exp,interaction=interaction)  # check open paths for win
+                if (r == 2) & (c == 3):
+                    print 'here'
 
-                x_paths = compute_open_paths_data_interaction(r, c, board_matrix,exp=exp,interaction=interaction)
+                x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction)
                 square_score_x = x_paths[0]
                 x_paths_data = []
                 for path in x_paths[1]:
@@ -1758,7 +1987,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 # square_score_0 = compute_open_paths(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
 
                 # o_paths = compute_open_paths_data(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
-                o_paths = compute_open_paths_data_interaction(r, c, board_matrix,player = 'O', exp=exp,interaction=interaction)
+                o_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player = 'O', player_turn = o_turn,exp=exp,interaction=interaction)
                 square_score_o = o_paths[0]
 
 
@@ -1771,9 +2000,11 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                     square_score_o = INFINITY_O
                 # if x_paths[2] == (streak_size-1):
                 #     square_score_o =0
-                square_score = (1-o_weight)*square_score_x + o_weight*square_score_o
-                if player == 'O':
-                    square_score = -1*square_score
+                square_score = square_score_x + square_score_o
+                if square_score > 10000:
+                    square_score = 10000
+                # if player == 'O':
+                #     square_score = -1*square_score
                 if integrate:
                     square_score = square_score*density_score_matrix[r][c]
                 score_matrix[r][c] = square_score
@@ -1792,6 +2023,31 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
     #         if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free
     #             score_matrix[r][c] = compute_relative_path_score(r,c,paths_data[r][c],absolute_score_matrix)
     #             sum_scores+=score_matrix[r][c]
+
+
+    # check for immediate win/loss
+    winning_moves = check_immediate_win(board_matrix, player)
+    if len(winning_moves) > 0:
+        for move in winning_moves:
+            move_row, move_col = convert_position(move, len(board_matrix))
+            score_matrix[move_row][move_col] = 10000
+    else:
+        other_player = 'O'
+        if player == 'O':
+            other_player = 'X'
+        winning_moves_opp = check_immediate_win(board_matrix, other_player)
+        if len(winning_moves_opp) > 1:
+            for row in range(len(board_matrix)):
+                for col in range(len(board_matrix[row])):
+                    if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
+                        score_matrix[row][col] = -10000
+        elif len(winning_moves_opp) == 1:
+            move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
+            for row in range(len(board_matrix)):
+                for col in range(len(board_matrix[row])):
+                    if (move_row != row) & (move_col != col):
+                        if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
+                            score_matrix[row][col] = -10000
 
     if dominance:
         score_matrix = compute_square_scores_dominance(board_matrix, score_matrix)

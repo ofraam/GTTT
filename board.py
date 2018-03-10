@@ -418,6 +418,37 @@ class Board:
     return score
 
 
+  def immediate_threats(self, player, board = None):
+    if board == None:
+      board = self.board
+    open_win_paths_computer = []
+    open_win_paths_human = []
+    # if player == c.COMPUTER:
+    winning_moves = []
+    for path in self.winning_paths:
+      len_path = len(path)
+      c.COMPUTER_count, c.HUMAN_count = 0, 0
+      free_on_path = []
+      for space in path:
+        if board[space] == c.COMPUTER:
+          c.COMPUTER_count += 1
+        elif board[space] == c.HUMAN:
+          c.HUMAN_count += 1
+        else:
+          free_on_path.append(space)
+
+      # first check win moves
+      if player == c.HUMAN:
+        if (((c.HUMAN_count == (len_path-1)) & (c.COMPUTER_count==0))):
+          winning_moves.append(free_on_path[0])
+      if player == c.COMPUTER:
+        if (((c.COMPUTER_count == (len_path-1)) & (c.HUMAN_count==0))):
+          winning_moves.append(free_on_path[0])
+
+    return winning_moves
+
+
+
   def win_or_forced_move(self, player, board = None):
     if board == None:
       board = self.board
