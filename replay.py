@@ -1207,7 +1207,7 @@ def explore_exploit(output_file):
                         curr_data['solved'] = participant_answer
                         curr_data['explore_time'] = explore_time
                         curr_data['exploit_time'] = exploit_time
-                        # results_table.append(copy.deepcopy(curr_data))
+                        results_table.append(copy.deepcopy(curr_data))
                         curr_data = {}
 
 
@@ -1230,7 +1230,7 @@ def explore_exploit(output_file):
                     prev_action = 'undo'
                     time_before_undo = int(row['time']) - int(prev_time)
                     curr_data['time_before'] = time_before_undo
-                    results_table.append(copy.deepcopy(curr_data))
+                    # results_table.append(copy.deepcopy(curr_data))
                     prev_time = row['time']
 
 
@@ -1256,11 +1256,11 @@ def explore_exploit(output_file):
                     prev_time = row['time']
                     initial_time = int(prev_row['time'])
                 prev_row = copy.deepcopy(row)
-    # dataFile = open(output_file, 'wb')
-    # dataWriter = csv.DictWriter(dataFile, fieldnames=results_table[0].keys(), delimiter=',')
-    # dataWriter.writeheader()
-    # for record in results_table:
-    #     dataWriter.writerow(record)
+    dataFile = open(output_file, 'wb')
+    dataWriter = csv.DictWriter(dataFile, fieldnames=results_table[0].keys(), delimiter=',')
+    dataWriter.writeheader()
+    for record in results_table:
+        dataWriter.writerow(record)
     print user_counter
     print reset_count
 
@@ -2095,8 +2095,8 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/actionsLog.csv')
-    # explore_exploit('stats/timeBeforeUndo.csv')
+    # moves_stats('stats/actionsLog.csv')
+    explore_exploit('stats/exploreExploitTimes0311.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

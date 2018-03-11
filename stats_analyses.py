@@ -101,9 +101,9 @@ if __name__== "__main__":
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     dynamics = pd.read_csv("stats/dynamics.csv")
-    # exploreExploit = pd.read_csv("stats/exploreExploitData.csv")
+    exploreExploit = pd.read_csv("stats/exploreExploit0311_avg.csv")
     # exploreExploit2 = pd.read_csv("stats/exploreExploitData2.csv")
-    exploreExploit2 = pd.read_csv("stats/exploreExploitDataNoUndo.csv")
+    # exploreExploit2 = pd.read_csv("stats/exploreExploitDataNoUndo.csv")
     timeResets = pd.read_csv("stats/timeBeforeReset.csv")
     timeUndos = pd.read_csv("stats/timeBeforeUndo.csv")
 
@@ -185,6 +185,72 @@ if __name__== "__main__":
     # plt.ylim(0,100)
     # plt.show()
 
+    boards = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
+    # print len(users)
+    # for user in users:
+    #     print user
+    # for board in boards:
+    #     print board
+    #     f, (ax1, ax2) = plt.subplots(2)
+    #     exploreExploit_filtered = exploreExploit.loc[(exploreExploit['explore_time'] < 100) & (exploreExploit['exploit_time'] < 100)   & (exploreExploit['board']==board)]
+    #     print stats.spearmanr(exploreExploit_filtered['explore_time'], exploreExploit_filtered['exploit_time'])
+    #     spear = stats.spearmanr(exploreExploit_filtered['explore_time'], exploreExploit_filtered['exploit_time'])
+    #     # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+    #     sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered, n_boot=1000, color='blue', ax=ax1)
+    #     plt.xlim(0,100)
+    #     plt.ylim(0,100)
+    #
+    #     exploreExploit_filtered1 = exploreExploit.loc[(exploreExploit['explore_time'] < 100) & (exploreExploit['exploit_time'] < 100) & (exploreExploit['solved']=='validatedCorrect') & (exploreExploit['board']==board)]
+    #     print stats.spearmanr(exploreExploit_filtered1['explore_time'], exploreExploit_filtered1['exploit_time'])
+    #     # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+    #     sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered1, n_boot=1000, color='green', ax=ax2)
+    #     plt.xlim(0,100)
+    #     plt.ylim(0,100)
+    #
+    #     exploreExploit_filtered2 = exploreExploit.loc[(exploreExploit['explore_time'] < 100) & (exploreExploit['exploit_time'] < 100)  & ((exploreExploit['solved']=='wrong') | (exploreExploit['solved']=='solvedCorrect')) & (exploreExploit['board']==board)]
+    #     print stats.spearmanr(exploreExploit_filtered2['explore_time'], exploreExploit_filtered2['exploit_time'])
+    #     # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+    #     sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered2, n_boot=1000, color='red', ax=ax2)
+    #     plt.xlim(0,100)
+    #     plt.ylim(0,100)
+    #
+    #
+    #     title = board + '_' + "spearman = " + str(round(spear.correlation,2))
+    #     ax1.set_title(title)
+    #     # plt.show()
+    #     plt.savefig("dynamics/explore_exploit/explore_exploit_"+ title +".png", format='png')
+
+    # f, (ax1, ax2) = plt.subplots(2)
+    # exploreExploit_filtered = exploreExploit.loc[(exploreExploit['explore_time'] < 100) & (exploreExploit['exploit_time'] < 100)]
+    # print stats.spearmanr(exploreExploit_filtered['explore_time'], exploreExploit_filtered['exploit_time'])
+    # spear = stats.spearmanr(exploreExploit_filtered['explore_time'], exploreExploit_filtered['exploit_time'])
+    # # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+    # sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered, n_boot=1000, color='blue', ax=ax1)
+    # plt.xlim(0,100)
+    # plt.ylim(0,100)
+    #
+    # exploreExploit_filtered1 = exploreExploit.loc[(exploreExploit['explore_time'] < 100) & (exploreExploit['exploit_time'] < 100) & (exploreExploit['solved']=='validatedCorrect')]
+    # print stats.spearmanr(exploreExploit_filtered1['explore_time'], exploreExploit_filtered1['exploit_time'])
+    # # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+    # sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered1, n_boot=1000, color='green', ax=ax2)
+    # plt.xlim(0,100)
+    # plt.ylim(0,100)
+    #
+    # exploreExploit_filtered2 = exploreExploit.loc[(exploreExploit['explore_time'] < 100) & (exploreExploit['exploit_time'] < 100)  & ((exploreExploit['solved']=='wrong') | (exploreExploit['solved']=='solvedCorrect'))]
+    # print stats.spearmanr(exploreExploit_filtered2['explore_time'], exploreExploit_filtered2['exploit_time'])
+    # # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+    # sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered2, n_boot=1000, color='red', ax=ax2)
+    # plt.xlim(0,100)
+    # plt.ylim(0,100)
+    #
+    #
+    # title = 'all_boards' + '_' + "spearman = " + str(round(spear.correlation,2))
+    # ax1.set_title(title)
+    # # plt.show()
+    # plt.savefig("dynamics/explore_exploit/explore_exploit_"+ title +".png", format='png')
+
+        # plt.show()
+
     # reset and undo distributions
     # ax = sns.distplot(timeResets['time_before_sec'])
     # timeUndos_filtered = timeUndos.loc[(timeUndos['time_before_sec'] < 10)]
@@ -199,7 +265,7 @@ if __name__== "__main__":
 
     for user in userids:
         # print user
-        f, (ax1, ax2, ax3) = plt.subplots(3, figsize = (20,10))
+        f, (ax1, ax2) = plt.subplots(2, figsize = (20,10))
         clicks_filtered = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click')]
         clicks_filtered_p1 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==1)]
         clicks_filtered_p2 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==2)]
@@ -208,12 +274,12 @@ if __name__== "__main__":
         # ax = ax.map_dataframe(sns.tsplot, time='time_rel_sec', value='time_between', unit='userid', data=clicks_filtered, interpolate=False)
         if (len(clicks_filtered_p1) < 2) | (len(clicks_filtered_p2) < 2):
             continue
-        sns.tsplot(time='time_rel_sec', value='time_from_click', unit='userid', data=clicks_filtered, interpolate=False, ax=ax1)
+        sns.tsplot(time='time_rel_sec', value='time_from_action', unit='userid', data=clicks_filtered, interpolate=False, ax=ax1)
         sns.tsplot(time='time_rel_sec', value='score_move', unit='userid', data=clicks_filtered_p1, interpolate=False, color='blue', ax=ax2)
         sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p1, interpolate=False, color='orange',  ax=ax2)
 
-        sns.tsplot(time='time_rel_sec', value='score_move', unit='userid', data=clicks_filtered_p2, interpolate=False, color='blue', ax=ax3)
-        sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p2, interpolate=False, color='orange',  ax=ax3)
+        sns.tsplot(time='time_rel_sec', value='score_move', unit='userid', data=clicks_filtered_p2, interpolate=False, color='black', ax=ax2)
+        sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p2, interpolate=False, color='orange',  ax=ax2)
 
         resets = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='reset')]
 
@@ -222,7 +288,7 @@ if __name__== "__main__":
             # print time_reset
             ax1.axvline(time_reset, color="red", linestyle="--");
             ax2.axvline(time_reset, color="red", linestyle="--");
-            ax3.axvline(time_reset, color="red", linestyle="--");
+            # ax3.axvline(time_reset, color="red", linestyle="--");
 
             solved = event['solved']
             board_name = event['board_name']
@@ -234,24 +300,24 @@ if __name__== "__main__":
             # print time_undo
             ax1.axvline(time_undo, color="purple", linestyle="--");
             ax2.axvline(time_undo, color="purple", linestyle="--");
-            ax3.axvline(time_undo, color="purple", linestyle="--");
+            # ax3.axvline(time_undo, color="purple", linestyle="--");
 
 
 
         ax2.set(yscale="symlog")
         ax2.set_ylim(-100000,100000)
 
-        ax3.set(yscale="symlog")
-        ax3.set_ylim(-100000,100000)
+        # ax3.set(yscale="symlog")
+        # ax3.set_ylim(-100000,100000)
         # plt.show()
 
-        ax2.set_ylabel('x score vs. best')
-        ax3.set_ylabel('o score vs. best')
+        ax2.set_ylabel('score vs. best')
+        # ax3.set_ylabel('o score vs. best')
 
         title = user + '_' + solved + '_' + board_name
         ax1.set_title(title)
         # plt.show()
-        plt.savefig("dynamics/time_series2/timeSeries_"+ title +".png", format='png')
+        plt.savefig("dynamics/time_series3/timeSeries_"+ title +".png", format='png')
 
         plt.clf()
         plt.close()
