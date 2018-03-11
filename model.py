@@ -1975,8 +1975,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
         for c in range(len(board_matrix[r])):
             if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free & passed threshold
                 # x_paths = compute_open_paths_data(r, c, board_matrix,exp=exp,interaction=interaction)  # check open paths for win
-                if (r == 2) & (c == 3):
-                    print 'here'
+
 
                 x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction)
                 square_score_x = x_paths[0]
@@ -2031,6 +2030,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
         for move in winning_moves:
             move_row, move_col = convert_position(move, len(board_matrix))
             score_matrix[move_row][move_col] = 10000
+
     else:
         other_player = 'O'
         if player == 'O':
@@ -2045,7 +2045,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
             move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
             for row in range(len(board_matrix)):
                 for col in range(len(board_matrix[row])):
-                    if (move_row != row) & (move_col != col):
+                    if (move_row != row) | (move_col != col):
                         if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
                             score_matrix[row][col] = -10000
 

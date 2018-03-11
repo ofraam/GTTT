@@ -818,15 +818,22 @@ def moves_stats(output_file):
 
         with open(LOGFILE[g], 'rb') as csvfile:
             print LOGFILE[g]
-            condition = LOGFILE[g][5:-10].replace("_",",")
+            cond = LOGFILE[g][5:-10].replace("_",",")
+            cond = cond.split(',')
+            board_size = cond[0]
+            board_type = cond[1]
+            condition = cond[2]
             board_name = LOGFILE[g]
             board_name=board_name[:-4]
+            board_name = board_name[5:-6]
+
             log_reader = csv.DictReader(csvfile)
             move_number = 1
             move_stack = []
             curr_path = []
             curr_user = ''
             prev_time = None
+            prev_click_time = None
             prev_action = None
             initial_time = None
             for row in log_reader:
@@ -841,6 +848,7 @@ def moves_stats(output_file):
                     # reset all values for next user
                     prev_time = None
                     prev_action = None
+                    prev_click_time = None
                     prev_row = None
                     first_move_for_player = True
                     move_number = 1
@@ -862,6 +870,7 @@ def moves_stats(output_file):
 
 
                     # scores computation
+
                     scores = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2)
                     scores_data = get_scores(scores, rowPos, colPos)
                     # print rowPos
@@ -883,20 +892,27 @@ def moves_stats(output_file):
                             initial_time = int(prev_row['time'])
                     if prev_time == None:
                         print row
-                    time_between = int(row['time']) - int(prev_time)
-                    time_between = time_between/1000.0
+                    time_between_action = (int(row['time']) - int(prev_time))/1000.0
+
+                    time_between_click = 0
+                    if prev_click_time != None:
+                        time_between_click = (int(row['time']) - int(prev_click_time))/1000.0
 
 
 
                     curr_data['userid'] = curr_user
+
+                    curr_data['board_size'] = board_size
+                    curr_data['board_type'] = board_type
                     curr_data['condition'] = condition
                     curr_data['board_name'] = board_name
+                    curr_data['action'] = 'click'
 
                     curr_data['score_move'] = scores_data[0]
                     curr_data['move_ranking'] = scores_data[1]
-                    curr_data['top_score'] = scores_data[2]
-                    curr_data['second_score'] = scores_data[3]
-                    curr_data['possible_moves'] = scores_data[4]
+                    curr_data['top_possible_score'] = scores_data[2]
+                    curr_data['second_possible_score'] = scores_data[3]
+                    curr_data['num_possible_moves'] = scores_data[4]
 
                     curr_data['solved'] = participant_answer
                     curr_data['player'] = player
@@ -904,18 +920,57 @@ def moves_stats(output_file):
                     curr_data['time'] = row['time']
 
                     curr_data['time_rel'] = int(row['time']) - initial_time
-                    curr_data['time_prev_move'] = prev_time
-                    curr_data['time_between'] = time_between
+                    curr_data['time_prev_action'] = prev_time
+                    curr_data['time_from_action'] = time_between_action
+                    curr_data['time_from_click'] = time_between_click
                     curr_data['prev_action'] = prev_action
                     curr_data['first_move_in_path'] = first_move
                     curr_data['move_number'] = move_number
                     curr_data['move_number_in_path'] = len(curr_path)
+
                     results_table.append(copy.deepcopy(curr_data))
+
                     move_number += 1
                     prev_action = 'click'
                     prev_time = row['time']
+                    prev_click_time = row['time']
 
                 elif row['key'] == 'reset':
+                    time_between_action = (int(row['time']) - int(prev_time))/1000.0
+                    time_between_click = ""
+                    if prev_click_time != None:
+                        time_between_click = (int(row['time']) - int(prev_click_time))/1000.0
+
+                    curr_data['userid'] = curr_user
+
+                    curr_data['board_size'] = board_size
+                    curr_data['board_type'] = board_type
+                    curr_data['condition'] = condition
+                    curr_data['board_name'] = board_name
+                    curr_data['action'] = 'reset'
+
+                    curr_data['score_move'] = ""
+                    curr_data['move_ranking'] = ""
+                    curr_data['top_possible_score'] = ""
+                    curr_data['second_possible_score'] = ""
+                    curr_data['num_possible_moves'] = ""
+
+                    curr_data['solved'] = participant_answer
+                    curr_data['player'] = ""
+                    curr_data['position'] = ""
+                    curr_data['time'] = row['time']
+
+                    curr_data['time_rel'] = int(row['time']) - initial_time
+                    curr_data['time_prev_action'] = prev_time
+                    curr_data['time_from_action'] = time_between_action
+                    curr_data['time_from_click'] = time_between_click
+                    curr_data['prev_action'] = prev_action
+                    curr_data['first_move_in_path'] = ""
+                    curr_data['move_number'] = ""
+                    curr_data['move_number_in_path'] = ""
+
+                    results_table.append(copy.deepcopy(curr_data))
+
                     curr_move_matrix = copy.deepcopy(initial_board)
                     prev_action = 'reset'
                     prev_time = row['time']
@@ -924,6 +979,40 @@ def moves_stats(output_file):
                 elif row['key'] == 'undo':
                     if len(move_stack) > 0:
                         undo_move = move_stack.pop()
+
+                        time_between_action = (int(row['time']) - int(prev_time))/1000.0
+                        time_between_click = (int(row['time']) - int(prev_click_time))/1000.0
+
+                        curr_data['userid'] = curr_user
+
+                        curr_data['board_size'] = board_size
+                        curr_data['board_type'] = board_type
+                        curr_data['condition'] = condition
+                        curr_data['board_name'] = board_name
+                        curr_data['action'] = 'undo'
+
+                        curr_data['score_move'] = ""
+                        curr_data['move_ranking'] = ""
+                        curr_data['top_possible_score'] = ""
+                        curr_data['second_possible_score'] = ""
+                        curr_data['num_possible_moves'] = ""
+
+                        curr_data['solved'] = participant_answer
+                        curr_data['player'] = ""
+                        curr_data['position'] = str(undo_move[0]) +'_' +str(undo_move[1])
+                        curr_data['time'] = row['time']
+
+                        curr_data['time_rel'] = int(row['time']) - initial_time
+                        curr_data['time_prev_action'] = prev_time
+                        curr_data['time_from_action'] = time_between_action
+                        curr_data['time_from_click'] = time_between_click
+                        curr_data['prev_action'] = prev_action
+                        curr_data['first_move_in_path'] = ""
+                        curr_data['move_number'] = ""
+                        curr_data['move_number_in_path'] = ""
+
+                        results_table.append(copy.deepcopy(curr_data))
+
                         curr_move_matrix[undo_move[0]][undo_move[1]] = 0
                         curr_path = curr_path[:-1]
                     else:
@@ -936,9 +1025,13 @@ def moves_stats(output_file):
                 elif row['key'] == 'start':
                     prev_time = row['time']
                     initial_time = int(prev_row['time'])
+
                 prev_row = copy.deepcopy(row)
     dataFile = open(output_file, 'wb')
-    dataWriter = csv.DictWriter(dataFile, fieldnames=results_table[0].keys(), delimiter=',')
+    fieldnames = ['userid','board_name','board_size','board_type','condition','solved', 'action','time','time_rel',
+                  'player','score_move','move_ranking','top_possible_score', 'second_possible_score', 'num_possible_moves',
+                  'position', 'time_from_action','time_from_click','prev_action','move_number','move_number_in_path','first_move_in_path','time_prev_action']
+    dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
     dataWriter.writeheader()
     for record in results_table:
         dataWriter.writerow(record)
@@ -2002,7 +2095,7 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/testMovesStatsScoresFixed.csv')
+    moves_stats('stats/actionsLog.csv')
     # explore_exploit('stats/timeBeforeUndo.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
