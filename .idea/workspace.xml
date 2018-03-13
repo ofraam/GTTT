@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="f27e7977-f565-4ab6-8925-e8910730b8bd" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/replay.py" afterPath="$PROJECT_DIR$/replay.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats_analyses.py" afterPath="$PROJECT_DIR$/stats_analyses.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -27,7 +25,7 @@
     <SUITE FILE_PATH="coverage/GTTT$Unittest_TicTacToeTest_test_basic_game_play.coverage" NAME="Unittest TicTacToeTest.test_basic_game_play Coverage Results" MODIFIED="1490667105400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_computational_model.coverage" NAME="Unittests in computational_model Coverage Results" MODIFIED="1515839066274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gen_winning_paths.coverage" NAME="gen_winning_paths Coverage Results" MODIFIED="1494872363873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$stats_analyses.coverage" NAME="stats_analyses Coverage Results" MODIFIED="1520934852110" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$stats_analyses.coverage" NAME="stats_analyses Coverage Results" MODIFIED="1520941313250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$board_mcts.coverage" NAME="board_mcts Coverage Results" MODIFIED="1517489416335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$replay.coverage" NAME="replay Coverage Results" MODIFIED="1520933614294" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
@@ -72,8 +70,8 @@
       <file leaf-file-name="replay.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/replay.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.3103447">
-              <caret line="2150" column="23" selection-start-line="2150" selection-start-column="23" selection-end-line="2150" selection-end-column="23" />
+            <state vertical-scroll-proportion="-7.8965516">
+              <caret line="1079" column="4" selection-start-line="1079" selection-start-column="4" selection-end-line="1079" selection-end-column="38" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -117,8 +115,8 @@
       <file leaf-file-name="stats_analyses.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/stats_analyses.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.609215">
-              <caret line="216" column="88" selection-start-line="216" selection-start-column="88" selection-end-line="216" selection-end-column="88" />
+            <state vertical-scroll-proportion="0.7679181">
+              <caret line="148" column="58" selection-start-line="148" selection-start-column="58" selection-end-line="148" selection-end-column="58" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -704,7 +702,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1358" y="-8" width="1936" height="1096" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15351813" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -712,7 +710,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32883817" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33298755" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33298755" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24946696" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
@@ -920,7 +918,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>660</line>
+          <line>698</line>
           <option name="timeStamp" value="509" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -990,12 +988,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>554</line>
+          <line>592</line>
           <option name="timeStamp" value="554" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>62</line>
+          <line>64</line>
           <option name="timeStamp" value="555" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1050,12 +1048,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>477</line>
+          <line>515</line>
           <option name="timeStamp" value="572" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>333</line>
+          <line>371</line>
           <option name="timeStamp" value="577" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1065,11 +1063,16 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>290</line>
+          <line>328</line>
           <option name="timeStamp" value="622" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/stats_analyses.py</url>
+          <line>107</line>
+          <option name="timeStamp" value="623" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="623" />
+      <option name="time" value="624" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
@@ -1458,8 +1461,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/replay.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.3103447">
-          <caret line="2150" column="23" selection-start-line="2150" selection-start-column="23" selection-end-line="2150" selection-end-column="23" />
+        <state vertical-scroll-proportion="-7.8965516">
+          <caret line="1079" column="4" selection-start-line="1079" selection-start-column="4" selection-end-line="1079" selection-end-column="38" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
@@ -1468,8 +1471,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/stats_analyses.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.609215">
-          <caret line="216" column="88" selection-start-line="216" selection-start-column="88" selection-end-line="216" selection-end-column="88" />
+        <state vertical-scroll-proportion="0.7679181">
+          <caret line="148" column="58" selection-start-line="148" selection-start-column="58" selection-end-line="148" selection-end-column="58" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
