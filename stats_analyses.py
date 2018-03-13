@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 import copy
 import csv
+from altair import Chart
+from IPython.display import display
 import math
 # import Tkinter
 
@@ -112,6 +114,7 @@ def get_user_stats():
         first_moves = user_data.loc[user_data['move_number_in_path'] == 1]
         curr_data['num_unique_first_moves'] = len(first_moves['position'].unique())
         curr_data['solved'] = user_data.iloc[0]['solved']
+        curr_data['board'] = user_data.iloc[0]['board_name']
         curr_data['number_of_moves'] = user_data['move_number'].max()
         curr_data['solution_time'] = user_data['time_rel_sec'].max()
         curr_data['explore_time'] = None
@@ -228,6 +231,105 @@ if __name__== "__main__":
     # plt.show()
 
     boards = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
+    # for board in boards:
+    #     print board
+    #     # sns.load_dataset
+    #     exploreExploit_filtered1 = user_stats_exploration.loc[(user_stats_exploration['board']==board)]
+    #     colors = {'solvedCorrect':'blue','validatedCorrect':'green', 'wrong':'red' }
+    #     plt.scatter(exploreExploit_filtered1.explore_time, exploreExploit_filtered1.exploit_time,
+    #                 c = exploreExploit_filtered1.solved_num, s=(exploreExploit_filtered1.num_resets**2), cmap="viridis")
+    #     ax = plt.gca()
+    #
+    #     plt.colorbar(label="solved")
+    #     plt.xlabel("explore_time")
+    #     plt.ylabel("exploit_time")
+    #
+    #     #make a legend:
+    #     # pws = [0.5, 1, 1.5, 2., 2.5]
+    #     # for pw in pws:
+    #     #     plt.scatter([], [], s=(pw**2), c="k",label=str(pw))
+    #     #
+    #     # h, l = plt.gca().get_legend_handles_labels()
+    #     # plt.legend(h[1:], l[1:], labelspacing=1.2, title="num_resets", borderpad=1,
+    #     #             frameon=True, framealpha=0.6, )
+    #
+    #     plt.show()
+    for board in boards:
+        exploreExploit_filtered1 = user_stats_exploration.loc[user_stats_exploration['board']==board]
+        colors = {'correct':'green', 'wrong':'red'}
+        cols = ['num_resets','num_unique_first_moves','num_moves_win_score','mean_score','solution_time','median_score','number_of_moves']
+        mult_vals = [10.0, 50.0,50.0,50.0,5.0,10.0,10.0]
+        for i in range(len(cols)):
+            p = cols[i]
+            # ax = sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered1, n_boot=1000, scatter_kws={"s": (exploreExploit_filtered1.num_resets**2)})
+            print p
+            max_value = exploreExploit_filtered1[p].max()*1.0
+            filt_min = exploreExploit_filtered1[exploreExploit_filtered1[p]>0.001]
+            min_value = filt_min[p].min()*1.0
+            # print exploreExploit_filtered1['norm_val']
+
+            mult = ((min_value+0.)**2)/mult_vals[i]
+            print mult
+            sns.lmplot(x="explore_time", y="exploit_time",data=exploreExploit_filtered1,hue='correct', n_boot=1000,markers=['+','+'], palette=colors,scatter_kws={"s": ((exploreExploit_filtered1[p])**2 )/mult},fit_reg=False, legend=False)
+            # plt.scatter(exploreExploit_filtered1.explore_time, exploreExploit_filtered1.exploit_time,
+            #             c = exploreExploit_filtered1['solved'].apply(lambda x: colors[x]), s=(exploreExploit_filtered1.num_resets**2), cmap="Paired")
+            # ax = plt.gca()
+
+            # plt.colorbar(label="solved")
+            plt.xlabel("explore_time")
+            plt.ylabel("exploit_time")
+
+            #make a legend:
+            # pws = [0.5, 1, 1.5, 2., 2.5]
+            # for pw in pws:
+            #     plt.scatter([], [], s=(pw**2), c="k",label=str(pw))
+            #
+            # h, l = plt.gca().get_legend_handles_labels()
+            # plt.legend(h[1:], l[1:], labelspacing=1.2, title="num_resets", borderpad=1,
+            #             frameon=True, framealpha=0.6, )
+            plt.xlim(0, min(exploreExploit_filtered1['explore_time'].max()+10,60))
+            plt.ylim(0, min(exploreExploit_filtered1['exploit_time'].max()+10,60))
+            # plt.xlim(0,60)
+            # plt.ylim(0,60)
+            title = p + '_' +board
+            plt.title(title)
+            # plt.show()
+            # plt.figure(figsize=(20,10))
+            # plt.show()
+            plt.savefig("dynamics/explore_exploit/test/explore_exploit_60_"+ title +".png", format='png')
+        # plt.clf()
+        # c = Chart(exploreExploit_filtered1)
+        # c.mark_circle().encode(
+        #     x='explore_time',
+        #     y='exploit_time',
+        #     color='solved',
+        #     size='num_resets',
+        # )
+        # c.serve()
+        # break
+        # display(c)
+        # print(c.to_json(indent=2))
+        # plt.show()
+        # exploreExploit_filtered1 = user_stats_exploration.loc[(user_stats_exploration['solved']=='validatedCorrect') & (user_stats_exploration['board']==board)]
+
+        # print stats.spearmanr(exploreExploit_filtered1['explore_time'], exploreExploit_filtered1['exploit_time'])
+        # # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+        # ax = sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered1, n_boot=1000, color='green')
+        # # plt.gca().set_xlim(left=0)
+        # # plt.gca().set_ylim(left=0)
+        # plt.xlim(0, 130)
+        # plt.ylim(0, 180)
+        #
+        # exploreExploit_filtered2 = user_stats_exploration.loc[((user_stats_exploration['solved']=='wrong') | (user_stats_exploration['solved']=='solvedCorrect')) & (user_stats_exploration['board']==board)]
+        # print stats.spearmanr(exploreExploit_filtered2['explore_time'], exploreExploit_filtered2['exploit_time'])
+        # # ax = sns.barplot(x="solved", y="exploit_time", data=exploreExploit)
+        # ax = sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered2, n_boot=1000, color='red')
+        # plt.xlim(0, 130)
+        # plt.ylim(0, 180)
+        # # plt.gca().set_xlim(left=0)
+        # # plt.gca().set_ylim(left=0)
+        # plt.show()
+
     # print len(users)
     # for user in users:
     #     print user
