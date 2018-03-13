@@ -883,8 +883,9 @@ def moves_stats(output_file):
 
                     # scores computation
 
-                    scores = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2)
+                    scores = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
                     scores_data = get_scores(scores, rowPos, colPos)
+
                     delta_score = ""
                     if player == 1:
                         if prev_x_score != None:
@@ -1283,22 +1284,22 @@ def explore_exploit(output_file):
                     prev_time = row['time']
 
 
-                    # if (exploit_time_start != None) & (explore_time_start != None):
-                    #     exploit_time = exploit_time_end - exploit_time_start
-                    #     explore_time = explore_time_end - explore_time_start
-                    #     curr_data['userid'] = curr_user
-                    #     curr_data['condition'] = condition
-                    #     curr_data['board_name'] = board_name
-                    #     curr_data['solved'] = participant_answer
-                    #     curr_data['explore_time'] = explore_time
-                    #     curr_data['exploit_time'] = exploit_time
-                    #     results_table.append(copy.deepcopy(curr_data))
-                    #     curr_data = {}
-                    #
-                    # explore_time_start = int(row['time'])
-                    # exploit_time_start = None
-                    # exploit_time_end = None
-                    # explore_time_end = None
+                    if (exploit_time_start != None) & (explore_time_start != None) & (len(curr_path)==1):
+                        exploit_time = exploit_time_end - exploit_time_start
+                        explore_time = explore_time_end - explore_time_start
+                        curr_data['userid'] = curr_user
+                        curr_data['condition'] = condition
+                        curr_data['board_name'] = board_name
+                        curr_data['solved'] = participant_answer
+                        curr_data['explore_time'] = explore_time
+                        curr_data['exploit_time'] = exploit_time
+                        results_table.append(copy.deepcopy(curr_data))
+                        curr_data = {}
+
+                    explore_time_start = int(row['time'])
+                    exploit_time_start = None
+                    exploit_time_end = None
+                    explore_time_end = None
                 # else:
                 #     prev_time = row['time']
                 elif row['key'] == 'start':
@@ -2144,8 +2145,8 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/actionsLogDelta.csv')
-    # explore_exploit('stats/exploreExploitTimes0311.csv')
+    # moves_stats('stats/actionsLogDelta_blocking.csv')
+    explore_exploit('stats/exploreExploitTimesPathLength.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

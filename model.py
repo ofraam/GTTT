@@ -1994,9 +1994,13 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 if len(board_matrix)==10:
                     streak_size = 5
 
-                if block & (x_paths[2] == (streak_size-1)):  # give score for blocking O
+                if block & (x_paths[2] == (streak_size-1)) & x_turn:  # give score for blocking O
                     # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
                     square_score_o = INFINITY_O
+
+                elif block & (o_paths[2] == (streak_size-1)) & o_turn:  # give score for blocking O
+                    # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
+                    square_score_x = INFINITY_O
                 # if x_paths[2] == (streak_size-1):
                 #     square_score_o =0
                 square_score = square_score_x + square_score_o
