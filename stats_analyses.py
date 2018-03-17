@@ -8,8 +8,11 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 import copy
 import csv
+from sklearn.covariance import EllipticEnvelope
+from  sklearn.neighbors import LocalOutlierFactor
 from altair import Chart
 from IPython.display import display
+from sklearn.linear_model import LinearRegression
 import math
 # import Tkinter
 
@@ -148,8 +151,71 @@ if __name__== "__main__":
     timeResets = pd.read_csv("stats/timeBeforeReset.csv")
     timeUndos = pd.read_csv("stats/timeBeforeUndo.csv")
     resetsData = pd.read_csv("stats/resetsData.csv")
+    resetsDelta = pd.read_csv("stats/resetsDeltaData.csv")
 
     user_stats_exploration = pd.read_csv("stats/user_stats.csv")
+    df = user_stats_exploration[['explore_time','exploit_time']]
+    lof = LocalOutlierFactor()
+    outliers =  lof.fit_predict(df)
+
+
+    # ev = EllipticEnvelope(contamination=0.05)
+    # print ev.fit(df)
+    # outliers = ev.predict(df)
+    print len(outliers)
+    user_stats_exploration['outliers'] = outliers
+    # print user_stats_exploration['outliers']
+    user_stats_exploration_filtered = user_stats_exploration.loc[user_stats_exploration['outliers']!=-1]
+    # print user_stats_exploration_filtered['explore_time']
+    ax = sns.regplot(x="explore_time", y="exploit_time", data=user_stats_exploration_filtered, n_boot=1000)
+
+    l = ax.get_lines()
+    x1 = l[0]._path._vertices[0][0]
+    y1 = l[0]._path._vertices[0][1]
+
+    x2 = l[0]._path._vertices[len(l[0]._path._vertices)-1][0]
+    y2 = l[0]._path._vertices[len(l[0]._path._vertices)-1][1]
+    new_x = []
+    new_y = []
+    for index, row in user_stats_exploration_filtered.iterrows():
+        x3 = row['explore_time']
+        y3 = row['exploit_time']
+        dx = x2 - x1
+        dy = y2 - y1
+        d2 = dx*dx + dy*dy
+        nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
+        point = (dx*nx + x1, dy*nx + y1)
+        new_x.append(point[0])
+        new_y.append(point[1])
+        # print point
+    user_stats_exploration_filtered['new_x'] = new_x
+    user_stats_exploration_filtered['new_y'] = new_y
+    # ax = sns.regplot(x="new_x", y="new_y", data=user_stats_exploration_filtered, n_boot=1000)
+    min_x_val = user_stats_exploration_filtered['new_x'].min()
+    min_y_val = user_stats_exploration_filtered['new_y'].min()
+    print min_x_val
+    min_explore = math.sqrt((math.pow(min_x_val,2) + math.pow(min_y_val,2)))
+    print min_explore
+    exploration = []
+    for index, row in user_stats_exploration_filtered.iterrows():
+        distance = math.sqrt((math.pow(row['explore_time']-min_x_val,2) + math.pow(row['exploit_time']-min_y_val,2)))
+        exploration.append(distance+min_explore)
+    user_stats_exploration_filtered['exploration'] = exploration
+    plt.clf()
+    # ax = sns.distplot(user_stats_exploration_filtered['exploration'], )
+    # g = sns.FacetGrid(user_stats_exploration_filtered, hue="condition", legend_out=False)
+    # g = g.map(sns.distplot, "exploration")
+
+    g = sns.FacetGrid(user_stats_exploration_filtered, col="condition", row = "num_resets", margin_titles=True)
+    bins = np.linspace(0, 110, 10)
+    g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
+    # g.map(sns.distplot, "exploration")
+    plt.show()
+    # print reg.get_params()
+    # print m
+    # print b
+    # plt.ylim(0,80)
+    # plt.show()
     # get_user_stats()
 
     # log-likelhood
@@ -230,7 +296,7 @@ if __name__== "__main__":
     # plt.ylim(0,100)
     # plt.show()
 
-    boards = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
+    # boards = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
     # for board in boards:
     #     print board
     #     # sns.load_dataset
@@ -254,49 +320,58 @@ if __name__== "__main__":
     #     #             frameon=True, framealpha=0.6, )
     #
     #     plt.show()
-    for board in boards:
-        exploreExploit_filtered1 = user_stats_exploration.loc[user_stats_exploration['board']==board]
-        colors = {'correct':'green', 'wrong':'red'}
-        cols = ['num_resets','num_unique_first_moves','num_moves_win_score','mean_score','solution_time','median_score','number_of_moves']
-        mult_vals = [10.0, 50.0,50.0,50.0,5.0,10.0,10.0]
-        for i in range(len(cols)):
-            p = cols[i]
-            # ax = sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered1, n_boot=1000, scatter_kws={"s": (exploreExploit_filtered1.num_resets**2)})
-            print p
-            max_value = exploreExploit_filtered1[p].max()*1.0
-            filt_min = exploreExploit_filtered1[exploreExploit_filtered1[p]>0.001]
-            min_value = filt_min[p].min()*1.0
-            # print exploreExploit_filtered1['norm_val']
-
-            mult = ((min_value+0.)**2)/mult_vals[i]
-            print mult
-            sns.lmplot(x="explore_time", y="exploit_time",data=exploreExploit_filtered1,hue='correct', n_boot=1000,markers=['+','+'], palette=colors,scatter_kws={"s": ((exploreExploit_filtered1[p])**2 )/mult},fit_reg=False, legend=False)
-            # plt.scatter(exploreExploit_filtered1.explore_time, exploreExploit_filtered1.exploit_time,
-            #             c = exploreExploit_filtered1['solved'].apply(lambda x: colors[x]), s=(exploreExploit_filtered1.num_resets**2), cmap="Paired")
-            # ax = plt.gca()
-
-            # plt.colorbar(label="solved")
-            plt.xlabel("explore_time")
-            plt.ylabel("exploit_time")
-
-            #make a legend:
-            # pws = [0.5, 1, 1.5, 2., 2.5]
-            # for pw in pws:
-            #     plt.scatter([], [], s=(pw**2), c="k",label=str(pw))
-            #
-            # h, l = plt.gca().get_legend_handles_labels()
-            # plt.legend(h[1:], l[1:], labelspacing=1.2, title="num_resets", borderpad=1,
-            #             frameon=True, framealpha=0.6, )
-            plt.xlim(0, min(exploreExploit_filtered1['explore_time'].max()+10,60))
-            plt.ylim(0, min(exploreExploit_filtered1['exploit_time'].max()+10,60))
-            # plt.xlim(0,60)
-            # plt.ylim(0,60)
-            title = p + '_' +board
-            plt.title(title)
-            # plt.show()
-            # plt.figure(figsize=(20,10))
-            # plt.show()
-            plt.savefig("dynamics/explore_exploit/test/explore_exploit_60_"+ title +".png", format='png')
+    # for board in boards:
+    # exploreExploit_filtered1 = user_stats_exploration.loc[user_stats_exploration['board']==board]
+    # exploreExploit_filtered1 = user_stats_exploration
+    # exploreExploit_filtered1 = user_stats_exploration.loc[user_stats_exploration['explore_time']<100]
+    # ax = sns.lmplot(x="explore_time", y="exploit_time",data=exploreExploit_filtered1,hue='condition', n_boot=1000,fit_reg=False)
+    # plt.show()
+    # # exploreExploit_filtered1 = user_stats_exploration.loc[user_stats_exploration['board'].str.endswith('full')]
+    # colors = {'correct':'green', 'wrong':'red'}
+    # cols = ['num_resets','num_unique_first_moves','num_moves_win_score','mean_score','solution_time','median_score','number_of_moves']
+    # # mult_vals = [10.0, 50.0,50.0,50.0,5.0,10.0,10.0]
+    # for i in range(len(cols)):
+    #     # f, (ax1, ax2) = plt.subplots(2)
+    #     p = cols[i]
+    #     # ax = sns.regplot(x="explore_time", y="exploit_time", data=exploreExploit_filtered1, n_boot=1000, scatter_kws={"s": (exploreExploit_filtered1.num_resets**2)})
+    #     print p
+    #     max_value = exploreExploit_filtered1[p].max()*1.0
+    #     filt_min = exploreExploit_filtered1[exploreExploit_filtered1[p]>0.001]
+    #     min_value = filt_min[p].min()*1.0
+    #     # print exploreExploit_filtered1['norm_val']
+    #
+    #     mult = ((min_value+0.)**2)/30.0
+    #     print mult
+    #     ax = sns.lmplot(x="explore_time", y="exploit_time",data=exploreExploit_filtered1,hue='board', n_boot=1000,palette=colors,scatter_kws={"s": ((exploreExploit_filtered1[p])**2 )/mult},fit_reg=False, legend=False)
+    #     # plt.scatter(exploreExploit_filtered1.explore_time, exploreExploit_filtered1.exploit_time,
+    #     #             c = exploreExploit_filtered1['solved'].apply(lambda x: colors[x]), s=(exploreExploit_filtered1.num_resets**2), cmap="Paired")
+    #     # ax = plt.gca()
+    #
+    #     # plt.colorbar(label="solved")
+    #     plt.xlabel("explore_time")
+    #     plt.ylabel("exploit_time")
+    #
+    #     #make a legend:
+    #     # pws = [0.5, 1, 1.5, 2., 2.5]
+    #     # for pw in pws:
+    #     #     plt.scatter([], [], s=(pw**2), c="k",label=str(pw))
+    #     #
+    #     # h, l = plt.gca().get_legend_handles_labels()
+    #     # plt.legend(h[1:], l[1:], labelspacing=1.2, title="num_resets", borderpad=1,
+    #     #             frameon=True, framealpha=0.6, )
+    #     plt.xlim(0, min(exploreExploit_filtered1['explore_time'].max()+10,100))
+    #     plt.ylim(0, min(exploreExploit_filtered1['exploit_time'].max()+10,100))
+    #     # plt.xlim(0,60)
+    #     # plt.ylim(0,60)
+    #     # title = p + '_' +board
+    #     title = p + '_full'
+    #     plt.title(title)
+    #     # plt.show()
+    #     # plt.figure(figsize=(20,10))
+    #     # ax.set(yscale="symlog")
+    #     # ax.set(xscale="symlog")
+    #     plt.show()
+        # plt.savefig("dynamics/explore_exploit/test/15_explore_exploit_allBoards60_"+ title +".png", format='png')
         # plt.clf()
         # c = Chart(exploreExploit_filtered1)
         # c.mark_circle().encode(
@@ -402,6 +477,9 @@ if __name__== "__main__":
 
     # reset and undo distributions
     # ax = sns.distplot(timeResets['time_before_sec'])
+    # delta_filtered = resetsDelta.loc[(resetsDelta['delta_score'] > -9000) & (resetsDelta['delta_score'] < 9000)]
+    # ax = sns.distplot(delta_filtered['delta_score'])
+    # plt.show()
     # timeUndos_filtered = timeUndos.loc[(timeUndos['time_before_sec'] < 10)]
     # timeResets_filtered = timeResets.loc[(timeResets['time_before_sec'] < 10)]
     # # ax = sns.distplot(timeUndos_filtered['time_before_sec'])
