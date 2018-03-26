@@ -2273,7 +2273,7 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
 
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
         plt.rcParams.update({'font.size': 9})
-        fig_file_name = base_heatmap_name + '_' + board + '.pdf'
+        fig_file_name = base_heatmap_name + '_' + board + '.png'
         heatmaps = []
         full = board + '_full'
         pruned = board + '_pruned'
@@ -2282,7 +2282,7 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
             # fig, axes = plt.subplots(1, len(data), figsize=(16,8))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
             # fig, axes = plt.subplots(2, 4, figsize=(10,6))
         else:
-            fig, axes = plt.subplots(2, len(data), figsize=(24,12)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            fig, axes = plt.subplots(2, len(data), figsize=(12,12)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
             # fig, axes = plt.subplots(2, 4, figsize=(18,12))
 
         fig.suptitle(board)  # add subtitle to the figure based on board name
@@ -2922,9 +2922,10 @@ if __name__ == "__main__":
     # generate_uniform_dist_for_boards('model_config_opp_non-linear_interaction.json')
     # models_files = ['model_config_blocking50_blocking.json', 'avg_people_first_moves_all.json']
     # models_files = ['model_config_blocking10_blocking_layers.json', 'model_config_opp_non-linear_layers.json','model_config_opp_linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json','model_density_nbr=2.json','avg_people_first_moves_all.json']
-    models_files = ['model_config_blocking10_blocking.json', 'model_config_opp_non-linear.json','model_config_opp_linear.json', 'model_config_opp_non-linear_interaction.json','model_density_nbr=2.json','chance.json']
-
-    likelihood('data_matrices/cogsci/people_first_moves_values_byParticipant_wrong.json',models_files)
+    # models_files = ['model_config_blocking10_blocking.json', 'model_config_opp_non-linear.json','model_config_opp_linear.json', 'model_config_opp_non-linear_interaction.json','model_density_nbr=2.json','chance.json']
+    models_files = ['first_pruned.json']
+    run_models_from_list(models_files, 'heatmaps/cogsci/markov')
+    # likelihood('data_matrices/cogsci/people_first_moves_values_byParticipant_wrong.json',models_files)
 
     # model_files = ['mcts.json','model_config_blocking10_blocking.json','avg_people_first_moves_all.json']
     # model_files = ['model_config_blocking10_blocking_layers.json','avg_people_first_moves_all.json']

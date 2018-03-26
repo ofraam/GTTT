@@ -14,8 +14,26 @@ from altair import Chart
 from IPython.display import display
 from sklearn.linear_model import LinearRegression
 import math
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_predict
+from replay import *
 # import Tkinter
 
+
+# these are the files with user data foeach of the board
+LOGFILE = ['6_hard_full','6_hard_pruned','10_hard_full','10_hard_pruned', '6_easy_full','6_easy_pruned','10_easy_full','10_easy_pruned', '10_medium_full','10_medium_pruned']
+# these are the boards starting positions (1 = X, 2 = O)
+START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
+                  [[0,2,0,1,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[2,1,0,2,0,0],[0,1,0,0,0,0],[0,2,0,0,2,0]],
+                  [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,0,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,0,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[0,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,0,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
+                 [[0,0,0,2,0,0,0,0,0,0],[0,0,0,1,0,2,0,0,0,0],[0,2,2,0,1,1,1,0,2,0],[0,0,2,1,2,0,0,0,0,0],[0,1,1,0,0,0,0,0,0,0],[0,1,1,0,2,0,0,0,0,0],[2,0,1,0,2,0,0,0,0,0],[0,0,1,0,0,0,0,0,0,0],[0,0,2,0,0,2,2,0,0,0],[0,0,0,0,1,0,0,0,0,0]],
+                  [[0,1,0,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,0],[2,0,1,1,2,0],[1,0,2,2,0,0],[0,0,0,0,0,0]],
+                  [[0,1,2,2,0,0],[0,2,1,1,0,0],[1,2,2,2,1,0],[2,0,1,1,2,1],[1,0,2,2,0,0],[0,0,0,0,0,0]],
+                [[0,0,0,0,1,0,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,0],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
+                  [[0,0,0,0,1,2,2,0,0,0],[0,0,0,0,2,1,1,1,0,0],[0,0,0,1,2,2,2,1,0,0],[0,0,0,2,2,1,1,2,1,1],[2,0,0,1,0,2,2,0,0,1],[1,0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0,0],[2,2,0,0,0,0,1,0,0,0],[0,0,0,0,0,0,1,0,0,0],[0,0,0,0,0,2,2,2,0,0]],
+                [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
+                 [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
+                  ]
 
 
 def boot_matrix(z, B):
@@ -126,11 +144,67 @@ def get_user_stats():
             curr_data['explore_time'] = exploreExploitData_user.iloc[0]['explore_time']
             curr_data['exploit_time'] = exploreExploitData_user.iloc[0]['exploit_time']
         all_data.append(copy.deepcopy(curr_data))
-    dataFile = open('stats\user_stats.csv', 'wb')
+    dataFile = open('stats\user_stats2.csv', 'wb')
     dataWriter = csv.DictWriter(dataFile, fieldnames=curr_data.keys(), delimiter=',')
     dataWriter.writeheader()
     for record in all_data:
         dataWriter.writerow(record)
+
+def compare_start_move(dynamics):
+    first_move = {'6hard':'0_3', '6easy':'3_5', '10hard':'2_4', '10easy':'4_9', '10medium':'3_2'}
+    second_move = {'6hard':'3_0', '6easy':'0_2', '10hard':'6_0', '10easy':'0_5', '10medium':'3_5'}
+    # hard6pruned = dynamics.loc[(dynamics['board_name']=='6_hard_pruned') & (dynamics['move_number_in_path']==1)]
+    # hard6full = dynamics.loc[dynamics['board_name']=='6_hard_full' ]
+
+    # hard6full['prev_pos'] = hard6full['position'].shift()
+    # hard6full.ix[0,'prev_pos'] =
+    dynamics['first_pruned'] = False
+    for index, row in dynamics.iterrows():
+        if (row['move_number_in_path'] == 3) & (row['condition'] == 'full'):
+            board = row['sizeType']
+            # print board
+            prev_row = dynamics.iloc[[index-1]]
+            prev_prev_row = dynamics.iloc[[index-2]]
+            # print prev_row['position'].values[0]
+            # print prev_prev_row['position'].values[0]
+            if (prev_row['position'].values[0] == second_move[board]) & (prev_prev_row['position'].values[0] == first_move[board]):
+                # print 'boo'
+                dynamics.loc[index,'first_pruned'] = True
+
+    dynamics.to_csv('stats/dynamicsFirstMoves.csv')
+
+        # print row
+
+def probs_clicks(dynamics):
+    data_matrics = {}
+    full = dynamics.loc[(dynamics['condition'] == 'full') & (dynamics['first_pruned'] == True) & (dynamics['action'] == 'click')]
+    pruned = dynamics.loc[(dynamics['condition'] == 'pruned') & (dynamics['move_number_in_path'] == 1) & (dynamics['action'] == 'click')]
+    boards_full = full.board_name.unique()
+    for i in range(len(LOGFILE)):
+        board = LOGFILE[i]
+        board_matrix = copy.deepcopy(START_POSITION[i])
+
+        board_data = full
+        if board.endswith('pruned'):
+            board_data = pruned
+
+        first_moves = board_data.loc[board_data['board_name'] == board]
+        total_first_moves = first_moves.shape[0]
+
+        print total_first_moves
+        for row in range(len(board_matrix)):
+            for col in range(len(board_matrix[row])):
+                if board_matrix[row][col] == 1:
+                    board_matrix[row][col] = -0.00001
+                elif board_matrix[row][col] == 2:
+                    board_matrix[row][col] = -0.00002
+                elif total_first_moves > 0:
+                    num = first_moves[(first_moves['row'] == row) & (first_moves['col'] == col)].shape[0]
+                    board_matrix[row][col] = float(num)/float(total_first_moves)
+
+        data_matrics[board] = copy.deepcopy(board_matrix)
+
+    write_matrices_to_file(data_matrics, 'data_matrices/cogsci/first_pruned.json')
 
 
 if __name__== "__main__":
@@ -143,6 +217,11 @@ if __name__== "__main__":
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     dynamics = pd.read_csv("stats/dynamics.csv")
+    # dynamics = pd.read_csv("stats/dynamicsFirstMoves1.csv")
+    # compare_start_move(dynamics)
+    # probs_clicks(dynamics)
+    # print 1/0
+
     # exploreExploit = pd.read_csv("stats/exploreExploit0311_avg.csv")
     exploreExploit = pd.read_csv("stats/exploreExploitPath_avg.csv")
 
@@ -151,66 +230,100 @@ if __name__== "__main__":
     timeResets = pd.read_csv("stats/timeBeforeReset.csv")
     timeUndos = pd.read_csv("stats/timeBeforeUndo.csv")
     resetsData = pd.read_csv("stats/resetsData.csv")
-    resetsDelta = pd.read_csv("stats/resetsDeltaData.csv")
-
-    user_stats_exploration = pd.read_csv("stats/user_stats.csv")
-    df = user_stats_exploration[['explore_time','exploit_time']]
-    lof = LocalOutlierFactor()
-    outliers =  lof.fit_predict(df)
+    # resetsDelta = pd.read_csv("stats/resetsDeltaData.csv")
+    resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
 
 
-    # ev = EllipticEnvelope(contamination=0.05)
-    # print ev.fit(df)
-    # outliers = ev.predict(df)
-    print len(outliers)
-    user_stats_exploration['outliers'] = outliers
-    # print user_stats_exploration['outliers']
-    user_stats_exploration_filtered = user_stats_exploration.loc[user_stats_exploration['outliers']!=-1]
-    # print user_stats_exploration_filtered['explore_time']
-    ax = sns.regplot(x="explore_time", y="exploit_time", data=user_stats_exploration_filtered, n_boot=1000)
+    # -- explore-exploit correlation line
+    # user_stats_exploration = pd.read_csv("stats/user_stats2.csv")
+    # df = user_stats_exploration[['explore_time','exploit_time']]
+    # lof = LocalOutlierFactor()
+    # outliers =  lof.fit_predict(df)
+    #
+    #
+    # # ev = EllipticEnvelope(contamination=0.05)
+    # # print ev.fit(df)
+    # # outliers = ev.predict(df)
+    # print len(outliers)
+    # user_stats_exploration['outliers'] = outliers
+    # # print user_stats_exploration['outliers']
+    # user_stats_exploration_filtered = user_stats_exploration.loc[user_stats_exploration['outliers']!=-1]
+    # # print user_stats_exploration_filtered['explore_time']
+    # ax = sns.regplot(x="explore_time", y="exploit_time", data=user_stats_exploration_filtered, n_boot=1000)
+    #
+    # l = ax.get_lines()
+    # x1 = l[0]._path._vertices[0][0]
+    # y1 = l[0]._path._vertices[0][1]
+    #
+    # x2 = l[0]._path._vertices[len(l[0]._path._vertices)-1][0]
+    # y2 = l[0]._path._vertices[len(l[0]._path._vertices)-1][1]
+    # new_x = []
+    # new_y = []
+    # for index, row in user_stats_exploration_filtered.iterrows():
+    #     x3 = row['explore_time']
+    #     y3 = row['exploit_time']
+    #     dx = x2 - x1
+    #     dy = y2 - y1
+    #     d2 = dx*dx + dy*dy
+    #     nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
+    #     point = (dx*nx + x1, dy*nx + y1)
+    #     new_x.append(point[0])
+    #     new_y.append(point[1])
+    #     # print point
+    # user_stats_exploration_filtered['new_x'] = new_x
+    # user_stats_exploration_filtered['new_y'] = new_y
+    # # ax = sns.regplot(x="new_x", y="new_y", data=user_stats_exploration_filtered, n_boot=1000)
+    # min_x_val = user_stats_exploration_filtered['new_x'].min()
+    # min_y_val = user_stats_exploration_filtered['new_y'].min()
+    # print min_x_val
+    # min_explore = math.sqrt((math.pow(min_x_val,2) + math.pow(min_y_val,2)))
+    # print min_explore
+    # exploration = []
+    # for index, row in user_stats_exploration_filtered.iterrows():
+    #     distance = math.sqrt((math.pow(row['explore_time']-min_x_val,2) + math.pow(row['exploit_time']-min_y_val,2)))
+    #     exploration.append(distance+min_explore)
+    # user_stats_exploration_filtered['exploration'] = exploration
+    # #
+    # # lr = LinearRegression()
+    # # y = user_stats_exploration_filtered.exploration
+    # # df = user_stats_exploration_filtered[['median_score']]
+    # # predicted = cross_val_predict(lr, df, y, cv=10)
+    # # #
+    # # fig, ax = plt.subplots()
+    # # ax.scatter(y, predicted, edgecolors=(0, 0, 0))
+    # # ax.plot([y.min(), y.max()], [y.min(), y.max()], 'k--', lw=4)
+    # # ax.set_xlabel('Measured')
+    # # ax.set_ylabel('Predicted')
+    # # plt.show()
+    #
+    # plt.clf()
+    # # ax = sns.distplot(user_stats_exploration_filtered['exploration'], )
+    # # g = sns.FacetGrid(user_stats_exploration_filtered, hue="condition", legend_out=False)
+    # # g = g.map(sns.distplot, "exploration")
+    # #
+    # # X = user_stats_exploration_filtered
+    # # y = # Some classes
+    # #
+    # # clf = linear_model.Lasso()
+    # # scores = cross_val_score(clf, X, y, cv=10)
+    # # g = sns.FacetGrid(user_stats_exploration_filtered, col="correctness", margin_titles=True)
+    # g = sns.FacetGrid(user_stats_exploration_filtered,col="typeSize", row="condition", margin_titles=True)
+    # #
+    # bins = np.linspace(0, 110, 10)
+    # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
+    # # g.map(sns.distplot, "exploration", bins=bins)
+    # # g.map(sns.regplot,"exploration", "solution_time");
+    # #
+    # # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration_filtered, n_boot=1000)
+    # plt.show()
 
-    l = ax.get_lines()
-    x1 = l[0]._path._vertices[0][0]
-    y1 = l[0]._path._vertices[0][1]
+    # feature_names = ["num_moves", "solved"]
+    # df = pd.DataFrame(user_stats_exploration_filtered, columns=feature_names)
+    # print df
+    # target = pd.DataFrame(user_stats_exploration_filtered, columns=["exploration"])
+    # print target
 
-    x2 = l[0]._path._vertices[len(l[0]._path._vertices)-1][0]
-    y2 = l[0]._path._vertices[len(l[0]._path._vertices)-1][1]
-    new_x = []
-    new_y = []
-    for index, row in user_stats_exploration_filtered.iterrows():
-        x3 = row['explore_time']
-        y3 = row['exploit_time']
-        dx = x2 - x1
-        dy = y2 - y1
-        d2 = dx*dx + dy*dy
-        nx = ((x3-x1)*dx + (y3-y1)*dy) / d2
-        point = (dx*nx + x1, dy*nx + y1)
-        new_x.append(point[0])
-        new_y.append(point[1])
-        # print point
-    user_stats_exploration_filtered['new_x'] = new_x
-    user_stats_exploration_filtered['new_y'] = new_y
-    # ax = sns.regplot(x="new_x", y="new_y", data=user_stats_exploration_filtered, n_boot=1000)
-    min_x_val = user_stats_exploration_filtered['new_x'].min()
-    min_y_val = user_stats_exploration_filtered['new_y'].min()
-    print min_x_val
-    min_explore = math.sqrt((math.pow(min_x_val,2) + math.pow(min_y_val,2)))
-    print min_explore
-    exploration = []
-    for index, row in user_stats_exploration_filtered.iterrows():
-        distance = math.sqrt((math.pow(row['explore_time']-min_x_val,2) + math.pow(row['exploit_time']-min_y_val,2)))
-        exploration.append(distance+min_explore)
-    user_stats_exploration_filtered['exploration'] = exploration
-    plt.clf()
-    # ax = sns.distplot(user_stats_exploration_filtered['exploration'], )
-    # g = sns.FacetGrid(user_stats_exploration_filtered, hue="condition", legend_out=False)
-    # g = g.map(sns.distplot, "exploration")
 
-    g = sns.FacetGrid(user_stats_exploration_filtered, col="condition", row = "num_resets", margin_titles=True)
-    bins = np.linspace(0, 110, 10)
-    g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
-    # g.map(sns.distplot, "exploration")
-    plt.show()
     # print reg.get_params()
     # print m
     # print b
@@ -476,10 +589,22 @@ if __name__== "__main__":
         # plt.show()
 
     # reset and undo distributions
+
     # ax = sns.distplot(timeResets['time_before_sec'])
+    resetsDelta = resetsDelta.loc[resetsDelta['action'] == 'reset']
     # delta_filtered = resetsDelta.loc[(resetsDelta['delta_score'] > -9000) & (resetsDelta['delta_score'] < 9000)]
+    delta_filtered = resetsDelta.loc[(resetsDelta['delta_score_direction'] !=0) & (resetsDelta['score_move'] < 10000)]
+
     # ax = sns.distplot(delta_filtered['delta_score'])
-    # plt.show()
+
+    g = sns.FacetGrid(resetsDelta, row="condition", col="sizeType", legend_out=False)
+    # g = g.map(sns.distplot, "delta_score")
+    bins = np.linspace(0,15,num=15)
+    g.map(plt.hist, "move_number_in_path", color="steelblue",bins=bins,  lw=0)
+    # ax = g.ax_joint
+    # ax.set_xscale('log')
+    # # g.set(yscale="symlog")
+    plt.show()
     # timeUndos_filtered = timeUndos.loc[(timeUndos['time_before_sec'] < 10)]
     # timeResets_filtered = timeResets.loc[(timeResets['time_before_sec'] < 10)]
     # # ax = sns.distplot(timeUndos_filtered['time_before_sec'])
