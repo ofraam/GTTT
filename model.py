@@ -2273,7 +2273,7 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
 
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
         plt.rcParams.update({'font.size': 9})
-        fig_file_name = base_heatmap_name + '_' + board + '.png'
+        fig_file_name = base_heatmap_name + '_' + board + '2603_2.png'
         heatmaps = []
         full = board + '_full'
         pruned = board + '_pruned'
@@ -2923,7 +2923,7 @@ if __name__ == "__main__":
     # models_files = ['model_config_blocking50_blocking.json', 'avg_people_first_moves_all.json']
     # models_files = ['model_config_blocking10_blocking_layers.json', 'model_config_opp_non-linear_layers.json','model_config_opp_linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json','model_density_nbr=2.json','avg_people_first_moves_all.json']
     # models_files = ['model_config_blocking10_blocking.json', 'model_config_opp_non-linear.json','model_config_opp_linear.json', 'model_config_opp_non-linear_interaction.json','model_density_nbr=2.json','chance.json']
-    models_files = ['first_pruned.json']
+    models_files = ['first_pruned.json','model_config_blocking10_blocking_layers.json']
     run_models_from_list(models_files, 'heatmaps/cogsci/markov')
     # likelihood('data_matrices/cogsci/people_first_moves_values_byParticipant_wrong.json',models_files)
 

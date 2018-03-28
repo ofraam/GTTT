@@ -744,7 +744,7 @@ def entropy_paths_average(subpaths = False):
 
 
 def check_participant_answer(userid):
-    with open('logs/tttResultsCogSci.csv', 'rb') as csvfile:
+    with open('logs/tttResults_2603.csv', 'rb') as csvfile:
         log_reader = csv.DictReader(csvfile)
         for row in log_reader:
             if row['userid']==userid:
@@ -2157,8 +2157,8 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/actionsLogDelta_blocking_moveStates_2503.csv')
-    # explore_exploit('stats/exploreExploitTimesPathLength2503.csv')
+    moves_stats('stats/actionsLogDelta_blocking_moveStates_2603.csv')
+    # explore_exploit('stats/exploreExploitTimesPathLength2603.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)
