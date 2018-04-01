@@ -2077,7 +2077,10 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 if (score_matrix[r][c]!=-0.00001) & (score_matrix[r][c]!=-0.00002):
                 # if (score_matrix[r][c]>0):
                     if lamb is None:
-                        score_matrix[r][c] = score_matrix[r][c]/sum_scores
+                        if (sum_scores == 0):
+                            score_matrix[r][c] = 0
+                        else:
+                            score_matrix[r][c] = score_matrix[r][c]/sum_scores
                     else:
                         score_matrix[r][c] = score_matrix[r][c]/sum_scores_exp
 

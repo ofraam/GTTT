@@ -239,7 +239,7 @@ if __name__== "__main__":
     resetsData = pd.read_csv("stats/resetsData.csv")
     # resetsDelta = pd.read_csv("stats/resetsDeltaData.csv")
     # resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
-    resetsDelta = pd.read_csv("stats/resetsFiltered1.csv")
+    resetsDelta = pd.read_csv("stats/resetsFiltered2.csv")
 
 
     # -- explore-exploit correlation line
@@ -320,17 +320,17 @@ if __name__== "__main__":
     user_stats_exploration = pd.read_csv("stats/exploreExploitCombined2.csv")
     user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
     user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
-    g = sns.FacetGrid(user_stats_exploration, row="condition",col="typeSize", margin_titles=True)
-    #
-    bins = np.linspace(0, 110, 20)
-    # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
-    # g.map(sns.distplot, "exploration", bins=bins)
-    test_char = "median_first_move_score"
-    g.map(sns.regplot,"exploration", test_char);
-    print stats.spearmanr(user_stats_exploration['exploration'], user_stats_exploration[test_char])
-    #
-    # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration_filtered, n_boot=1000)
-    plt.show()
+    # g = sns.FacetGrid(user_stats_exploration_correct, row="condition",col="typeSize", margin_titles=True)
+    # #
+    # bins = np.linspace(0, 110, 20)
+    # # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
+    # # g.map(sns.distplot, "exploration", bins=bins)
+    # test_char = "avg_first_move_score"
+    # g.map(sns.regplot,"exploration", test_char);
+    # print stats.spearmanr(user_stats_exploration_correct['exploration'], user_stats_exploration_correct[test_char])
+    # #
+    # # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration_filtered, n_boot=1000)
+    # plt.show()
 
     # feature_names = ["num_moves", "solved"]
     # df = pd.DataFrame(user_stats_exploration_filtered, columns=feature_names)
@@ -605,12 +605,12 @@ if __name__== "__main__":
         # plt.show()
 
     # ------ states ------
-    entropies = pd.read_csv("stats/entropies_data.csv")
-    # g = sns.FacetGrid(entropies, col="sizeType", legend_out=False)
-    ax = sns.barplot(x="condition",y="entropy", data = entropies)
-    # print moves_s['board_name'].unique()
-    # plt.title("tt")
-    plt.show()
+    # entropies = pd.read_csv("stats/entropies_data.csv")
+    # # g = sns.FacetGrid(entropies, col="sizeType", legend_out=False)
+    # ax = sns.barplot(x="condition",y="entropy", data = entropies)
+    # # print moves_s['board_name'].unique()
+    # # plt.title("tt")
+    # plt.show()
     # states = states.loc[(states['action'] == 'click') & (states['sizeType'] == '10medium')]
     # states = states.loc[(states['action'] == 'click')]
     # board_states = states['board_state'].unique()
@@ -618,6 +618,7 @@ if __name__== "__main__":
     # entropies_full = []
     # states_data = []
     # boards = []
+    # solved = []
     # entropies = []
     # for s in board_states:
     #     moves_s = states.loc[(states['board_state'] == s)]
@@ -648,8 +649,11 @@ if __name__== "__main__":
     #             entropies_pruned.append(ent)
     #             states_data.append(s)
     #             boards.append(moves_pruned['board_name'].unique()[0])
+    #             solvers = moves_pruned[moves_pruned['solved'] == 'validatedCorrect'].shape[0]
+    #             solved.append(float(solvers)/total)
     #             entropies.append(ent)
     #             pk = []
+    #
     #             moves_full = moves_s.loc[moves_s['condition'] == 'full']
     #             mf = moves_full['position'].unique()
     #             total = moves_full.shape[0] + 0.0
@@ -659,42 +663,44 @@ if __name__== "__main__":
     #             ent = stats.entropy(pk)
     #             entropies_full.append(ent)
     #             states_data.append(s)
+    #             solvers = moves_full[moves_full['solved'] == 'validatedCorrect'].shape[0]
+    #             solved.append(float(solvers)/total)
     #             boards.append(moves_full['board_name'].unique()[0])
     #             entropies.append(ent)
-    # entropies_data = {'board': boards, 'state': states_data, 'entropy':entropies}
+    # entropies_data = {'board': boards, 'state': states_data, 'entropy':entropies, 'solvers':solved}
     # entropies_data =pd.DataFrame(entropies_data)
     #
     #
     # # plt.title("tt")
     # plt.show()
-    # # entropies_data.to_csv('stats/entropies_data.csv')
+    # entropies_data.to_csv('stats/entropies_data_solvers.csv')
     # print entropies_data
     # print np.mean(entropies_full)
     # print np.mean(entropies_pruned)
     # entropies_full = np.asarray(entropies_full)
-    entropies_full = entropies.loc[entropies['condition']=='full']
-    entropies_pruned = entropies.loc[entropies['condition']=='pruned']
-    # entropies_pruned = np.asarray(entropies_pruned)
-    print bootstrap_t_pvalue(entropies_pruned['entropy'].values, entropies_full['entropy'].values)
+    # entropies_full = entropies.loc[entropies['condition']=='full']
+    # entropies_pruned = entropies.loc[entropies['condition']=='pruned']
+    # # entropies_pruned = np.asarray(entropies_pruned)
+    # print bootstrap_t_pvalue(entropies_pruned['entropy'].values, entropies_full['entropy'].values)
     #--------- reset and undo distributions-----------
 
     # ax = sns.distplot(timeResets['time_before_sec'])
-    # resetsDelta = resetsDelta.loc[resetsDelta['action'] == 'reset']
-    # # delta_filtered = resetsDelta.loc[(resetsDelta['delta_score'] > -9000) & (resetsDelta['delta_score'] < 9000)]
-    # delta_filtered = resetsDelta.loc[(resetsDelta['delta_score_direction'] !=0) & (resetsDelta['deltaScoreByScore'] < 20) & (resetsDelta['deltaScoreByScore'] > -20)]
+    resetsDelta = resetsDelta.loc[resetsDelta['action'] == 'reset']
+    # delta_filtered = resetsDelta.loc[(resetsDelta['delta_score'] > -9000) & (resetsDelta['delta_score'] < 9000)]
+    # delta_filtered = resetsDelta.loc[(resetsDelta['deltaScoreByScore'] < 20) & (resetsDelta['deltaScoreByScore'] > -20)]
     #
     # # ax = sns.distplot(delta_filtered['delta_score'])
     #
-    # g = sns.FacetGrid(resetsDelta, row="condition",  legend_out=False)
-    # # g = g.map(sns.distplot, "delta_score")
-    # bins = np.linspace(-10000,10000,num=100)
-    # g.map(plt.hist, "deltaScoreByScore", color="steelblue",  bins=bins,lw=0)
-    # # g.map(plt.hist, "deltaScoreByScore", color="steelblue",  lw=0)
-    #
-    # # ax = g.ax_joint
-    # # ax.set_xscale('log')
-    # # # g.set(yscale="symlog")
-    # plt.show()
+    g = sns.FacetGrid(resetsDelta, row="condition",  legend_out=False)
+    # g = g.map(sns.distplot, "delta_score")
+    bins = np.linspace(-10,10,num=20)
+    g.map(plt.hist, "score_move", color="steelblue",  bins=bins,lw=0)
+    # g.map(plt.hist, "deltaScoreByScore", color="steelblue",  lw=0)
+
+    # ax = g.ax_joint
+    # ax.set_xscale('log')
+    # # g.set(yscale="symlog")
+    plt.show()
     # timeUndos_filtered = timeUndos.loc[(timeUndos['time_before_sec'] < 10)]
     # timeResets_filtered = timeResets.loc[(timeResets['time_before_sec'] < 10)]
     # # ax = sns.distplot(timeUndos_filtered['time_before_sec'])

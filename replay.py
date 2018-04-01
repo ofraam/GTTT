@@ -756,15 +756,33 @@ def check_participant_answer(userid):
         return 'wrong'
 
 
-def get_scores(score_matrix, row, col):
+def get_scores(score_matrix, row, col, prob_matrix):
     top_score = -10000
     second_score = -10000
     chosen_score = score_matrix[row][col]
+    move_prob = copy.deepcopy(score_matrix)
     all_scores = []
+    sum_scores = 0.0
+    counter = 0.0
+    scores = np.matrix(score_matrix)
+
     for r in range(len(score_matrix)):
         for c in range(len(score_matrix[r])):
             if (score_matrix[r][c] != -0.00001) & (score_matrix[r][c] != -0.00002):
                 all_scores.append(score_matrix[r][c])
+                move_prob[r][c] = (((score_matrix[r][c]-scores.min())*(100))/(scores.max()-scores.min()))
+                sum_scores += move_prob[r][c]
+                counter += 1.0
+
+
+    for r in range(len(score_matrix)):
+        for c in range(len(score_matrix[r])):
+            if (move_prob[r][c] != -0.00001) & (move_prob[r][c] != -0.00002):
+                if sum_scores!=0:
+                    move_prob[r][c] = move_prob[r][c]/sum_scores
+
+                else:
+                    move_prob[r][c] = 1.0/counter
 
     sorted_scores = sorted(all_scores, reverse=True)
     if len(sorted_scores) == 0:
@@ -776,10 +794,10 @@ def get_scores(score_matrix, row, col):
             if i == len(sorted_scores):
                 break
 
-        return (chosen_score, i, sorted_scores[0], sorted_scores[1], len(sorted_scores))
+        return (chosen_score, i, sorted_scores[0], sorted_scores[1], len(sorted_scores), move_prob[row][col])
 
     else:
-        return (chosen_score, i, sorted_scores[0], sorted_scores[0], len(sorted_scores))
+        return (chosen_score, i, sorted_scores[0], sorted_scores[0], len(sorted_scores), move_prob[row][col])
 
 
 
@@ -836,11 +854,13 @@ def moves_stats(output_file):
             prev_click_time = None
             prev_action = None
             initial_time = None
-            prev_x_score = None
+            prev_x_score = 0
             prev_o_score = None
-            delta_x_score = None
+            delta_x_score = 0
             delta_o_score = None
             prev_player = None
+            path_prob = 1.0
+            path_number = 0
             i = 0
             for row in log_reader:
                 # print i
@@ -864,11 +884,13 @@ def moves_stats(output_file):
                     move_stack = []
                     curr_user = row['userid']
                     initial_time = None
-                    prev_x_score = None
+                    prev_x_score = 0
                     prev_o_score = None
-                    delta_x_score = None
+                    delta_x_score = 0
                     delta_o_score = None
                     prev_player = None
+                    path_prob = 1.0
+                    path_number = 0
 
                     curr_move_matrix = copy.deepcopy(initial_board)
 
@@ -882,11 +904,21 @@ def moves_stats(output_file):
                     if player == 2:
                         player_type = 'O'
 
-
+                    if len(curr_path) == 0:
+                        path_number += 1
                     # scores computation
 
                     scores = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
-                    scores_data = get_scores(scores, rowPos, colPos)
+                    probs = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True, lamb=None)
+                    scores_data = get_scores(scores, rowPos, colPos, probs)
+                    move_prob = scores_data[5]
+                    # print board_name
+                    if move_prob == 0 :
+                        move_prob += 0.0001
+                    # if abs(move_prob) > 1:
+                    #     print 'what'
+
+                    path_prob = move_prob*path_prob
 
                     delta_score = ""
                     if player == 1:
@@ -896,10 +928,14 @@ def moves_stats(output_file):
                         prev_x_score = scores_data[0]
 
                     elif player == 2:
-                        if prev_o_score != None:
-                            delta_o_score = scores_data[0] - prev_o_score
-                            delta_score = delta_o_score
-                        prev_o_score = scores_data[0]
+                        if prev_x_score != None:
+                            delta_x_score = (-1*scores_data[0]) - prev_x_score
+                            delta_score = delta_x_score
+                            prev_x_score = -1*scores_data[0]
+                        # if prev_o_score != None:
+                        #     delta_o_score = scores_data[0] - prev_o_score
+                        #     delta_score = delta_o_score
+                        # prev_o_score = scores_data[0]
                     # print rowPos
                     # print colPos
                     # print move_matrix[rowPos][colPos]
@@ -958,6 +994,9 @@ def moves_stats(output_file):
                     curr_data['move_number'] = move_number
                     curr_data['move_number_in_path'] = len(curr_path)
                     curr_data['path'] = curr_path[:-1]
+                    curr_data['move_prob'] = move_prob
+                    curr_data['path_prob'] = path_prob
+                    curr_data['path_number'] = path_number
                     results_table.append(copy.deepcopy(curr_data))
 
                     move_number += 1
@@ -988,7 +1027,7 @@ def moves_stats(output_file):
                     curr_data['delta_score'] = delta_x_score
 
                     curr_data['solved'] = participant_answer
-                    curr_data['player'] = ""
+                    curr_data['player'] = prev_player
                     curr_data['position'] = ""
                     curr_data['time'] = row['time']
 
@@ -1001,7 +1040,10 @@ def moves_stats(output_file):
                     curr_data['move_number'] = ""
                     curr_data['move_number_in_path'] = len(curr_path)
                     curr_data['board_state'] = copy.deepcopy(curr_move_matrix)
-                    curr_data['path'] = curr_path[:-1]
+                    curr_data['path'] = curr_path
+                    curr_data['move_prob'] = move_prob
+                    curr_data['path_prob'] = path_prob
+                    curr_data['path_number'] = path_number
 
 
                     results_table.append(copy.deepcopy(curr_data))
@@ -1012,9 +1054,10 @@ def moves_stats(output_file):
                     curr_path = []
                     delta_x_score = ""
                     delta_o_score = ""
-                    prev_x_score = None
+                    prev_x_score = 0
                     prev_o_score = None
                     prev_player = None
+                    path_prob = 1.0
 
                 elif row['key'] == 'undo':
                     if len(move_stack) > 0:
@@ -1039,7 +1082,7 @@ def moves_stats(output_file):
                         curr_data['delta_score'] = delta_x_score
 
                         curr_data['solved'] = participant_answer
-                        curr_data['player'] = ""
+                        curr_data['player'] = prev_player
                         curr_data['position'] = str(undo_move[0]) +'_' +str(undo_move[1])
                         curr_data['time'] = row['time']
 
@@ -1052,13 +1095,17 @@ def moves_stats(output_file):
                         curr_data['move_number'] = ""
                         curr_data['move_number_in_path'] = len(curr_path)
                         curr_data['board_state'] = copy.deepcopy(curr_move_matrix)
-                        curr_data['path'] = curr_path[:-1]
-
+                        curr_data['path'] = curr_path
+                        curr_data['move_prob'] = move_prob
+                        curr_data['path_prob'] = path_prob
+                        curr_data['path_number'] = path_number
                         results_table.append(copy.deepcopy(curr_data))
 
                         curr_move_matrix[undo_move[0]][undo_move[1]] = 0
 
                         curr_path = curr_path[:-1]
+
+                        path_prob = path_prob/move_prob
                     else:
                         print 'problem undo'
 
@@ -1069,7 +1116,7 @@ def moves_stats(output_file):
                         prev_player = None
                         delta_x_score = ""
                         delta_o_score = ""
-                        prev_x_score = None
+                        prev_x_score = 0
                         prev_o_score = None
                     elif prev_player == 1:
                         prev_player = 2
@@ -1081,6 +1128,7 @@ def moves_stats(output_file):
                         prev_o_score = None
                 # else:
                 #     prev_time = row['time']
+
                 elif row['key'] == 'start':
                     prev_time = row['time']
                     initial_time = int(prev_row['time'])
@@ -1088,7 +1136,7 @@ def moves_stats(output_file):
                 prev_row = copy.deepcopy(row)
     dataFile = open(output_file, 'wb')
     fieldnames = ['userid','board_name','board_size','board_type','condition','solved', 'action','time','time_rel',
-                  'player','score_move','move_ranking','top_possible_score', 'second_possible_score', 'num_possible_moves','delta_score','path','board_state',
+                  'player','score_move','move_ranking','top_possible_score', 'second_possible_score', 'num_possible_moves','delta_score','path','move_prob', 'path_prob', 'path_number','board_state',
                   'position', 'time_from_action','time_from_click','prev_action','move_number','move_number_in_path','first_move_in_path','time_prev_action']
     dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
     dataWriter.writeheader()
@@ -2157,7 +2205,7 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/actionsLogDelta_blocking_moveStates_2603.csv')
+    moves_stats('stats/actionsLogDelta_blocking_moveProbsDeltaScore.csv')
     # explore_exploit('stats/exploreExploitTimesPathLength2603.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()

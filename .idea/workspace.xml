@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27e7977-f565-4ab6-8925-e8910730b8bd" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19 - Copy - Copy.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19 - Copy - Copy.csv" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19.csv" afterPath="$PROJECT_DIR$/logs/6_hard_full_dec19.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19.csv" afterPath="$PROJECT_DIR$/logs/6_hard_pruned_dec19.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/replay.py" afterPath="$PROJECT_DIR$/replay.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/dynamics.csv" afterPath="$PROJECT_DIR$/stats/dynamics.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats_analyses.py" afterPath="$PROJECT_DIR$/stats_analyses.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -32,9 +27,9 @@
     <SUITE FILE_PATH="coverage/GTTT$Unittest_TicTacToeTest_test_basic_game_play.coverage" NAME="Unittest TicTacToeTest.test_basic_game_play Coverage Results" MODIFIED="1490667105400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_computational_model.coverage" NAME="Unittests in computational_model Coverage Results" MODIFIED="1515839066274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gen_winning_paths.coverage" NAME="gen_winning_paths Coverage Results" MODIFIED="1494872363873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$stats_analyses.coverage" NAME="stats_analyses Coverage Results" MODIFIED="1522249204960" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$stats_analyses.coverage" NAME="stats_analyses Coverage Results" MODIFIED="1522587534993" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$board_mcts.coverage" NAME="board_mcts Coverage Results" MODIFIED="1517489416335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$replay.coverage" NAME="replay Coverage Results" MODIFIED="1522153205983" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$replay.coverage" NAME="replay Coverage Results" MODIFIED="1522582955476" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -55,8 +50,8 @@
       <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.103448">
-              <caret line="2156" column="35" selection-start-line="2156" selection-start-column="28" selection-end-line="2156" selection-end-column="35" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="156" column="42" selection-start-line="156" selection-start-column="42" selection-end-line="156" selection-end-column="42" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -67,8 +62,8 @@
       <file leaf-file-name="replay.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/replay.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.103448">
-              <caret line="1415" column="30" selection-start-line="1415" selection-start-column="30" selection-end-line="1415" selection-end-column="47" />
+            <state vertical-scroll-proportion="-16.48276">
+              <caret line="1079" column="45" selection-start-line="1079" selection-start-column="45" selection-end-line="1079" selection-end-column="45" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -79,21 +74,11 @@
       <file leaf-file-name="stats_analyses.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/stats_analyses.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.65457416">
-              <caret line="339" column="0" selection-start-line="339" selection-start-column="0" selection-end-line="339" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.51121074">
+              <caret line="696" column="69" selection-start-line="696" selection-start-column="69" selection-end-line="696" selection-end-column="69" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="generic.py" pinned="false" current-in-tab="false">
-        <entry file="file://C:/Anaconda2/Lib/site-packages/pandas/core/generic.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="1312" column="0" selection-start-line="1312" selection-start-column="0" selection-end-line="1312" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -195,8 +180,8 @@
         <option value="$PROJECT_DIR$/computational_model.py" />
         <option value="$PROJECT_DIR$/ab_config1.json" />
         <option value="$PROJECT_DIR$/board.py" />
-        <option value="$PROJECT_DIR$/replay.py" />
         <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/replay.py" />
         <option value="$PROJECT_DIR$/stats_analyses.py" />
       </list>
     </option>
@@ -237,7 +222,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -287,6 +271,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -607,8 +592,8 @@
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.stats_analyses" />
-        <item index="1" class="java.lang.String" itemvalue="Python.model" />
-        <item index="2" class="java.lang.String" itemvalue="Python.replay" />
+        <item index="1" class="java.lang.String" itemvalue="Python.replay" />
+        <item index="2" class="java.lang.String" itemvalue="Python.model" />
         <item index="3" class="java.lang.String" itemvalue="Python.computational_model" />
         <item index="4" class="java.lang.String" itemvalue="Python.board_mcts" />
       </list>
@@ -648,13 +633,13 @@
     <frame x="1358" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15351813" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15671642" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32883817" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28319502" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2476684" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24946696" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
@@ -712,12 +697,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2071</line>
+          <line>2119</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2067</line>
+          <line>2115</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -747,17 +732,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2008</line>
+          <line>2056</line>
           <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2017</line>
+          <line>2065</line>
           <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2087</line>
+          <line>2135</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -767,7 +752,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2119</line>
+          <line>2167</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -782,7 +767,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1919</line>
+          <line>1967</line>
           <option name="timeStamp" value="59" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -797,7 +782,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2246</line>
+          <line>2249</line>
           <option name="timeStamp" value="168" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -822,12 +807,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2207</line>
+          <line>2210</line>
           <option name="timeStamp" value="272" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2299</line>
+          <line>2302</line>
           <option name="timeStamp" value="355" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -837,7 +822,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2568</line>
+          <line>2571</line>
           <option name="timeStamp" value="415" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -862,7 +847,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>1093</line>
+          <line>1099</line>
           <option name="timeStamp" value="509" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -902,37 +887,37 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2642</line>
+          <line>2645</line>
           <option name="timeStamp" value="533" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2598</line>
+          <line>2601</line>
           <option name="timeStamp" value="544" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2637</line>
+          <line>2640</line>
           <option name="timeStamp" value="549" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2682</line>
+          <line>2685</line>
           <option name="timeStamp" value="551" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2692</line>
+          <line>2695</line>
           <option name="timeStamp" value="552" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2363</line>
+          <line>2366</line>
           <option name="timeStamp" value="553" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>987</line>
+          <line>993</line>
           <option name="timeStamp" value="554" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -942,27 +927,27 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1610</line>
+          <line>1658</line>
           <option name="timeStamp" value="557" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2755</line>
+          <line>2758</line>
           <option name="timeStamp" value="559" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2720</line>
+          <line>2723</line>
           <option name="timeStamp" value="560" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2739</line>
+          <line>2742</line>
           <option name="timeStamp" value="561" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2801</line>
+          <line>2804</line>
           <option name="timeStamp" value="562" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -977,27 +962,27 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2861</line>
+          <line>2864</line>
           <option name="timeStamp" value="569" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2814</line>
+          <line>2817</line>
           <option name="timeStamp" value="570" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2820</line>
+          <line>2823</line>
           <option name="timeStamp" value="571" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>910</line>
+          <line>916</line>
           <option name="timeStamp" value="572" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>766</line>
+          <line>772</line>
           <option name="timeStamp" value="577" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1007,7 +992,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>723</line>
+          <line>729</line>
           <option name="timeStamp" value="622" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1042,26 +1027,61 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>2925</line>
+          <line>2928</line>
           <option name="timeStamp" value="633" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>690</line>
+          <line>696</line>
           <option name="timeStamp" value="634" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>639</line>
+          <line>640</line>
           <option name="timeStamp" value="637" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/stats_analyses.py</url>
-          <line>641</line>
+          <line>642</line>
           <option name="timeStamp" value="638" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/stats_analyses.py</url>
+          <line>652</line>
+          <option name="timeStamp" value="639" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/stats_analyses.py</url>
+          <line>669</line>
+          <option name="timeStamp" value="640" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/stats_analyses.py</url>
+          <line>668</line>
+          <option name="timeStamp" value="641" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>2080</line>
+          <option name="timeStamp" value="642" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/replay.py</url>
+          <line>915</line>
+          <option name="timeStamp" value="647" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/replay.py</url>
+          <line>786</line>
+          <option name="timeStamp" value="648" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/replay.py</url>
+          <line>773</line>
+          <option name="timeStamp" value="649" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="639" />
+      <option name="time" value="650" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
@@ -1081,6 +1101,16 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/stats_analyses.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="487" column="33" selection-start-line="487" selection-start-column="29" selection-end-line="487" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/data_matrices/cogsci/model_config_opp_non-linear_interaction.json">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.8661654">
@@ -1324,7 +1354,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="7" column="1" selection-start-line="7" selection-start-column="1" selection-end-line="7" selection-end-column="1" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1332,7 +1361,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="327" column="0" selection-start-line="327" selection-start-column="0" selection-end-line="327" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1347,7 +1375,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1355,7 +1382,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1363,7 +1389,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="5" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="5" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1380,7 +1405,7 @@
         <state vertical-scroll-proportion="-8.103448">
           <caret line="672" column="41" selection-start-line="672" selection-start-column="39" selection-end-line="672" selection-end-column="41" />
           <folding>
-            <element signature="e#27#44#0" expanded="true" />
+            <element signature="e#27#44#0" expanded="false" />
             <marker date="1517513086718" expanded="true" signature="14688:14773" placeholder="..." />
           </folding>
         </state>
@@ -1390,7 +1415,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="357" column="0" selection-start-line="357" selection-start-column="0" selection-end-line="357" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1398,7 +1422,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="1389" column="0" selection-start-line="1389" selection-start-column="0" selection-end-line="1389" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1406,7 +1429,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="717" column="0" selection-start-line="717" selection-start-column="0" selection-end-line="717" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1414,7 +1436,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="2406" column="0" selection-start-line="2406" selection-start-column="0" selection-end-line="2406" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1422,14 +1443,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Anaconda2/Lib/site-packages/pandas/core/generic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="1312" column="0" selection-start-line="1312" selection-start-column="0" selection-end-line="1312" selection-end-column="0" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.103448">
-          <caret line="2156" column="35" selection-start-line="2156" selection-start-column="28" selection-end-line="2156" selection-end-column="35" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="156" column="42" selection-start-line="156" selection-start-column="42" selection-end-line="156" selection-end-column="42" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -1438,26 +1465,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/replay.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.103448">
-          <caret line="1415" column="30" selection-start-line="1415" selection-start-column="30" selection-end-line="1415" selection-end-column="47" />
+        <state vertical-scroll-proportion="-16.48276">
+          <caret line="1079" column="45" selection-start-line="1079" selection-start-column="45" selection-end-line="1079" selection-end-column="45" />
           <folding>
             <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/Anaconda2/Lib/site-packages/pandas/core/generic.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1312" column="0" selection-start-line="1312" selection-start-column="0" selection-end-line="1312" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stats_analyses.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.65457416">
-          <caret line="339" column="0" selection-start-line="339" selection-start-column="0" selection-end-line="339" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.51121074">
+          <caret line="696" column="69" selection-start-line="696" selection-start-column="69" selection-end-line="696" selection-end-column="69" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
