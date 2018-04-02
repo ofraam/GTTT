@@ -18,6 +18,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
 from replay import *
 # import Tkinter
+import ast
 
 
 # these are the files with user data foeach of the board
@@ -210,6 +211,26 @@ def probs_clicks(dynamics):
     write_matrices_to_file(data_matrics, 'data_matrices/cogsci/first_pruned.json')
 
 
+def fit_heuristic_user(transitions,dynamics):
+    for userid in dynamics['userid'].unique():
+        user_data = dynamics.loc[(dynamics['userid'] == userid) & (dynamics['action'] == 'click')]
+
+        paths = []
+        curr_path = []
+        for index, row in user_data.iterrows():
+            move = row['position'].split('_')
+            row_pos = move[0]
+            col_pos = move[1]
+            board_state = row['board_state']
+            state = np.array(ast.literal_eval(board_state))
+            path_data = np.array(ast.literal_eval(row['path']))
+            print path_data
+
+
+
+
+
+
 if __name__== "__main__":
     # get_user_stats()
     # print 1/0
@@ -222,7 +243,13 @@ if __name__== "__main__":
     distances = pd.read_csv("stats/distanceFirstMoves.csv")
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
-    dynamics = pd.read_csv("stats/dynamics.csv")
+    # dynamics = pd.read_csv("stats/dynamics.csv")
+    dynamics = pd.read_csv("stats/actionsLogDelta_blocking_moveProbsDeltaScore100potential.csv")
+    transitions = pd.read_csv("stats/transitions_6_hard_full.csv", dtype={'board_state':np.ndarray})
+
+    fit_heuristic_user(transitions,dynamics)
+    print 1/0
+
     states = pd.read_csv("stats/states.csv")
     # dynamics = pd.read_csv("stats/dynamicsFirstMoves1.csv")
     # compare_start_move(dynamics)
@@ -685,20 +712,27 @@ if __name__== "__main__":
     #--------- reset and undo distributions-----------
 
     # ax = sns.distplot(timeResets['time_before_sec'])
-    resetsDelta = resetsDelta.loc[resetsDelta['action'] == 'reset']
-    # delta_filtered = resetsDelta.loc[(resetsDelta['delta_score'] > -9000) & (resetsDelta['delta_score'] < 9000)]
-    # delta_filtered = resetsDelta.loc[(resetsDelta['deltaScoreByScore'] < 20) & (resetsDelta['deltaScoreByScore'] > -20)]
+    # resetsDelta = resetsDelta.loc[resetsDelta['action'] == 'reset']
+    # resetsDelta = pd.read_csv('stats/resetsPotential.csv')
+    # delta_filtered = dynamics.loc[(dynamics['score_curr_move'] > -100) & (dynamics['score_curr_move'] < 100)]
+    delta_filtered = dynamics.loc[(dynamics['action'] == 'reset') & (dynamics['move_number_in_path']>5)]
+    # delta_filtered = dynamics.loc[(dynamics['move_number_in_path']>4) & (dynamics['board_name']=='6_hard_full')]
+    # delta_filtered = dynamics.loc[(dynamics['delta_score']>-100) & (dynamics['delta_score']<100) & (dynamics['board_name']=='6_hard_full')]
+    # delta_filtered = dynamics.loc[(dynamics['move_number_in_path']<11) &(dynamics['score_move']>-100) & (dynamics['score_move']<100) ]
+    # delta_filtered = dynamics.loc[ (dynamics['board_name']=='6_hard_full')]
     #
-    # # ax = sns.distplot(delta_filtered['delta_score'])
-    #
-    g = sns.FacetGrid(resetsDelta, row="condition",  legend_out=False)
-    # g = g.map(sns.distplot, "delta_score")
-    bins = np.linspace(-10,10,num=20)
-    g.map(plt.hist, "score_move", color="steelblue",  bins=bins,lw=0)
-    # g.map(plt.hist, "deltaScoreByScore", color="steelblue",  lw=0)
+    ax = sns.distplot(delta_filtered['potential_score'])
 
+    # g = sns.FacetGrid(delta_filtered, row="action",  legend_out=False)
+    # g = g.map(sns.distplot, "score_move_x")
+    # bins = np.linspace(-20,20,num=100)
+    # g.map(plt.hist, "score_move", color="steelblue",  bins=bins,lw=0)
+    # g.map(plt.hist, "score_move", color="steelblue",  lw=0)
+    # g.map(sns.regplot,"move_number_in_path", "delta_score");
+    # # g.map(plt.hist, "deltaScoreByScore", color="steelblue",  lw=0)
+    # ax = sns.regplot(x="move_number_in_path",y= "potential_score", data=delta_filtered)
     # ax = g.ax_joint
-    # ax.set_xscale('log')
+    # ax.set_yscale('symlog')
     # # g.set(yscale="symlog")
     plt.show()
     # timeUndos_filtered = timeUndos.loc[(timeUndos['time_before_sec'] < 10)]

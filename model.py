@@ -41,6 +41,7 @@ INFINITY_O = 10
 IMMEDIATE_THREAT_SCORE = 20
 
 BOARDS_MINUS_1 =[]
+WIN_SCORE = 100
 
 '''
 computes the density score for a cell
@@ -143,7 +144,7 @@ computes the density score for all cells based on neighbors
 @neighborhood_size: how far to look for neighbors
 @lamb: this is what I used before for the quantal response, you can ignore it
 '''
-def compute_scores_density(normalized=False, neighborhood_size=1, lamb=1):
+def compute_scores_density(normalized=False, neighborhood_size=1, lamb=1, player='X'):
     data_matrices = {}
     for g in range(len(LOGFILE)):
         board_matrix = copy.deepcopy(START_POSITION[g])
@@ -165,7 +166,7 @@ def compute_scores_density(normalized=False, neighborhood_size=1, lamb=1):
         for r in range(len(board_matrix)):
             for c in range(len(board_matrix[r])):
                 if board_matrix[r][c] == 0:  # only check if free
-                    square_score = compute_density(r, c, board_matrix, neighborhood_size)  # check neighborhood
+                    square_score = compute_density(r, c, board_matrix, neighborhood_size, player=player)  # check neighborhood
                     score_matrix[r][c] = square_score
                     sum_scores += square_score
                     sum_scores_exp += math.pow(math.e,lamb*square_score)
@@ -696,7 +697,7 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
         p1 = open_paths_data[i]
 
         if streak_size == p1[0]:
-            score = 10000
+            score = WIN_SCORE
         else:
             score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
         if interaction:
@@ -707,7 +708,7 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
                         top = 0.0 +p1[0]*p2[0]
                         bottom = ((streak_size-1)*(streak_size-1))-(p1[0]*p2[0])
                         if bottom == 0:
-                            score = 10000
+                            score = WIN_SCORE
                         else:
                             score += math.pow(top/bottom, exp)
 
@@ -872,7 +873,7 @@ def compute_open_paths_data_interaction_new(row, col, board, exp=1, player = 'X'
         p1 = open_paths_data[i]
 
         if streak_size == p1[0]:
-            score = 10000
+            score = WIN_SCORE
         else:
             score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
         if interaction:
@@ -883,7 +884,7 @@ def compute_open_paths_data_interaction_new(row, col, board, exp=1, player = 'X'
                         top = 0.0 +p1[0]*p2[0]
                         bottom = ((streak_size-1)*(streak_size-1))-(p1[0]*p2[0])
                         if bottom == 0:
-                            score = 10000
+                            score = WIN_SCORE
                         else:
                             score += math.pow(top/bottom, exp)
 
@@ -1909,7 +1910,7 @@ the @exp parameter creates the non-linearity (i.e., 2 --> squared)
 @integrate says whether to combine density and path scores (done if = True), or just use path score after the initial filtering (done if = False)
 '''
 def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, exp=1, neighborhood_size=1, density = 'reg', lamb=None, sig=3,
-                          threshold=0.2, o_weight=0.0, integrate = False, interaction = True, dominance = False, block = False):
+                          threshold=0.2, o_weight=0.0, integrate = False, interaction = True, dominance = False, block = False, only_density = False):
     data_matrices = {}
     board_matrix = copy.deepcopy(board_mat)
     for i in range(len(board_matrix)):
@@ -1947,6 +1948,27 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 # if lamb!=None:
                 #     sum_scores_exp += math.pow(math.e,lamb*square_score)
 
+    if only_density:
+        for r in range(0,len(density_score_matrix)):
+            for j in range(0,len(density_score_matrix[r])):
+                if (density_score_matrix[r][j]=='X'):
+                    density_score_matrix[r][j] = -0.00001
+                elif (density_score_matrix[r][j]=='O'):
+                    density_score_matrix[r][j] = -0.00002
+        if normalized:
+            for r in range(len(density_score_matrix)):
+                for c in range(len(density_score_matrix[r])):
+                    if (density_score_matrix[r][c]!=-0.00001) & (density_score_matrix[r][c]!=-0.00002):
+                    # if (score_matrix[r][c]>0):
+                        if lamb is None:
+                            if (sum_scores == 0):
+                                density_score_matrix[r][c] = 0
+                            else:
+                                # print density_score_matrix[r][c]
+                                density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores
+                        else:
+                            density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores_exp
+        return density_score_matrix
     # compute maximal density score for filtering
     max_density_score = -1000000
     for r in range(len(density_score_matrix)):
@@ -1956,6 +1978,8 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores
                 if density_score_matrix[r][c] > max_density_score:
                     max_density_score = density_score_matrix[r][c]
+                # if density_score_matrix[r][c] > max_density_score:
+                #     max_density_score = density_score_matrix[r][c]
                 # score_matrix[r][c] = (math.pow(math.e, lamb*score_matrix[r][c]))/sum_scores_exp
 
     # run path score on remaining squares
@@ -2004,8 +2028,8 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 # if x_paths[2] == (streak_size-1):
                 #     square_score_o =0
                 square_score = square_score_x + square_score_o
-                if square_score > 10000:
-                    square_score = 10000
+                if square_score > WIN_SCORE:
+                    square_score = WIN_SCORE
                 # if player == 'O':
                 #     square_score = -1*square_score
                 if integrate:
@@ -2033,7 +2057,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
     if len(winning_moves) > 0:
         for move in winning_moves:
             move_row, move_col = convert_position(move, len(board_matrix))
-            score_matrix[move_row][move_col] = 10000
+            score_matrix[move_row][move_col] = WIN_SCORE
 
     else:
         other_player = 'O'
@@ -2044,14 +2068,14 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
             for row in range(len(board_matrix)):
                 for col in range(len(board_matrix[row])):
                     if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
-                        score_matrix[row][col] = -10000
+                        score_matrix[row][col] = -1*WIN_SCORE
         elif len(winning_moves_opp) == 1:
             move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
             for row in range(len(board_matrix)):
                 for col in range(len(board_matrix[row])):
                     if (move_row != row) | (move_col != col):
                         if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
-                            score_matrix[row][col] = -10000
+                            score_matrix[row][col] = -1*WIN_SCORE
 
     if dominance:
         score_matrix = compute_square_scores_dominance(board_matrix, score_matrix)
@@ -2942,7 +2966,7 @@ if __name__ == "__main__":
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_non-linear.json', threshold=0.2)
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_non-linear_interaction.json', threshold=0.2)
     # compute_square_scores_layers_from_matrix('data_matrices/cogsci/model_density_nbr=2.json', 'data_matrices/cogsci/model_config_opp_linear.json', threshold=0.2)
-    # compute_scores_density(normalized=True,neighborhood_size=2)
+    compute_scores_density(normalized=True,neighborhood_size=2)
     # compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.0, integrate=False, interaction=True, dominance=False, block=False)
     # compute_scores_layers(normalized=True, exp=2, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=True)
     # compute_scores_layers(normalized=True, exp=1, neighborhood_size=2, o_weight=0.5, integrate=False, interaction=True, dominance=False, block=False)
