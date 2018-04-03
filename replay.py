@@ -835,6 +835,12 @@ def transition_probs(output_file):
 
     first_moves_data_matrices = {}
     results_table = []
+    scores_blocking = []
+    scores_interaction = []
+    scores_density = []
+    board_states = []
+    boards = []
+    player_list = []
     for g in range(len(LOGFILE)):
         # print g
         initial_board = copy.deepcopy(START_POSITION[g])
@@ -863,20 +869,30 @@ def transition_probs(output_file):
             board_name=board_name[:-4]
             board_name = board_name[5:-6]
 
+            scores_block = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+            scores_int = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+            scores_dens = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
+            probs_block = get_prob_matrix(scores_block)
+            probs_int = get_prob_matrix(scores_int)
+            probs_dens = get_prob_matrix(scores_dens)
+            scores_blocking.append(str(copy.deepcopy(probs_block)))
+            scores_interaction.append(str(copy.deepcopy(probs_int)))
+            scores_density.append(str(copy.deepcopy(probs_dens)))
+            board_states.append(str(copy.deepcopy(curr_move_matrix)))
+            player_list.append(1)
+            boards.append(board_name)
+
             log_reader = csv.DictReader(csvfile)
             move_number = 1
             move_stack = []
             curr_path = []
             curr_user = ''
 
-            scores_blocking = []
-            scores_interaction = []
-            scores_density = []
-            board_states = []
-            player_list = []
+
 
             path_number = 0
             i = 0
+            counter = 0
             for row in log_reader:
                 # print i
                 # i += 1
@@ -899,6 +915,7 @@ def transition_probs(output_file):
                     curr_move_matrix = copy.deepcopy(initial_board)
 
                 elif row['key'] == 'clickPos':
+                    counter+=1
                     rowPos = int(row['value'][0])
                     colPos = int(row['value'][2])
                     move_stack.append((rowPos, colPos))
@@ -912,8 +929,13 @@ def transition_probs(output_file):
                         path_number += 1
                     # scores computation
                     # curr_data['board_state'] = copy.deepcopy(curr_move_matrix)
-                    if (curr_move_matrix[rowPos][colPos]!=1) & (curr_move_matrix[rowPos][colPos]!=2):
-                        curr_move_matrix[rowPos][colPos] = player
+
+
+
+                    if counter==15:
+                        print '20'
+                    if (str(curr_move_matrix) == '[[0, 2, 0, 0, 1, 0], [2, 2, 1, 2, 0, 0], [0, 1, 2, 0, 0, 0], [0, 1, 1, 2, 0, 0], [0, 1, 1, 1, 0, 0], [0, 2, 0, 0, 2, 0]]'):
+                        print 'state'
 
                     if str(curr_move_matrix) not in board_states:
                         scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
@@ -927,8 +949,56 @@ def transition_probs(output_file):
                         scores_density.append(str(copy.deepcopy(probs_dens)))
                         board_states.append(str(copy.deepcopy(curr_move_matrix)))
                         player_list.append(player)
+                        boards.append(board_name)
 
 
+                    if (curr_move_matrix[rowPos][colPos]!=1) & (curr_move_matrix[rowPos][colPos]!=2):
+                        curr_move_matrix[rowPos][colPos] = player
+
+                    # if str(curr_move_matrix) not in board_states:
+                    #     scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+                    #     scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+                    #     scores_dens = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
+                    #     probs_block = get_prob_matrix(scores_block)
+                    #     probs_int = get_prob_matrix(scores_int)
+                    #     probs_dens = get_prob_matrix(scores_dens)
+                    #     scores_blocking.append(str(copy.deepcopy(probs_block)))
+                    #     scores_interaction.append(str(copy.deepcopy(probs_int)))
+                    #     scores_density.append(str(copy.deepcopy(probs_dens)))
+                    #     board_states.append(str(copy.deepcopy(curr_move_matrix)))
+                    #     player_list.append(player)
+                    #     boards.append(board_name)
+
+                elif row['key'] == 'reset':
+                    curr_move_matrix = copy.deepcopy(initial_board)
+                    curr_path = []
+                    move_stack = []
+                #     if str(curr_move_matrix) not in board_states:
+                #         scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+                #         scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+                #         scores_dens = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
+                #         probs_block = get_prob_matrix(scores_block)
+                #         probs_int = get_prob_matrix(scores_int)
+                #         probs_dens = get_prob_matrix(scores_dens)
+                #         scores_blocking.append(str(copy.deepcopy(probs_block)))
+                #         scores_interaction.append(str(copy.deepcopy(probs_int)))
+                #         scores_density.append(str(copy.deepcopy(probs_dens)))
+                #         board_states.append(str(copy.deepcopy(curr_move_matrix)))
+                #         player_list.append(player)
+                #         boards.append(board_name)
+                #
+                elif row['key'] == 'undo':
+                    if len(move_stack) > 0:
+                        undo_move = move_stack.pop()
+                        curr_move_matrix[undo_move[0]][undo_move[1]] = 0
+                        curr_path = curr_path[:-1]
+
+                    elif prev_player == 1:
+                        prev_player = 2
+                        # delta_x_score = ""
+                        prev_x_score = None
+                    else:
+                        prev_player = 1
 
 
                 elif row['key'] == 'start':
@@ -939,13 +1009,14 @@ def transition_probs(output_file):
 
 
         # dataFile = open(board_name+'_'+output_file, 'wb')
-        trans_dict = {'player':player_list,'board_state':board_states,'probs_blocking':scores_blocking,'probs_interaction':scores_interaction,'probs_density':scores_density}
+    print boards
+    trans_dict = {'board_name':boards, 'player':player_list,'board_state':board_states,'probs_blocking':scores_blocking,'probs_interaction':scores_interaction,'probs_density':scores_density}
 
-        transitions =pd.DataFrame(trans_dict)
-        print str(len(transitions['board_state'].unique()))
+    transitions =pd.DataFrame(trans_dict)
+    print str(len(transitions['board_state'].unique()))
 
-        # plt.title("tt")
-        transitions.to_csv(output_file+'_'+board_name +'.csv')
+    # plt.title("tt")
+    transitions.to_csv(output_file +'.csv')
         # fieldnames = ['board_state','player','probs_blocking','probs_interaction','probs_density']
         # dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
         # dataWriter.writeheader()
@@ -1235,6 +1306,7 @@ def moves_stats(output_file):
                     prev_o_score = None
                     prev_player = None
                     path_prob = 1.0
+                    move_stack = []
 
                 elif row['key'] == 'undo':
                     if len(move_stack) > 0:
