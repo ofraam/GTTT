@@ -1222,7 +1222,19 @@ def moves_stats(output_file):
                     curr_data['move_prob'] = move_prob
                     curr_data['path_prob'] = path_prob
                     curr_data['path_number'] = path_number
-                    curr_data['potential_score'] = ""
+
+                    player_type = 'X'
+                    if player == 1:
+                        player_type = 'O'
+
+                    scores = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+                    probs = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True, lamb=None)
+                    scores_data = get_scores(scores, 0, 0, probs)
+                    score_x = scores_data[2]
+                    if player == 1:
+                        score_x = -1*scores_data[0]
+
+                    curr_data['potential_score'] = score_x
                     results_table.append(copy.deepcopy(curr_data))
 
                     move_number += 1
@@ -1348,7 +1360,21 @@ def moves_stats(output_file):
                         curr_data['move_prob'] = move_prob
                         curr_data['path_prob'] = path_prob
                         curr_data['path_number'] = path_number
-                        curr_data['potential_score'] = ""
+
+                        player_type = 'X'
+                        if player == 1:
+                            player_type = 'O'
+
+                        scores = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+                        probs = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True, lamb=None)
+                        scores_data = get_scores(scores, 0, 0, probs)
+                        score_x = scores_data[2]
+                        if player == 1:
+                            score_x = -1*scores_data[0]
+
+                        curr_data['potential_score'] = score_x
+
+                        # curr_data['potential_score'] = ""
                         results_table.append(copy.deepcopy(curr_data))
 
                         curr_move_matrix[undo_move[0]][undo_move[1]] = 0
@@ -2445,18 +2471,64 @@ def write_matrices_to_file(data_matrices, filename):
       json.dump(data_matrices, fp)
 
 
+def choose_move(state, player_type, states_dict):
+    player = 'X'
+    if player_type == 2:
+        player = 'O'
+    if str(state) in states_dict.keys():
+        probs_block = states_dict[str(state)]
+    else:
+        scores_block = compute_scores_layers_for_matrix(state,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+        probs_block = get_prob_matrix(scores_block)
+        states_dict[str(state)] = copy.deepcopy(probs_block)
+    rand = random.random()
+    cumm_prob = 0.0
+    for row in range(len(state)):
+        for col in range(len(state[row])):
+            if (probs_block[row][col] != -0.00001) & (probs_block[row][col] != -0.00002):
+                cumm_prob += probs_block[row][col]
+                if rand < cumm_prob:
+                    move = [row, col]
+                    return move
 
 
+
+def simulate_game(num_simulations):
+    for g in range(1):
+        # print g
+        initial_board = copy.deepcopy(START_POSITION[g])
+        states_dict = {}
+        paths = {}
+        for j in range(num_simulations):
+            curr_path = []
+            max_path_length = 12
+            curr_state = copy.deepcopy(initial_board)
+            player = 1
+            for i in range(max_path_length):
+                move = choose_move(curr_state, player, states_dict)
+                curr_path.append(copy.deepcopy(move))
+                if str(curr_path) in paths.keys():
+                    paths[str(curr_path)] = paths[str(curr_path)] + 1
+                else:
+                    paths[str(curr_path)] = 1
+                curr_state[move[0]][move[1]] = player
+                if player == 1:
+                    player = 2
+                elif player == 2:
+                    player = 1
+
+        print paths
 
 
 if __name__ == "__main__":
+    simulate_game(30)
     # heat_map_solution(normalized=True)
     # paths_stats(participants='all')
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    # moves_stats('stats/actionsLogDelta_blocking_moveProbsDeltaScore100potential.csv')
-    transition_probs('stats/transitions')
+    # moves_stats('stats/actionsLogDelta_blocking_moveProbsDeltaScore100potentialAll.csv')
+    # transition_probs('stats/transitions')
     # explore_exploit('stats/exploreExploitTimesPathLength2603.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()

@@ -389,8 +389,8 @@ if __name__== "__main__":
     dynamics = pd.read_csv("stats/actionsLogDelta_blocking_moveProbsDeltaScore100potential.csv")
     transitions = pd.read_csv("stats/transitions.csv",dtype = {'board_state':str})
 
-    fit_heuristic_user(transitions,dynamics)
-    print 1/0
+    # fit_heuristic_user(transitions,dynamics)
+    # print 1/0
 
     states = pd.read_csv("stats/states.csv")
     # dynamics = pd.read_csv("stats/dynamicsFirstMoves1.csv")
@@ -486,19 +486,20 @@ if __name__== "__main__":
     # clf = linear_model.Lasso()
     # scores = cross_val_score(clf, X, y, cv=10)
     # g = sns.FacetGrid(user_stats_exploration_filtered, col="correctness", margin_titles=True)
-    user_stats_exploration = pd.read_csv("stats/exploreExploitCombined2.csv")
-    user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
-    user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
-    # g = sns.FacetGrid(user_stats_exploration_correct, row="condition",col="typeSize", margin_titles=True)
-    # #
+    # user_stats_exploration = pd.read_csv("stats/exploreExploitCombined2.csv")
+    # # user_stats_exploration_filtered =user_stats_exploration.loc[user_stats_exploration['exploration']]
+    # # user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
+    # # user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
+    # g = sns.FacetGrid(user_stats_exploration, col="board", margin_titles=True)
+    # # # #
     # bins = np.linspace(0, 110, 20)
     # # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
     # # g.map(sns.distplot, "exploration", bins=bins)
     # test_char = "avg_first_move_score"
     # g.map(sns.regplot,"exploration", test_char);
-    # print stats.spearmanr(user_stats_exploration_correct['exploration'], user_stats_exploration_correct[test_char])
+    # # print stats.spearmanr(user_stats_exploration_6hard['exploration'], user_stats_exploration_6hard[test_char])
     # #
-    # # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration_filtered, n_boot=1000)
+    # # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration, n_boot=1000)
     # plt.show()
 
     # feature_names = ["num_moves", "solved"]
@@ -857,16 +858,17 @@ if __name__== "__main__":
     # resetsDelta = resetsDelta.loc[resetsDelta['action'] == 'reset']
     # resetsDelta = pd.read_csv('stats/resetsPotential.csv')
     # delta_filtered = dynamics.loc[(dynamics['score_curr_move'] > -100) & (dynamics['score_curr_move'] < 100)]
-    delta_filtered = dynamics.loc[(dynamics['action'] == 'reset') & (dynamics['move_number_in_path']>5)]
+    # delta_filtered = dynamics.loc[(dynamics['action'] == 'reset')]
+    delta_filtered = dynamics.loc[dynamics['move_number_in_path']==5]
     # delta_filtered = dynamics.loc[(dynamics['move_number_in_path']>4) & (dynamics['board_name']=='6_hard_full')]
     # delta_filtered = dynamics.loc[(dynamics['delta_score']>-100) & (dynamics['delta_score']<100) & (dynamics['board_name']=='6_hard_full')]
     # delta_filtered = dynamics.loc[(dynamics['move_number_in_path']<11) &(dynamics['score_move']>-100) & (dynamics['score_move']<100) ]
     # delta_filtered = dynamics.loc[ (dynamics['board_name']=='6_hard_full')]
     #
-    ax = sns.distplot(delta_filtered['potential_score'])
+    # ax = sns.distplot(delta_filtered['potential_score'])
 
-    # g = sns.FacetGrid(delta_filtered, row="action",  legend_out=False)
-    # g = g.map(sns.distplot, "score_move_x")
+    g = sns.FacetGrid(delta_filtered, row="action", legend_out=False)
+    g = g.map(sns.distplot, "score_move_x")
     # bins = np.linspace(-20,20,num=100)
     # g.map(plt.hist, "score_move", color="steelblue",  bins=bins,lw=0)
     # g.map(plt.hist, "score_move", color="steelblue",  lw=0)
