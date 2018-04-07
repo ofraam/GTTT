@@ -9,6 +9,7 @@ import math
 import json
 from model import *
 import pandas as pd
+import ast
 
 LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
 
@@ -772,7 +773,6 @@ def get_prob_matrix(score_matrix):
                 sum_scores += move_prob[r][c]
                 counter += 1.0
 
-
     for r in range(len(score_matrix)):
         for c in range(len(score_matrix[r])):
             if (move_prob[r][c] != -0.00001) & (move_prob[r][c] != -0.00002):
@@ -784,6 +784,7 @@ def get_prob_matrix(score_matrix):
 
 
     return move_prob
+
 
 def get_scores(score_matrix, row, col, prob_matrix):
     top_score = -10000
@@ -802,7 +803,6 @@ def get_scores(score_matrix, row, col, prob_matrix):
                 move_prob[r][c] = (((score_matrix[r][c]-scores.min())*(100))/(scores.max()-scores.min()))
                 sum_scores += move_prob[r][c]
                 counter += 1.0
-
 
     for r in range(len(score_matrix)):
         for c in range(len(score_matrix[r])):
@@ -1096,7 +1096,7 @@ def moves_stats(output_file):
                     participant_answer = check_participant_answer(curr_user)
 
                 if row['userid'] != curr_user:
-                    participant_answer = check_participant_answer(curr_user)
+                    # participant_answer = check_participant_answer(curr_user)
 
                     # reset all values for next user
                     prev_time = None
@@ -1108,6 +1108,7 @@ def moves_stats(output_file):
                     curr_path = []
                     move_stack = []
                     curr_user = row['userid']
+                    participant_answer = check_participant_answer(curr_user)
                     initial_time = None
                     prev_x_score = 0
                     prev_o_score = None
@@ -1129,7 +1130,7 @@ def moves_stats(output_file):
                     if player == 2:
                         player_type = 'O'
 
-                    if len(curr_path) == 0:
+                    if ((len(curr_path) == 0) | (prev_action == 'undo')):
                         path_number += 1
                     # scores computation
 
@@ -1219,6 +1220,7 @@ def moves_stats(output_file):
                     curr_data['move_number'] = move_number
                     curr_data['move_number_in_path'] = len(curr_path)
                     curr_data['path'] = curr_path[:-1]
+                    curr_data['path_after'] = curr_path
                     curr_data['move_prob'] = move_prob
                     curr_data['path_prob'] = path_prob
                     curr_data['path_number'] = path_number
@@ -1301,6 +1303,7 @@ def moves_stats(output_file):
                     curr_data['move_number_in_path'] = len(curr_path)
                     curr_data['board_state'] = copy.deepcopy(curr_move_matrix)
                     curr_data['path'] = curr_path
+                    curr_data['path_after'] = curr_path
                     curr_data['move_prob'] = move_prob
                     curr_data['path_prob'] = path_prob
                     curr_data['path_number'] = path_number
@@ -1357,6 +1360,7 @@ def moves_stats(output_file):
                         curr_data['move_number_in_path'] = len(curr_path)
                         curr_data['board_state'] = copy.deepcopy(curr_move_matrix)
                         curr_data['path'] = curr_path
+                        curr_data['path_after'] = curr_path
                         curr_data['move_prob'] = move_prob
                         curr_data['path_prob'] = path_prob
                         curr_data['path_number'] = path_number
@@ -1413,7 +1417,7 @@ def moves_stats(output_file):
     dataFile = open(output_file, 'wb')
     fieldnames = ['userid','board_name','board_size','board_type','condition','solved', 'action','time','time_rel',
                   'player','score_move','move_ranking','top_possible_score', 'second_possible_score', 'num_possible_moves','delta_score','potential_score','path','move_prob', 'path_prob', 'path_number','board_state',
-                  'position', 'time_from_action','time_from_click','prev_action','move_number','move_number_in_path','first_move_in_path','time_prev_action']
+                  'position','path_after', 'time_from_action','time_from_click','prev_action','move_number','move_number_in_path','first_move_in_path','time_prev_action']
     dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
     dataWriter.writeheader()
     for record in results_table:
@@ -2478,7 +2482,7 @@ def choose_move(state, player_type, states_dict):
     if str(state) in states_dict.keys():
         probs_block = states_dict[str(state)]
     else:
-        scores_block = compute_scores_layers_for_matrix(state,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+        scores_block = compute_scores_layers_for_matrix(state, player=player, normalized=True, o_weight=0.5, exp=2, neighborhood_size=2, block=True)
         probs_block = get_prob_matrix(scores_block)
         states_dict[str(state)] = copy.deepcopy(probs_block)
     rand = random.random()
@@ -2492,42 +2496,67 @@ def choose_move(state, player_type, states_dict):
                     return move
 
 
-
 def simulate_game(num_simulations):
-    for g in range(1):
+    paths_data = []
+    probs = []
+    boards = []
+    lengths = []
+    for g in range(len(LOGFILE)):
+    # for g in range(1):
+        board_name = LOGFILE[g]
+        board_name=board_name[:-4]
+        board_name = board_name[5:-6]
+        print board_name
+        counters = {}
         # print g
         initial_board = copy.deepcopy(START_POSITION[g])
         states_dict = {}
         paths = {}
         for j in range(num_simulations):
             curr_path = []
-            max_path_length = 12
+            max_path_length = 10
+            if 'easy' in board_name:
+                max_path_length = 8
+                # print 'easy'
             curr_state = copy.deepcopy(initial_board)
             player = 1
             for i in range(max_path_length):
                 move = choose_move(curr_state, player, states_dict)
                 curr_path.append(copy.deepcopy(move))
                 if str(curr_path) in paths.keys():
-                    paths[str(curr_path)] = paths[str(curr_path)] + 1
+                    paths[str(curr_path)] += 1.0
                 else:
-                    paths[str(curr_path)] = 1
+                    paths[str(curr_path)] = 1.0
+                if len(curr_path) in counters:
+                    counters[len(curr_path)] += 1
+                else:
+                    counters[len(curr_path)] = 1
                 curr_state[move[0]][move[1]] = player
                 if player == 1:
                     player = 2
                 elif player == 2:
                     player = 1
-
-        print paths
-
+        for path, count in paths.iteritems():
+            # print counters
+            paths_data.append(path)
+            p = np.array(ast.literal_eval(path))
+            prob_path = count/float(counters[len(p)])
+            # print len(p)
+            boards.append(board_name)
+            probs.append(prob_path)
+            lengths.append(len(p))
+    data = pd.DataFrame({'board_name':boards, 'path': paths_data, 'probability':probs, 'path_length':lengths})
+    data.to_csv('stats/paths_simulations129.csv')
 
 if __name__ == "__main__":
-    simulate_game(30)
+    simulate_game(129)
     # heat_map_solution(normalized=True)
     # paths_stats(participants='all')
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    # moves_stats('stats/actionsLogDelta_blocking_moveProbsDeltaScore100potentialAll.csv')
+    # moves_stats('stats/dynamics06042018.csv')
+    # check_participant_answer('63e5efe1')
     # transition_probs('stats/transitions')
     # explore_exploit('stats/exploreExploitTimesPathLength2603.csv')
     # seperate_log('logs/fullLogCogSci.csv')
