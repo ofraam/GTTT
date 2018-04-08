@@ -938,8 +938,8 @@ def transition_probs(output_file):
                         print 'state'
 
                     if str(curr_move_matrix) not in board_states:
-                        scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
-                        scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+                        scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0, exp=2, neighborhood_size=2, block=True)
+                        scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0, exp=2, neighborhood_size=2, block=False)
                         scores_dens = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
                         probs_block = get_prob_matrix(scores_block)
                         probs_int = get_prob_matrix(scores_int)
@@ -2482,7 +2482,10 @@ def choose_move(state, player_type, states_dict):
     if str(state) in states_dict.keys():
         probs_block = states_dict[str(state)]
     else:
-        scores_block = compute_scores_layers_for_matrix(state, player=player, normalized=True, o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+        if player_type == 1:
+            scores_block = compute_scores_layers_for_matrix(state, player=player, normalized=True, o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+        else:
+            scores_block = compute_scores_layers_for_matrix(state, player=player, normalized=True, o_weight=0.5, exp=2, neighborhood_size=2, block=True, only_density=True)
         probs_block = get_prob_matrix(scores_block)
         states_dict[str(state)] = copy.deepcopy(probs_block)
     rand = random.random()
@@ -2514,15 +2517,13 @@ def simulate_game(num_simulations):
         paths = {}
         for j in range(num_simulations):
             curr_path = []
-            max_path_length = 10
-            if 'easy' in board_name:
-                max_path_length = 8
-                # print 'easy'
+            max_path_length = MOVES_TO_WIN[g]
             curr_state = copy.deepcopy(initial_board)
             player = 1
             for i in range(max_path_length):
                 move = choose_move(curr_state, player, states_dict)
-                curr_path.append(copy.deepcopy(move))
+
+                curr_path.append(copy.deepcopy(move+[player]))
                 if str(curr_path) in paths.keys():
                     paths[str(curr_path)] += 1.0
                 else:
@@ -2546,10 +2547,10 @@ def simulate_game(num_simulations):
             probs.append(prob_path)
             lengths.append(len(p))
     data = pd.DataFrame({'board_name':boards, 'path': paths_data, 'probability':probs, 'path_length':lengths})
-    data.to_csv('stats/paths_simulations129.csv')
+    data.to_csv('stats/paths_simulations_interaction_density.csv')
 
 if __name__ == "__main__":
-    simulate_game(129)
+    simulate_game(500)
     # heat_map_solution(normalized=True)
     # paths_stats(participants='all')
     # paths_stats(participants='solvedCorrect')

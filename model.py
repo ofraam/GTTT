@@ -36,6 +36,7 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
                 [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
                   ]
+MOVES_TO_WIN = [10,8,10,8,8,6,8,6,10,8]
 
 INFINITY_O = 10
 IMMEDIATE_THREAT_SCORE = 20
@@ -2027,7 +2028,10 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                     square_score_x = INFINITY_O
                 # if x_paths[2] == (streak_size-1):
                 #     square_score_o =0
-                square_score = square_score_x + square_score_o
+                if o_weight == 0.5:
+                    square_score = square_score_x + square_score_o
+                elif o_weight== 0:
+                    square_score = square_score_x
                 if square_score > WIN_SCORE:
                     square_score = WIN_SCORE
                 # if player == 'O':

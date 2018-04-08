@@ -235,7 +235,7 @@ def fit_heuristic_user_moves(transitions,dynamics):
             curr_path = []
             counter = 0.0
             for index, row in user_data.iterrows():
-                transitions_board = transitions.loc[transitions['size_type'] == row['size_type']]
+                transitions_board = transitions.loc[transitions['sizeType'] == row['sizeType']]
 
                 move = row['position'].split('_')
                 row_pos = move[0]
@@ -293,7 +293,7 @@ def fit_heuristic_user_moves(transitions,dynamics):
             #     heuristic.append('density')
     heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int,'likelihoods_density':likelihoods_dens, 'move_number_in_path':move_numbers}
     heuristics_df = pd.DataFrame(heuristic_vals)
-    heuristics_df.to_csv('stats/heuristics_fitted_by_move.csv')
+    heuristics_df.to_csv('stats/heuristics_fitted_by_move_oWeight=0.csv')
 
 
 def fit_heuristic_user(transitions,dynamics):
@@ -496,45 +496,103 @@ def compute_path_probabilities_participants():
     probs = []
     counts = []
     paths = []
-    path_numbers = []
+    # path_numbers = []
 
     for board_name in board_names:
-        for path_number in participant_data['path_number'].unique():
-            path_data_participants = participant_data.loc[(participant_data['action'] == 'click') & (participant_data['board_name'] == board_name) & (participant_data['path_number'] == path_number)]
-            for path_length in participant_data['move_number_in_path'].unique():
-                # print path_length
+        # for path_number in participant_data['path_number'].unique():
+        # path_data_participants = participant_data.loc[(participant_data['action'] == 'click') & (participant_data['board_name'] == board_name) & (participant_data['path_number'] == path_number)]
+        path_data_participants = participant_data.loc[(participant_data['action'] == 'click') & (participant_data['board_name'] == board_name)]
+        for path_length in participant_data['move_number_in_path'].unique():
+            # print path_length
 
-                paths_counts = {}
-                num_paths = 0.0
-                paths_data = path_data_participants.loc[path_data_participants['move_number_in_path'] == path_length]
+            paths_counts = {}
+            num_paths = 0.0
+            paths_data = path_data_participants.loc[path_data_participants['move_number_in_path'] == path_length]
 
-                max_vals = path_data_participants.groupby(['userid','path_number'], as_index=False)['move_number_in_path'].max()
-                for index, row in paths_data.iterrows():
-                    max_val = max_vals.loc[(max_vals['userid'] == row['userid']) & (max_vals['path_number'] == row['path_number'])]
-                    if row['move_number_in_path'] != max_val['move_number_in_path'].iloc[0]:
-                        continue
-                    path_str = row['path_after']
+            max_vals = path_data_participants.groupby(['userid','path_number'], as_index=False)['move_number_in_path'].max()
+            for index, row in paths_data.iterrows():
+                max_val = max_vals.loc[(max_vals['userid'] == row['userid']) & (max_vals['path_number'] == row['path_number'])]
+                if row['move_number_in_path'] != max_val['move_number_in_path'].iloc[0]:
+                    continue
+                path_str = row['path_after']
 
-                    if path_str in paths_counts:
-                        paths_counts[path_str] += 1.0
-                    else:
-                        paths_counts[path_str] = 1.0
+                if path_str in paths_counts:
+                    paths_counts[path_str] += 1.0
+                else:
+                    paths_counts[path_str] = 1.0
 
-                    num_paths += 1.0
+                num_paths += 1.0
 
-                for p, count in paths_counts.iteritems():
-                    path = np.array(ast.literal_eval(p))
-                    paths.append(copy.deepcopy(path))
-                    path_lengths.append(len(path))
-                    counts.append(count)
-                    probs.append(count/num_paths)
-                    path_numbers.append(path_number)
-                    boards.append(board_name)
+            for p, count in paths_counts.iteritems():
+                path = np.array(ast.literal_eval(p))
+                paths.append(p)
+                path_lengths.append(len(path))
+                counts.append(count)
+                probs.append(count/num_paths)
+                # path_numbers.append(path_number)
+                boards.append(board_name)
 
 
-    data_dict = {'board':boards, 'path_length': path_lengths, 'path':paths, 'probability': probs, 'counts': counts, 'path_number':path_numbers}
+    # data_dict = {'board':boards, 'path_length': path_lengths, 'path':paths, 'probability': probs, 'counts': counts, 'path_number':path_numbers}
+    data_dict = {'board':boards, 'path_length': path_lengths, 'path':paths, 'probability': probs, 'counts': counts,}
+
     paths_probs_df = pd.DataFrame(data_dict)
-    paths_probs_df.to_csv('stats/participants_path_probabilities_completePaths_byPathNumber.csv')
+    paths_probs_df.to_csv('stats/participants_path_probabilities_subpaths2.csv')
+
+
+def compare_distributions_simulation_population():
+    simulation_data = pd.read_csv("stats/paths_simulations_interaction_density.csv")
+    participant_data = pd.read_csv("stats/participants_path_probabilities_subpaths2.csv")
+
+    board_names = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
+
+    boards = []
+    path_lengths = []
+    wass_dist = []
+
+    for board in board_names:
+        print board
+        simulation_data_filtered = simulation_data.loc[(simulation_data['board_name'] == board)]
+        for path_length in simulation_data_filtered['path_length'].unique():
+            print path_length
+            paths_dict = {}
+            simulation_data_board = simulation_data.loc[(simulation_data['board_name'] == board) & (simulation_data['path_length'] == path_length)]
+            participant_data_board = participant_data.loc[(participant_data['board_name'] == board) & (participant_data['path_length'] == path_length)]
+            data_size = participant_data_board['counts'].sum()
+            probs_participants = []
+            probs_sim = []
+            for index, row in participant_data_board.iterrows():
+                p = row['path']
+                if str(p) not in paths_dict.keys():
+                    paths_dict[str(p)] = 1
+                prob_participant = row['probability']
+                prob_sim = 0.0
+
+                path_sim = simulation_data_board.loc[simulation_data_board['path'] == str(p)]
+                if path_sim.shape[0] > 0:
+                    prob_sim = path_sim['probability'].iloc[0]
+                # probs_participants.append(prob_participant*data_size)
+                probs_participants.append(prob_participant)
+                probs_sim.append(prob_sim)
+                # probs_sim.append(prob_sim*data_size)
+
+            for index, row in simulation_data_board.iterrows():
+                p = row['path']
+                if str(p) not in paths_dict.keys():
+                    probs_participants.append(0.0)
+                    # probs_sim.append(row['probability']*data_size)
+                    probs_sim.append(row['probability'])
+
+            boards.append(board)
+            path_lengths.append(path_length)
+            wass_dist.append(stats.wasserstein_distance(probs_participants, probs_sim))
+            print stats.wasserstein_distance(probs_participants, probs_sim)
+
+    data_dict = {'board':boards, 'path_length': path_lengths, 'wasserstein': wass_dist}
+    paths_probs_df = pd.DataFrame(data_dict)
+    paths_probs_df.to_csv('stats/wasserstein_interactionDensityVsParticipants.csv')
+
+
 
 # def compare_distributions_simulation_population():
 #     simulation_data = pd.read_csv("stats/paths_simulations2000.csv")
@@ -581,7 +639,10 @@ def compute_path_probabilities_participants():
 if __name__== "__main__":
     # compute_path_probabilities_participants();
     # # get_user_stats()
-    # print 1/0
+    # print stats.wasserstein_distance([1,2,7], [3,1,6])
+    # print stats.wasserstein_distance([0.1,0.2,0.7], [0.3,0.1,0.6])
+    compare_distributions_simulation_population();
+    print 1/0
 
     data = pd.read_csv("stats/cogSci.csv")
     mctsData = pd.read_csv("stats/mctsRuns.csv")
@@ -593,7 +654,7 @@ if __name__== "__main__":
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     # dynamics = pd.read_csv("stats/dynamics.csv")
     dynamics = pd.read_csv("stats/dynamics06042018.csv")
-    transitions = pd.read_csv("stats/transitions.csv",dtype = {'board_state':str})
+    transitions = pd.read_csv("stats/transitions=0.csv",dtype = {'board_state':str})
 
     # fit_heuristic_user_moves(transitions,dynamics)
     # print 1/0
@@ -622,16 +683,16 @@ if __name__== "__main__":
     # dynamics_filtered = dynamics.loc[dynamics['board_name'] in ten_to_win]
     # max_vals = dynamics.groupby(['userid','path_number', 'board_name', 'sizeType','condition','moves_to_win'], as_index=False)['move_number_in_path'].max()
     max_vals = dynamics.groupby(['userid','path_number'], as_index=False)['move_number_in_path'].max()
-    resets = dynamics.loc[(dynamics['action'] == 'reset') & (dynamics['board_name'] == '6_hard_full') & (dynamics['move_number_in_path'] < 11)]
+    resets = dynamics.loc[(dynamics['action'] == 'reset')]
     # g = sns.FacetGrid(max_vals, row="sizeType", col="condition", legend_out=False)
-    g = sns.FacetGrid(resets, row="move_number_in_path", legend_out=False)
-    # g = sns.FacetGrid(max_vals, col="moves_to_win", legend_out=False)
+    # g = sns.FacetGrid(dynamics, row="move_number_in_path", legend_out=False)
+    g = sns.FacetGrid(dynamics, col="moves_to_win", legend_out=False)
     # g = g.map(sns.distplot, "move_number_in_path")
     # g = g.map(sns.distplot, "score_move_x")
-    # bins = np.linspace(0, 15, 15)
-    # g.map(plt.hist, "move_number_in_path", color="steelblue", bins=bins, lw=0)
-    bins = np.linspace(-100, 100, 200)
-    g.map(plt.hist, "score_move_x", color="steelblue", bins=bins, lw=0)
+    bins = np.linspace(0, 15, 15)
+    g.map(plt.hist, "move_number_in_path", color="steelblue", bins=bins, lw=0)
+    # bins = np.linspace(-100, 100, 200)
+    # g.map(plt.hist, "score_move_x", color="steelblue", bins=bins, lw=0)
 
     plt.show()
     print 1/0
