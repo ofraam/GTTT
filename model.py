@@ -2039,7 +2039,9 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 if integrate:
                     square_score = square_score*density_score_matrix[r][c]
                 score_matrix[r][c] = square_score
-                sum_scores += square_score
+                #TODO: remember to change if we want to:
+                if square_score > 0:
+                    sum_scores += square_score
                 if lamb!=None:
                     score_matrix[r][c] = math.pow(math.e,lamb*square_score)
                     sum_scores_exp += math.pow(math.e,lamb*square_score)
@@ -2092,12 +2094,15 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
 
 
     # heatmaps
+    sum_scores = 0.0
     for r in range(0,len(score_matrix)):
         for j in range(0,len(score_matrix[r])):
             if (score_matrix[r][j]=='X'):
                 score_matrix[r][j] = -0.00001
             elif (score_matrix[r][j]=='O'):
                 score_matrix[r][j] = -0.00002
+            elif score_matrix[r][j] > 0:
+                sum_scores += score_matrix[r][j]
 
     if normalized:
         for r in range(len(score_matrix)):
@@ -2108,10 +2113,15 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                         if (sum_scores == 0):
                             score_matrix[r][c] = 0
                         else:
-                            score_matrix[r][c] = score_matrix[r][c]/sum_scores
+                            #TODO: change if we don't want to eliminate negative scores
+                            if score_matrix[r][c] >= 0:
+                                score_matrix[r][c] = score_matrix[r][c]/sum_scores
+                            else:
+                                score_matrix[r][c] = 0
                     else:
                         score_matrix[r][c] = score_matrix[r][c]/sum_scores_exp
-
+        if (np.sum(score_matrix) < 0.99) & (np.sum(score_matrix) > 0):
+            print 'why'
 
     return score_matrix
 

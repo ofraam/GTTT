@@ -216,6 +216,8 @@ def fit_heuristic_user_moves(transitions,dynamics):
     userids = []
     likelihoods_block = []
     likelihoods_int = []
+    likelihoods_block_dens = []
+    likelihoods_int_dens = []
     likelihoods_dens = []
     heuristic = []
     boards = []
@@ -246,7 +248,8 @@ def fit_heuristic_user_moves(transitions,dynamics):
                 probs_block = np.array(ast.literal_eval(probs_data['probs_blocking'].iloc[0]))
                 probs_interaction = np.array(ast.literal_eval(probs_data['probs_interaction'].iloc[0]))
                 probs_density = np.array(ast.literal_eval(probs_data['probs_density'].iloc[0]))
-
+                probs_block_dens = np.array(ast.literal_eval(probs_data['probs_blocking_dens'].iloc[0]))
+                probs_interaction_dens = np.array(ast.literal_eval(probs_data['probs_interaction_dens'].iloc[0]))
                 last_move = row['position'].split('_')
                 row_pos = int(last_move[0])
                 col_pos = int(last_move[1])
@@ -256,6 +259,14 @@ def fit_heuristic_user_moves(transitions,dynamics):
                 prob_interaction = probs_interaction[row_pos][col_pos]
                 if prob_interaction == 0:
                     prob_interaction = epsilon
+
+                prob_block_dens = probs_block_dens[row_pos][col_pos]
+                if prob_block_dens == 0:
+                    prob_block_dens = epsilon
+                prob_int_dens = probs_interaction_dens[row_pos][col_pos]
+                if prob_int_dens == 0:
+                    prob_int_dens = epsilon
+
                 prob_density = probs_density[row_pos][col_pos]
                 if prob_density == 0:
                     prob_density = epsilon
@@ -265,10 +276,12 @@ def fit_heuristic_user_moves(transitions,dynamics):
                 # sum_user_likelihoods +/= comm_prob
                 # print prob_block
                 likelihoods_block.append(math.log(prob_block))
+                likelihoods_block_dens.append(math.log(prob_block_dens))
                 boards.append(user_data['board_name'].iloc[0])
                 userids.append(userid)
                 move_numbers.append(row['move_number_in_path'])
                 likelihoods_int.append(math.log(prob_interaction))
+                likelihoods_int_dens.append(math.log(prob_int_dens))
                 # boards.append(user_data['board_name'].iloc[0])
                 # userids.append(userid)
                 # move_numbers.append(row['move_number_in_path'])
@@ -291,9 +304,9 @@ def fit_heuristic_user_moves(transitions,dynamics):
             #     heuristic.append('interaction')
             # else:
             #     heuristic.append('density')
-    heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int,'likelihoods_density':likelihoods_dens, 'move_number_in_path':move_numbers}
+    heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int,'likelihoods_block_dens':likelihoods_block_dens,'likelihoods_interaction_dens':likelihoods_int_dens,'likelihoods_density':likelihoods_dens, 'move_number_in_path':move_numbers}
     heuristics_df = pd.DataFrame(heuristic_vals)
-    heuristics_df.to_csv('stats/heuristics_fitted_by_move_oWeight=0.csv')
+    heuristics_df.to_csv('stats/heuristics_fitted_by_move_combinations.csv')
 
 
 def fit_heuristic_user(transitions,dynamics):
@@ -302,6 +315,8 @@ def fit_heuristic_user(transitions,dynamics):
     likelihoods_block = []
     likelihoods_int = []
     likelihoods_dens = []
+    likelihoods_block_dens = []
+    likelihoods_int_dens = []
     heuristic = []
     boards = []
 
@@ -311,9 +326,13 @@ def fit_heuristic_user(transitions,dynamics):
             boards.append(user_data['board_name'].iloc[0])
             log_likelihoods_block = 0.0
             log_likelihoods_interaction = 0.0
+            log_likelihoods_block_dens = 0.0
+            log_likelihoods_interaction_dens = 0.0
             log_likelihoods_density = 0.0
             prob_user_block = 1.0
             prob_user_interaction = 1.0
+            prob_user_block_dens = 1.0
+            prob_user_interaction_dens = 1.0
             prob_user_density = 1.0
             paths = []
             curr_path = []
@@ -330,7 +349,8 @@ def fit_heuristic_user(transitions,dynamics):
                 probs_block = np.array(ast.literal_eval(probs_data['probs_blocking'].iloc[0]))
                 probs_interaction = np.array(ast.literal_eval(probs_data['probs_interaction'].iloc[0]))
                 probs_density = np.array(ast.literal_eval(probs_data['probs_density'].iloc[0]))
-
+                probs_block_dens = np.array(ast.literal_eval(probs_data['probs_blocking_dens'].iloc[0]))
+                probs_interaction_dens = np.array(ast.literal_eval(probs_data['probs_interaction_dens'].iloc[0]))
                 last_move = row['position'].split('_')
                 row_pos = int(last_move[0])
                 col_pos = int(last_move[1])
@@ -340,16 +360,30 @@ def fit_heuristic_user(transitions,dynamics):
                 prob_interaction = probs_interaction[row_pos][col_pos]
                 if prob_interaction == 0:
                     prob_interaction = epsilon
+
+                prob_block_dens = probs_block_dens[row_pos][col_pos]
+                if prob_block_dens == 0:
+                    prob_block_dens = epsilon
+                prob_int_dens = probs_interaction_dens[row_pos][col_pos]
+                if prob_int_dens == 0:
+                    prob_int_dens = epsilon
+
+
                 prob_density = probs_density[row_pos][col_pos]
                 if prob_density == 0:
                     prob_density = epsilon
+
                 prob_user_block = prob_user_block*prob_block
                 prob_user_interaction = prob_user_interaction*prob_interaction
+                prob_user_block_dens = prob_user_block_dens*prob_block_dens
+                prob_user_interaction_dens = prob_user_interaction_dens*prob_int_dens
                 prob_user_density = prob_user_density*prob_density
                 # sum_user_likelihoods +/= comm_prob
                 # print prob_block
                 log_likelihoods_block += math.log(prob_block)
                 log_likelihoods_interaction += math.log(prob_interaction)
+                log_likelihoods_block_dens += math.log(prob_block_dens)
+                log_likelihoods_interaction_dens += math.log(prob_int_dens)
                 log_likelihoods_density += math.log(prob_density)
                 counter += 1.0
                 # break
@@ -360,18 +394,24 @@ def fit_heuristic_user(transitions,dynamics):
             likelihoods_block.append(log_likelihoods_block/counter)
             likelihoods_int.append(log_likelihoods_interaction/counter)
             likelihoods_dens.append(log_likelihoods_density/counter)
+            likelihoods_block_dens.append(log_likelihoods_block_dens/counter)
+            likelihoods_int_dens.append(log_likelihoods_interaction_dens/counter)
             # print log_likelihoods_block/counter
             # print log_likelihoods_interaction/counter
             # print log_likelihoods_density/counter
-            if max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density]) == log_likelihoods_block:
+            if max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens]) == log_likelihoods_block:
                 heuristic.append('blocking')
-            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density]) == log_likelihoods_interaction:
+            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens]) == log_likelihoods_interaction:
                 heuristic.append('interaction')
+            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens]) == log_likelihoods_block_dens:
+                heuristic.append('blocking_dens')
+            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens]) == log_likelihoods_interaction_dens:
+                heuristic.append('interaction_dens')
             else:
                 heuristic.append('density')
-    heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int,'likelihoods_density':likelihoods_dens,'heuristic':heuristic}
+    heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int,'likelihoods_block_dens':likelihoods_block_dens,'likelihoods_int_dens':likelihoods_int_dens,'likelihoods_density':likelihoods_dens,'heuristic':heuristic}
     heuristics_df = pd.DataFrame(heuristic_vals)
-    heuristics_df.to_csv('stats/heuristics_fitted.csv')
+    heuristics_df.to_csv('stats/heuristics_fitted_combinations.csv')
 
 
 def fit_heuristic_user_path(transitions,dynamics):
@@ -541,7 +581,7 @@ def compute_path_probabilities_participants():
 
 
 def compare_distributions_simulation_population():
-    simulation_data = pd.read_csv("stats/paths_simulations_interaction_density.csv")
+    simulation_data = pd.read_csv("stats/paths_simulations_blocking_blocking_softmax_5.csv")
     participant_data = pd.read_csv("stats/participants_path_probabilities_subpaths2.csv")
 
     board_names = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
@@ -590,7 +630,65 @@ def compare_distributions_simulation_population():
 
     data_dict = {'board':boards, 'path_length': path_lengths, 'wasserstein': wass_dist}
     paths_probs_df = pd.DataFrame(data_dict)
-    paths_probs_df.to_csv('stats/wasserstein_interactionDensityVsParticipants.csv')
+    paths_probs_df.to_csv('stats/wasserstein_blockingBlockingSoftmax5VsParticipants.csv')
+
+
+def probability_of_continuing_path():
+    participants_data_all = pd.read_csv("stats/dynamics06042018.csv")
+    board_names = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
+    boards = []
+    states = []
+    scores = []
+    delta_scores = []
+    path_lengths = []
+    state_counts = []
+    state_continued = []
+    prob_continue = []
+
+    for board in board_names:
+        print board
+        participants_data = participants_data_all.loc[(participants_data_all['board_name'] == board)]
+        state_cont = {}
+        for userid in participants_data['userid'].unique():
+            user_data = participants_data.loc[participants_data['userid'] == userid]
+            for i, (index, row) in enumerate(user_data.iterrows()):
+                board_mat = np.array(ast.literal_eval(row['board_state']))
+                board_str = str(board_mat)
+                if board_str not in state_cont.keys():
+                    state_cont[board_str] = {'path_length': row['move_number_in_path']-1, 'score':row['score_move_x'], 'delta_score':row['delta_score'],'count':0.0, 'continued':0.0}
+
+                state_cont[board_str]['count'] += 1.0
+                if row['action'] == 'click':
+                    state_cont[board_str]['continued'] += 1.0
+                if i == len(user_data)-1:
+                    if row['action'] == 'click':
+                        state = row['board_state']
+                        board_mat = np.array(ast.literal_eval(state))
+                        move = row['position'].split('_')
+
+                        board_mat[int(move[0])][int(move[1])] = row['player']
+                        new_state = str(board_mat)
+                        # new_state = new_state.replace('\n',',')
+                        if new_state not in state_cont.keys():
+                            state_cont[new_state] = {'path_length': row['move_number_in_path'], 'score':row['score_move_x'], 'delta_score':row['delta_score'],'count':1.0, 'continued':0.0}
+                        else:
+                            state_cont[new_state]['count'] += 1.0
+
+        for board_state, data in state_cont.iteritems():
+            boards.append(board)
+            states.append(board_state)
+            # scores.append(data['score'])
+            # delta_scores.append(data['delta_score'])
+            path_lengths.append(data['path_length'])
+            state_counts.append(data['count'])
+            state_continued.append(data['continued'])
+            prob_continue.append(data['continued']/data['count'])
+
+    data_dict = {'board':boards, 'path_length': path_lengths, 'state':states, 'count':state_counts, 'continued':state_continued, 'probability':prob_continue}
+    state_cont_data = pd.DataFrame(data_dict)
+    state_cont_data.to_csv('stats/states_continued.csv')
+
+
 
 
 
@@ -641,8 +739,19 @@ if __name__== "__main__":
     # # get_user_stats()
     # print stats.wasserstein_distance([1,2,7], [3,1,6])
     # print stats.wasserstein_distance([0.1,0.2,0.7], [0.3,0.1,0.6])
-    compare_distributions_simulation_population();
-    print 1/0
+    # compare_distributions_simulation_population();
+    # probability_of_continuing_path()
+    # states_cont = pd.read_csv("stats/states_continued.csv")
+    # # # & (states_cont['board'] == '6_hard_full')
+    # states_cont_filtered = states_cont.loc[(states_cont['count'] > 4) & (states_cont['path_length'] <6) & (states_cont['path_length'] > 0)]
+    # ax = sns.regplot(x="count", y="probability", data=states_cont_filtered, n_boot=1000)
+    # # plt.hist(states_cont_filtered['probability'])
+    # # g = sns.FacetGrid(states_cont_filtered, col="path_length", legend_out=False)
+    # # g.map(plt.hist, "probability", color="steelblue",  lw=0)
+    # # bins = np.linspace(-100, 100, 200)
+    # # g.map(plt.hist, "score_move_x", color="steelblue", bins=bins, lw=0)
+    # plt.show()
+    # print 1/0
 
     data = pd.read_csv("stats/cogSci.csv")
     mctsData = pd.read_csv("stats/mctsRuns.csv")
@@ -654,10 +763,10 @@ if __name__== "__main__":
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     # dynamics = pd.read_csv("stats/dynamics.csv")
     dynamics = pd.read_csv("stats/dynamics06042018.csv")
-    transitions = pd.read_csv("stats/transitions=0.csv",dtype = {'board_state':str})
+    transitions = pd.read_csv("stats/transitions_combinations.csv",dtype = {'board_state':str})
 
-    # fit_heuristic_user_moves(transitions,dynamics)
-    # print 1/0
+    fit_heuristic_user(transitions,dynamics)
+    print 1/0
 
     states = pd.read_csv("stats/states.csv")
     # dynamics = pd.read_csv("stats/dynamicsFirstMoves1.csv")

@@ -758,6 +758,11 @@ def check_participant_answer(userid):
         return 'wrong'
 
 
+def softmax(x):
+    """Compute softmax values for each sets of scores in x."""
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum()
+
 def get_prob_matrix(score_matrix):
     move_prob = copy.deepcopy(score_matrix)
     all_scores = []
@@ -769,9 +774,12 @@ def get_prob_matrix(score_matrix):
         for c in range(len(score_matrix[r])):
             if (score_matrix[r][c] != -0.00001) & (score_matrix[r][c] != -0.00002):
                 all_scores.append(score_matrix[r][c])
-                move_prob[r][c] = (((score_matrix[r][c]-scores.min())*(100))/(scores.max()-scores.min()))
+                # move_prob[r][c] = np.exp((((score_matrix[r][c]-scores.min())*(100))/(scores.max()-scores.min())))
+                # move_prob[r][c] = np.exp((((score_matrix[r][c]-scores.min())*(100))/(scores.max()-scores.min())))
+                # move_prob[r][c] = (((score_matrix[r][c]-scores.min())*(100))/(scores.max()-scores.min()))
                 sum_scores += move_prob[r][c]
                 counter += 1.0
+
 
     for r in range(len(score_matrix)):
         for c in range(len(score_matrix[r])):
@@ -838,6 +846,8 @@ def transition_probs(output_file):
     scores_blocking = []
     scores_interaction = []
     scores_density = []
+    scores_blocking_density = []
+    scores_interaction_density = []
     board_states = []
     boards = []
     player_list = []
@@ -872,13 +882,23 @@ def transition_probs(output_file):
             scores_block = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
             scores_int = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
             scores_dens = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
-            probs_block = get_prob_matrix(scores_block)
-            probs_int = get_prob_matrix(scores_int)
-            probs_dens = get_prob_matrix(scores_dens)
-            scores_blocking.append(str(copy.deepcopy(probs_block)))
-            scores_interaction.append(str(copy.deepcopy(probs_int)))
-            scores_density.append(str(copy.deepcopy(probs_dens)))
-            board_states.append(str(copy.deepcopy(curr_move_matrix)))
+            scores_block_density = scores_block
+            scores_int_density = scores_int
+            # probs_block = get_prob_matrix(scores_block)
+            # probs_int = get_prob_matrix(scores_int)
+            # probs_dens = get_prob_matrix(scores_dens)
+            probs_block = scores_block
+            probs_int = scores_int
+            probs_dens = scores_dens
+            print np.sum(probs_block)
+            print np.sum(probs_int)
+            print np.sum(probs_dens)
+            scores_blocking.append(str(probs_block))
+            scores_interaction.append(str(probs_int))
+            scores_density.append(str(probs_dens))
+            scores_blocking_density.append(str(scores_block_density))
+            scores_interaction_density.append(str(scores_int_density))
+            board_states.append(str(curr_move_matrix))
             player_list.append(1)
             boards.append(board_name)
 
@@ -931,23 +951,36 @@ def transition_probs(output_file):
                     # curr_data['board_state'] = copy.deepcopy(curr_move_matrix)
 
 
-
-                    if counter==15:
-                        print '20'
-                    if (str(curr_move_matrix) == '[[0, 2, 0, 0, 1, 0], [2, 2, 1, 2, 0, 0], [0, 1, 2, 0, 0, 0], [0, 1, 1, 2, 0, 0], [0, 1, 1, 1, 0, 0], [0, 2, 0, 0, 2, 0]]'):
-                        print 'state'
-
                     if str(curr_move_matrix) not in board_states:
-                        scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0, exp=2, neighborhood_size=2, block=True)
-                        scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0, exp=2, neighborhood_size=2, block=False)
+                        scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+                        scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
                         scores_dens = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
-                        probs_block = get_prob_matrix(scores_block)
-                        probs_int = get_prob_matrix(scores_int)
-                        probs_dens = get_prob_matrix(scores_dens)
-                        scores_blocking.append(str(copy.deepcopy(probs_block)))
-                        scores_interaction.append(str(copy.deepcopy(probs_int)))
-                        scores_density.append(str(copy.deepcopy(probs_dens)))
-                        board_states.append(str(copy.deepcopy(curr_move_matrix)))
+                        scores_block_density = scores_block
+                        scores_int_density = scores_int
+                        if player == 2:
+                            scores_block_density = scores_dens
+                            scores_int_density = scores_dens
+                        # probs_block = get_prob_matrix(scores_block)
+                        # probs_int = get_prob_matrix(scores_int)
+                        # probs_dens = get_prob_matrix(scores_dens)
+                        probs_block = scores_block
+                        probs_int = scores_int
+                        probs_dens = scores_dens
+                        # print np.sum(probs_block)
+                        # print np.sum(probs_int)
+                        # print np.sum(probs_dens)
+                        # if np.sum(probs_block) < 0.99:
+                        #     print 'wow'
+                        # if np.sum(probs_int) < 0.99:
+                        #     print 'wow'
+                        # if np.sum(probs_dens) < 0.99:
+                        #     print 'wow'
+                        scores_blocking.append(str(probs_block))
+                        scores_interaction.append(str(probs_int))
+                        scores_density.append(str(probs_dens))
+                        scores_blocking_density.append(str(scores_block_density))
+                        scores_interaction_density.append(str(scores_int_density))
+                        board_states.append(str(curr_move_matrix))
                         player_list.append(player)
                         boards.append(board_name)
 
@@ -1010,7 +1043,17 @@ def transition_probs(output_file):
 
         # dataFile = open(board_name+'_'+output_file, 'wb')
     print boards
-    trans_dict = {'board_name':boards, 'player':player_list,'board_state':board_states,'probs_blocking':scores_blocking,'probs_interaction':scores_interaction,'probs_density':scores_density}
+    print len(boards)
+    print len(player_list)
+    print len(board_states)
+    print len(scores_blocking)
+    print len(scores_interaction)
+    print len(scores_density)
+    print len(scores_blocking_density)
+    print len(scores_interaction_density)
+
+
+    trans_dict = {'board_name':boards, 'player':player_list,'board_state':board_states,'probs_blocking':scores_blocking,'probs_interaction':scores_interaction,'probs_density':scores_density, 'probs_blocking_dens':scores_blocking_density,'probs_interaction_dens':scores_interaction_density}
 
     transitions =pd.DataFrame(trans_dict)
     print str(len(transitions['board_state'].unique()))
@@ -2483,9 +2526,11 @@ def choose_move(state, player_type, states_dict):
         probs_block = states_dict[str(state)]
     else:
         if player_type == 1:
-            scores_block = compute_scores_layers_for_matrix(state, player=player, normalized=True, o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+            scores_block = compute_scores_layers_for_matrix(state, player=player, normalized=False, o_weight=0.5, exp=2, neighborhood_size=2, block=True)
         else:
-            scores_block = compute_scores_layers_for_matrix(state, player=player, normalized=True, o_weight=0.5, exp=2, neighborhood_size=2, block=True, only_density=True)
+            scores_block = compute_scores_layers_for_matrix(state, player='X', normalized=False, o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+
+            # scores_block = compute_scores_layers_for_matrix(state, player='X', normalized=True, o_weight=0.5, exp=2, neighborhood_size=2, block=True, only_density=True)
         probs_block = get_prob_matrix(scores_block)
         states_dict[str(state)] = copy.deepcopy(probs_block)
     rand = random.random()
@@ -2547,18 +2592,18 @@ def simulate_game(num_simulations):
             probs.append(prob_path)
             lengths.append(len(p))
     data = pd.DataFrame({'board_name':boards, 'path': paths_data, 'probability':probs, 'path_length':lengths})
-    data.to_csv('stats/paths_simulations_interaction_density.csv')
+    data.to_csv('stats/paths_simulations_blocking_blocking_softmax_5.csv')
 
 if __name__ == "__main__":
-    simulate_game(500)
+    # simulate_game(500)
     # heat_map_solution(normalized=True)
     # paths_stats(participants='all')
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    # moves_stats('stats/dynamics06042018.csv')
+    # moves_stats('stats/dynamics09042018.csv')
     # check_participant_answer('63e5efe1')
-    # transition_probs('stats/transitions')
+    transition_probs('stats/transitions_combinations')
     # explore_exploit('stats/exploreExploitTimesPathLength2603.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
