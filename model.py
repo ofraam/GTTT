@@ -1950,23 +1950,62 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 #     sum_scores_exp += math.pow(math.e,lamb*square_score)
 
     if only_density:
+        # check for immediate win/loss
+        winning_moves = check_immediate_win(board_matrix, player)
+        if len(winning_moves) > 0:
+            for move in winning_moves:
+                move_row, move_col = convert_position(move, len(board_matrix))
+                density_score_matrix[move_row][move_col] = WIN_SCORE
+
+        else:
+            other_player = 'O'
+            if player == 'O':
+                other_player = 'X'
+            winning_moves_opp = check_immediate_win(board_matrix, other_player)
+            if len(winning_moves_opp) > 1:
+                for row in range(len(board_matrix)):
+                    for col in range(len(board_matrix[row])):
+                        if (density_score_matrix[row][col] != 'X') & (density_score_matrix[row][col] != 'O'):
+                            density_score_matrix[row][col] = -1*WIN_SCORE
+            elif len(winning_moves_opp) == 1:
+                move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
+                for row in range(len(board_matrix)):
+                    for col in range(len(board_matrix[row])):
+                        if (move_row != row) | (move_col != col):
+                            if (density_score_matrix[row][col] != 'X') & (density_score_matrix[row][col] != 'O'):
+                                density_score_matrix[row][col] = -1*WIN_SCORE
+
+        # heatmaps
+        sum_scores = 0.0
+        counter = 0.0
         for r in range(0,len(density_score_matrix)):
             for j in range(0,len(density_score_matrix[r])):
                 if (density_score_matrix[r][j]=='X'):
                     density_score_matrix[r][j] = -0.00001
                 elif (density_score_matrix[r][j]=='O'):
                     density_score_matrix[r][j] = -0.00002
+                else:
+                    counter += 1.0
+                    if density_score_matrix[r][j] > 0:
+                        sum_scores += density_score_matrix[r][j]
+
         if normalized:
             for r in range(len(density_score_matrix)):
                 for c in range(len(density_score_matrix[r])):
                     if (density_score_matrix[r][c]!=-0.00001) & (density_score_matrix[r][c]!=-0.00002):
                     # if (score_matrix[r][c]>0):
                         if lamb is None:
+                            if (sum_scores < 0):
+                                print 'negative'
                             if (sum_scores == 0):
-                                density_score_matrix[r][c] = 0
+                                density_score_matrix[r][c] = 1.0/counter
                             else:
                                 # print density_score_matrix[r][c]
-                                density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores
+                                # density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores
+                                if density_score_matrix[r][c] >= 0:
+                                    density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores
+                                else:
+                                    density_score_matrix[r][c] = 0
                         else:
                             density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores_exp
         return density_score_matrix
@@ -2095,14 +2134,17 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
 
     # heatmaps
     sum_scores = 0.0
+    counter = 0.0
     for r in range(0,len(score_matrix)):
         for j in range(0,len(score_matrix[r])):
             if (score_matrix[r][j]=='X'):
                 score_matrix[r][j] = -0.00001
             elif (score_matrix[r][j]=='O'):
                 score_matrix[r][j] = -0.00002
-            elif score_matrix[r][j] > 0:
-                sum_scores += score_matrix[r][j]
+            else:
+                counter += 1.0
+                if score_matrix[r][j] > 0:
+                    sum_scores += score_matrix[r][j]
 
     if normalized:
         for r in range(len(score_matrix)):
@@ -2111,7 +2153,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 # if (score_matrix[r][c]>0):
                     if lamb is None:
                         if (sum_scores == 0):
-                            score_matrix[r][c] = 0
+                            score_matrix[r][c] = 1.0/counter # TODO: fix to uniform.
                         else:
                             #TODO: change if we don't want to eliminate negative scores
                             if score_matrix[r][c] >= 0:

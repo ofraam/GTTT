@@ -314,9 +314,11 @@ def fit_heuristic_user(transitions,dynamics):
     userids = []
     likelihoods_block = []
     likelihoods_int = []
+    likelihoods_linear = []
     likelihoods_dens = []
     likelihoods_block_dens = []
     likelihoods_int_dens = []
+    likelihoods_linear_dens = []
     heuristic = []
     boards = []
 
@@ -326,13 +328,17 @@ def fit_heuristic_user(transitions,dynamics):
             boards.append(user_data['board_name'].iloc[0])
             log_likelihoods_block = 0.0
             log_likelihoods_interaction = 0.0
+            log_likelihoods_linear = 0.0
             log_likelihoods_block_dens = 0.0
             log_likelihoods_interaction_dens = 0.0
+            log_likelihoods_linear_dens = 0.0
             log_likelihoods_density = 0.0
             prob_user_block = 1.0
             prob_user_interaction = 1.0
+            prob_user_linear = 1.0
             prob_user_block_dens = 1.0
             prob_user_interaction_dens = 1.0
+            prob_user_linear_dens = 1.0
             prob_user_density = 1.0
             paths = []
             curr_path = []
@@ -348,9 +354,11 @@ def fit_heuristic_user(transitions,dynamics):
                 probs_data = transitions_board.loc[transitions_board['board_state'] == board_state]
                 probs_block = np.array(ast.literal_eval(probs_data['probs_blocking'].iloc[0]))
                 probs_interaction = np.array(ast.literal_eval(probs_data['probs_interaction'].iloc[0]))
+                probs_linear = np.array(ast.literal_eval(probs_data['probs_linear'].iloc[0]))
                 probs_density = np.array(ast.literal_eval(probs_data['probs_density'].iloc[0]))
                 probs_block_dens = np.array(ast.literal_eval(probs_data['probs_blocking_dens'].iloc[0]))
                 probs_interaction_dens = np.array(ast.literal_eval(probs_data['probs_interaction_dens'].iloc[0]))
+                probs_linear_dens = np.array(ast.literal_eval(probs_data['probs_linear_dens'].iloc[0]))
                 last_move = row['position'].split('_')
                 row_pos = int(last_move[0])
                 col_pos = int(last_move[1])
@@ -360,6 +368,9 @@ def fit_heuristic_user(transitions,dynamics):
                 prob_interaction = probs_interaction[row_pos][col_pos]
                 if prob_interaction == 0:
                     prob_interaction = epsilon
+                prob_linear= probs_linear[row_pos][col_pos]
+                if prob_linear == 0:
+                    prob_linear = epsilon
 
                 prob_block_dens = probs_block_dens[row_pos][col_pos]
                 if prob_block_dens == 0:
@@ -367,6 +378,9 @@ def fit_heuristic_user(transitions,dynamics):
                 prob_int_dens = probs_interaction_dens[row_pos][col_pos]
                 if prob_int_dens == 0:
                     prob_int_dens = epsilon
+                prob_linear_dens= probs_linear_dens[row_pos][col_pos]
+                if prob_linear_dens == 0:
+                    prob_linear_dens = epsilon
 
 
                 prob_density = probs_density[row_pos][col_pos]
@@ -375,15 +389,20 @@ def fit_heuristic_user(transitions,dynamics):
 
                 prob_user_block = prob_user_block*prob_block
                 prob_user_interaction = prob_user_interaction*prob_interaction
+                prob_user_linear = prob_user_linear*prob_linear
                 prob_user_block_dens = prob_user_block_dens*prob_block_dens
                 prob_user_interaction_dens = prob_user_interaction_dens*prob_int_dens
+                prob_user_linear_dens = prob_user_linear_dens*prob_linear_dens
                 prob_user_density = prob_user_density*prob_density
                 # sum_user_likelihoods +/= comm_prob
                 # print prob_block
                 log_likelihoods_block += math.log(prob_block)
                 log_likelihoods_interaction += math.log(prob_interaction)
+                log_likelihoods_linear += math.log(prob_linear)
                 log_likelihoods_block_dens += math.log(prob_block_dens)
                 log_likelihoods_interaction_dens += math.log(prob_int_dens)
+                log_likelihoods_linear_dens += math.log(prob_linear_dens)
+                # print prob_density
                 log_likelihoods_density += math.log(prob_density)
                 counter += 1.0
                 # break
@@ -393,25 +412,31 @@ def fit_heuristic_user(transitions,dynamics):
 
             likelihoods_block.append(log_likelihoods_block/counter)
             likelihoods_int.append(log_likelihoods_interaction/counter)
+            likelihoods_linear.append(log_likelihoods_linear/counter)
             likelihoods_dens.append(log_likelihoods_density/counter)
             likelihoods_block_dens.append(log_likelihoods_block_dens/counter)
+            likelihoods_linear_dens.append(log_likelihoods_linear_dens/counter)
             likelihoods_int_dens.append(log_likelihoods_interaction_dens/counter)
             # print log_likelihoods_block/counter
             # print log_likelihoods_interaction/counter
             # print log_likelihoods_density/counter
-            if max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens]) == log_likelihoods_block:
+            if max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens, log_likelihoods_linear, log_likelihoods_linear_dens]) == log_likelihoods_block:
                 heuristic.append('blocking')
-            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens]) == log_likelihoods_interaction:
+            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens, log_likelihoods_linear, log_likelihoods_linear_dens]) == log_likelihoods_interaction:
                 heuristic.append('interaction')
-            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens]) == log_likelihoods_block_dens:
+            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens, log_likelihoods_linear, log_likelihoods_linear_dens]) == log_likelihoods_block_dens:
                 heuristic.append('blocking_dens')
-            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens]) == log_likelihoods_interaction_dens:
+            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens, log_likelihoods_linear, log_likelihoods_linear_dens]) == log_likelihoods_interaction_dens:
                 heuristic.append('interaction_dens')
+            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens, log_likelihoods_linear, log_likelihoods_linear_dens]) == log_likelihoods_linear:
+                heuristic.append('linear')
+            elif max([log_likelihoods_block,log_likelihoods_interaction,log_likelihoods_density, log_likelihoods_block_dens, log_likelihoods_interaction_dens, log_likelihoods_linear, log_likelihoods_linear_dens]) == log_likelihoods_linear_dens:
+                heuristic.append('linear_dens')
             else:
                 heuristic.append('density')
-    heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int,'likelihoods_block_dens':likelihoods_block_dens,'likelihoods_int_dens':likelihoods_int_dens,'likelihoods_density':likelihoods_dens,'heuristic':heuristic}
+    heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int, 'likelihood_linear': likelihoods_linear, 'likelihoods_linear_dens':likelihoods_linear_dens,'likelihoods_block_dens':likelihoods_block_dens,'likelihoods_int_dens':likelihoods_int_dens,'likelihoods_density':likelihoods_dens,'heuristic':heuristic}
     heuristics_df = pd.DataFrame(heuristic_vals)
-    heuristics_df.to_csv('stats/heuristics_fitted_combinations.csv')
+    heuristics_df.to_csv('stats/heuristics_fitted_combinations_13042018.csv')
 
 
 def fit_heuristic_user_path(transitions,dynamics):
@@ -732,6 +757,94 @@ def probability_of_continuing_path():
 #     paths_probs_df = pd.DataFrame(data_dict)
 #     paths_probs_df.to_csv('stats/participants_path_probabilities_simulation.csv')
 
+def add_score_heuristic(dynamics, scores):
+    scores_heuristic = []
+    clicks = dynamics.loc[dynamics['action'] == 'click']
+    scores_list = []
+    potential_scores = []
+    for i, (index, row) in enumerate(dynamics.iterrows()):
+        if row['action'] == 'click':
+            state = row['board_state']
+
+            heuristic = row['heuristic']
+            state_scores = scores.loc[scores['board_state'] == state]
+            # print state
+            board_mat = np.array(ast.literal_eval(state))
+            move = row['position'].split('_')
+            # print move
+            row_pos = int(move[0])
+            col_pos = int(move[1])
+            score = 0
+            potential_score = 0
+            if heuristic == 'density':
+                score_mat_str = state_scores['probs_density'].iloc[0]
+                scores_mat = np.array(ast.literal_eval(score_mat_str))
+                score = scores_mat[row_pos][col_pos]
+                board_mat[row_pos][col_pos] = int(row['player'])
+                board_str = str(board_mat).replace("\n", ",")
+                board_str = str(board_str).replace(" ", ", ")
+                board_str = str(board_str).replace(",,", ",")
+                state_scores = scores.loc[scores['board_state'] == board_str]
+                # if state_scores['board_state'].shape[0] == :
+                # print board_str
+                score_mat_str = state_scores['probs_density'].iloc[0]
+                scores_mat = np.array(ast.literal_eval(score_mat_str))
+                potential_score = np.max(scores_mat)
+            elif heuristic == 'blocking':
+                score_mat_str = state_scores['probs_blocking'].iloc[0]
+                scores_mat = np.array(ast.literal_eval(score_mat_str))
+                score = scores_mat[row_pos][col_pos]
+
+                board_mat[row_pos][col_pos] = int(row['player'])
+                board_str = str(board_mat).replace("\n", ",")
+                board_str = str(board_str).replace(" ", ", ")
+                board_str = str(board_str).replace(",,", ",")
+                state_scores = scores.loc[scores['board_state'] == str(board_str)]
+                # print board_str
+                score_mat_str = state_scores['probs_blocking'].iloc[0]
+                scores_mat = np.array(ast.literal_eval(score_mat_str))
+                potential_score = np.max(scores_mat)
+            elif heuristic == 'blocking_density':
+                score_mat_str = state_scores['probs_blocking_dens'].iloc[0]
+                scores_mat = np.array(ast.literal_eval(score_mat_str))
+                score = scores_mat[row_pos][col_pos]
+                board_mat[row_pos][col_pos] = int(row['player'])
+                board_str = str(board_mat).replace("\n", ",")
+                board_str = str(board_str).replace(" ", ", ")
+                board_str = str(board_str).replace(",,", ",")
+                state_scores = scores.loc[scores['board_state'] == str(board_str)]
+                # print board_str
+                score_mat_str = state_scores['probs_blocking_dens'].iloc[0]
+                scores_mat = np.array(ast.literal_eval(score_mat_str))
+                potential_score = np.max(scores_mat)
+
+        scores_list.append(score)
+        potential_scores.append(potential_score)
+
+        # else:
+
+    dynamics['score_heuristic'] = scores_list
+    dynamics['potential_score_heuristic'] = potential_scores
+    dynamics.to_csv('stats/moves_hueristic_scores.csv')
+
+
+def tag_last_moves_in_path(dynamics):
+    last = []
+
+    for i, (index, row) in enumerate(dynamics.iterrows()):
+        if row['action'] == 'click':
+            if i == dynamics.shape[0]:
+                last.append(True)
+            elif (dynamics['action'].iloc[i+1] == 'reset') | (dynamics['action'].iloc[i+1] == 'undo'):
+                last.append(True)
+            elif (dynamics['userid'].iloc[i+1] != row['userid']):
+                last.append(True)
+            else:
+                last.append(False)
+        else:
+            last.append(False)
+    dynamics['last_move'] = last
+    dynamics.to_csv('stats/moves_hueristic_scores_last.csv')
 
 
 if __name__== "__main__":
@@ -762,11 +875,13 @@ if __name__== "__main__":
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     # dynamics = pd.read_csv("stats/dynamics.csv")
-    dynamics = pd.read_csv("stats/dynamics06042018.csv")
-    transitions = pd.read_csv("stats/transitions_combinations.csv",dtype = {'board_state':str})
-
-    fit_heuristic_user(transitions,dynamics)
-    print 1/0
+    dynamics = pd.read_csv("stats/moves_hueristic_scores_last.csv")
+    transitions = pd.read_csv("stats/transitions_combinations_all.csv",dtype = {'board_state':str})
+    scores = pd.read_csv("stats/state_scores_heuristics_post.csv",dtype = {'board_state':str})
+    # fit_heuristic_user(transitions,dynamics)
+    # add_score_heuristic(dynamics,scores)
+    # tag_last_moves_in_path(dynamics)
+    # print 1/0
 
     states = pd.read_csv("stats/states.csv")
     # dynamics = pd.read_csv("stats/dynamicsFirstMoves1.csv")
@@ -786,25 +901,25 @@ if __name__== "__main__":
     # resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
     resetsDelta = pd.read_csv("stats/resetsFiltered2.csv")
 
-    # ten_to_win = ['6_hard_full', '10_hard_full', '10_medium_full']
-    # eight_to_win = ['6_hard_pruned', '10_hard_pruned', '10_medium_pruned', '10_easy_full', '6_easy_full']
-    # six_to_win = ['6_easy_pruned', '10_easy_pruned']
-    # dynamics_filtered = dynamics.loc[dynamics['board_name'] in ten_to_win]
-    # max_vals = dynamics.groupby(['userid','path_number', 'board_name', 'sizeType','condition','moves_to_win'], as_index=False)['move_number_in_path'].max()
-    max_vals = dynamics.groupby(['userid','path_number'], as_index=False)['move_number_in_path'].max()
-    resets = dynamics.loc[(dynamics['action'] == 'reset')]
-    # g = sns.FacetGrid(max_vals, row="sizeType", col="condition", legend_out=False)
-    # g = sns.FacetGrid(dynamics, row="move_number_in_path", legend_out=False)
-    g = sns.FacetGrid(dynamics, col="moves_to_win", legend_out=False)
-    # g = g.map(sns.distplot, "move_number_in_path")
-    # g = g.map(sns.distplot, "score_move_x")
-    bins = np.linspace(0, 15, 15)
-    g.map(plt.hist, "move_number_in_path", color="steelblue", bins=bins, lw=0)
-    # bins = np.linspace(-100, 100, 200)
-    # g.map(plt.hist, "score_move_x", color="steelblue", bins=bins, lw=0)
-
-    plt.show()
-    print 1/0
+    # # ten_to_win = ['6_hard_full', '10_hard_full', '10_medium_full']
+    # # eight_to_win = ['6_hard_pruned', '10_hard_pruned', '10_medium_pruned', '10_easy_full', '6_easy_full']
+    # # six_to_win = ['6_easy_pruned', '10_easy_pruned']
+    # # dynamics_filtered = dynamics.loc[dynamics['board_name'] in ten_to_win]
+    # # max_vals = dynamics.groupby(['userid','path_number', 'board_name', 'sizeType','condition','moves_to_win'], as_index=False)['move_number_in_path'].max()
+    # max_vals = dynamics.groupby(['userid','path_number'], as_index=False)['move_number_in_path'].max()
+    # resets = dynamics.loc[(dynamics['action'] == 'reset')]
+    # # g = sns.FacetGrid(max_vals, row="sizeType", col="condition", legend_out=False)
+    # # g = sns.FacetGrid(dynamics, row="move_number_in_path", legend_out=False)
+    # g = sns.FacetGrid(dynamics, col="moves_to_win", legend_out=False)
+    # # g = g.map(sns.distplot, "move_number_in_path")
+    # # g = g.map(sns.distplot, "score_move_x")
+    # bins = np.linspace(0, 15, 15)
+    # g.map(plt.hist, "move_number_in_path", color="steelblue", bins=bins, lw=0)
+    # # bins = np.linspace(-100, 100, 200)
+    # # g.map(plt.hist, "score_move_x", color="steelblue", bins=bins, lw=0)
+    #
+    # plt.show()
+    # print 1/0
 
     # -- explore-exploit correlation line
     # user_stats_exploration = pd.read_csv("stats/user_stats2603_3.csv")
@@ -881,21 +996,21 @@ if __name__== "__main__":
     # clf = linear_model.Lasso()
     # scores = cross_val_score(clf, X, y, cv=10)
     # g = sns.FacetGrid(user_stats_exploration_filtered, col="correctness", margin_titles=True)
-    user_stats_exploration = pd.read_csv("stats/exploreExploitCombined2.csv")
-    # user_stats_exploration_filtered =user_stats_exploration.loc[user_stats_exploration['exploration']]
-    # user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
-    # user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
-    g = sns.FacetGrid(user_stats_exploration, col="correct", margin_titles=True)
-    # # #
-    bins = np.linspace(0, 120, 20)
-    # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
-    g.map(sns.distplot, "exploration", bins=bins)
-    test_char = "avg_first_move_score"
-    # g.map(sns.regplot,"exploration", test_char);
-    # print stats.spearmanr(user_stats_exploration_6hard['exploration'], user_stats_exploration_6hard[test_char])
-    #
-    # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration, n_boot=1000)
-    plt.show()
+    # user_stats_exploration = pd.read_csv("stats/exploreExploitCombined2.csv")
+    # # user_stats_exploration_filtered =user_stats_exploration.loc[user_stats_exploration['exploration']]
+    # # user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
+    # # user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
+    # g = sns.FacetGrid(user_stats_exploration, col="correct", margin_titles=True)
+    # # # #
+    # bins = np.linspace(0, 120, 20)
+    # # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
+    # g.map(sns.distplot, "exploration", bins=bins)
+    # test_char = "avg_first_move_score"
+    # # g.map(sns.regplot,"exploration", test_char);
+    # # print stats.spearmanr(user_stats_exploration_6hard['exploration'], user_stats_exploration_6hard[test_char])
+    # #
+    # # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration, n_boot=1000)
+    # plt.show()
 
     # feature_names = ["num_moves", "solved"]
     # df = pd.DataFrame(user_stats_exploration_filtered, columns=feature_names)
@@ -1310,68 +1425,68 @@ if __name__== "__main__":
     #     plt.show()
 
     # dynamics_filtered = dynamics.loc[(dynamics['move_number_in_path'] < 11) & (dynamics['move_number_in_path'] > 1) & (dynamics['player'] == 2)]
-    # userids = dynamics['userid'].unique()
-    #
-    # for user in userids:
-    #     # print user
-    #     f, (ax1, ax2) = plt.subplots(2, figsize = (20,10))
-    #     clicks_filtered = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click')]
-    #     clicks_filtered_p1 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==1)]
-    #     clicks_filtered_p2 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==2)]
-    #
-    #     # ax = sns.FacetGrid(dynamics_filtered, row="userid")
-    #     # ax = ax.map_dataframe(sns.tsplot, time='time_rel_sec', value='time_between', unit='userid', data=clicks_filtered, interpolate=False)
-    #     if (len(clicks_filtered_p1) < 2) | (len(clicks_filtered_p2) < 2):
-    #         continue
-    #     sns.tsplot(time='time_rel_sec', value='time_from_action', unit='userid', data=clicks_filtered, interpolate=False, ax=ax1)
-    #     sns.tsplot(time='time_rel_sec', value='score_move_x', unit='userid', data=clicks_filtered, interpolate=False, color='blue', ax=ax2)
-    #     # sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p1, interpolate=False, color='orange',  ax=ax2)
-    #
-    #     # sns.tsplot(time='time_rel_sec', value='score_move', unit='userid', data=clicks_filtered_p2, interpolate=False, color='black', ax=ax2)
-    #     # sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p2, interpolate=False, color='orange',  ax=ax2)
-    #
-    #     solved = clicks_filtered['solved'].iloc[0]
-    #     board_name = clicks_filtered['board_name'].iloc[0]
-    #     resets = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='reset')]
-    #
-    #     for index, event in resets.iterrows():
-    #         time_reset = int(event['time_rel_sec'])
-    #         # print time_reset
-    #         ax1.axvline(time_reset, color="red", linestyle="--");
-    #         ax2.axvline(time_reset, color="red", linestyle="--");
-    #         # ax3.axvline(time_reset, color="red", linestyle="--");
-    #
-    #         solved = event['solved']
-    #         board_name = event['board_name']
-    #
-    #     undos = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='undo')]
-    #
-    #     for index, event in undos.iterrows():
-    #         time_undo = int(event['time_rel_sec'])
-    #         # print time_undo
-    #         ax1.axvline(time_undo, color="purple", linestyle="--");
-    #         ax2.axvline(time_undo, color="purple", linestyle="--");
-    #         # ax3.axvline(time_undo, color="purple", linestyle="--");
-    #
-    #
-    #
-    #     ax2.set(yscale="symlog")
-    #     ax2.set_ylim(-100,100)
-    #
-    #     # ax3.set(yscale="symlog")
-    #     # ax3.set_ylim(-100000,100000)
-    #     # plt.show()
-    #
-    #     ax2.set_ylabel('score vs. best')
-    #     # ax3.set_ylabel('o score vs. best')
-    #
-    #     title = user + '_' + solved + '_' + board_name
-    #     ax1.set_title(title)
-    #     plt.show()
+    userids = dynamics['userid'].unique()
+
+    for user in userids:
+        # print user
+        f, (ax1, ax2) = plt.subplots(2, figsize = (20,10))
+        clicks_filtered = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click')]
+        clicks_filtered_p1 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==1)]
+        clicks_filtered_p2 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==2)]
+
+        # ax = sns.FacetGrid(dynamics_filtered, row="userid")
+        # ax = ax.map_dataframe(sns.tsplot, time='time_rel_sec', value='time_between', unit='userid', data=clicks_filtered, interpolate=False)
+        if (len(clicks_filtered_p1) < 2) | (len(clicks_filtered_p2) < 2):
+            continue
+        sns.tsplot(time='time_rel_sec', value='time_from_action', unit='userid', data=clicks_filtered, interpolate=False, ax=ax1)
+        sns.tsplot(time='time_rel_sec', value='score_heuristic_x', unit='userid', data=clicks_filtered, interpolate=False, color='blue', ax=ax2)
+        # sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p1, interpolate=False, color='orange',  ax=ax2)
+
+        # sns.tsplot(time='time_rel_sec', value='score_move', unit='userid', data=clicks_filtered_p2, interpolate=False, color='black', ax=ax2)
+        # sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p2, interpolate=False, color='orange',  ax=ax2)
+
+        solved = clicks_filtered['solved'].iloc[0]
+        board_name = clicks_filtered['board_name'].iloc[0]
+        resets = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='reset')]
+
+        for index, event in resets.iterrows():
+            time_reset = int(event['time_rel_sec'])
+            # print time_reset
+            ax1.axvline(time_reset, color="red", linestyle="--");
+            ax2.axvline(time_reset, color="red", linestyle="--");
+            # ax3.axvline(time_reset, color="red", linestyle="--");
+
+            solved = event['solved']
+            board_name = event['board_name']
+
+        undos = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='undo')]
+
+        for index, event in undos.iterrows():
+            time_undo = int(event['time_rel_sec'])
+            # print time_undo
+            ax1.axvline(time_undo, color="purple", linestyle="--");
+            ax2.axvline(time_undo, color="purple", linestyle="--");
+            # ax3.axvline(time_undo, color="purple", linestyle="--");
+
+
+
+        ax2.set(yscale="symlog")
+        ax2.set_ylim(-110,110)
+
+        # ax3.set(yscale="symlog")
+        # ax3.set_ylim(-100000,100000)
+        # plt.show()
+
+        ax2.set_ylabel('score_heuristic_x')
+        # ax3.set_ylabel('o score vs. best')
+
+        title = user + '_' + solved + '_' + board_name
+        ax1.set_title(title)
+        plt.show()
         # plt.savefig("dynamics/time_series3/timeSeries_"+ title +".png", format='png')
 
-        # plt.clf()
-        # plt.close()
+        plt.clf()
+        plt.close()
 
     # participant actions figure-----
     # ax = sns.factorplot(x="board", y="actionsSolution", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 medium', '10 medium', '6 hard', '10 hard', '10 CV'],  markers=['o','^'], legend_out=False, legend=False)

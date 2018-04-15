@@ -845,9 +845,11 @@ def transition_probs(output_file):
     results_table = []
     scores_blocking = []
     scores_interaction = []
+    scores_linear = []
     scores_density = []
     scores_blocking_density = []
     scores_interaction_density = []
+    scores_linear_density = []
     board_states = []
     boards = []
     player_list = []
@@ -879,25 +881,27 @@ def transition_probs(output_file):
             board_name=board_name[:-4]
             board_name = board_name[5:-6]
 
-            scores_block = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
-            scores_int = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
-            scores_dens = compute_scores_layers_for_matrix(initial_board,player='X', normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
+            scores_block = compute_scores_layers_for_matrix(initial_board,player='X', normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+            scores_int = compute_scores_layers_for_matrix(initial_board,player='X', normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+            scores_lin = compute_scores_layers_for_matrix(curr_move_matrix,player='X', normalized=False,o_weight=0.5, exp=1, neighborhood_size=2, block=False)
+            scores_dens = compute_scores_layers_for_matrix(initial_board,player='X', normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
             scores_block_density = scores_block
             scores_int_density = scores_int
+            scores_lin_dens = scores_lin
             # probs_block = get_prob_matrix(scores_block)
             # probs_int = get_prob_matrix(scores_int)
             # probs_dens = get_prob_matrix(scores_dens)
             probs_block = scores_block
             probs_int = scores_int
             probs_dens = scores_dens
-            print np.sum(probs_block)
-            print np.sum(probs_int)
-            print np.sum(probs_dens)
+
             scores_blocking.append(str(probs_block))
             scores_interaction.append(str(probs_int))
             scores_density.append(str(probs_dens))
             scores_blocking_density.append(str(scores_block_density))
             scores_interaction_density.append(str(scores_int_density))
+            scores_linear.append(str(scores_lin))
+            scores_linear_density.append(str(scores_lin_dens))
             board_states.append(str(curr_move_matrix))
             player_list.append(1)
             boards.append(board_name)
@@ -952,14 +956,17 @@ def transition_probs(output_file):
 
 
                     if str(curr_move_matrix) not in board_states:
-                        scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
-                        scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
-                        scores_dens = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
+                        scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+                        scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+                        scores_lin = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=1, neighborhood_size=2, block=False)
+                        scores_dens = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
                         scores_block_density = scores_block
                         scores_int_density = scores_int
+                        scores_lin_dens = scores_lin
                         if player == 2:
                             scores_block_density = scores_dens
                             scores_int_density = scores_dens
+                            scores_lin_dens = scores_dens
                         # probs_block = get_prob_matrix(scores_block)
                         # probs_int = get_prob_matrix(scores_int)
                         # probs_dens = get_prob_matrix(scores_dens)
@@ -980,6 +987,8 @@ def transition_probs(output_file):
                         scores_density.append(str(probs_dens))
                         scores_blocking_density.append(str(scores_block_density))
                         scores_interaction_density.append(str(scores_int_density))
+                        scores_linear.append(str(scores_lin))
+                        scores_linear_density.append(str(scores_lin_dens))
                         board_states.append(str(curr_move_matrix))
                         player_list.append(player)
                         boards.append(board_name)
@@ -988,19 +997,48 @@ def transition_probs(output_file):
                     if (curr_move_matrix[rowPos][colPos]!=1) & (curr_move_matrix[rowPos][colPos]!=2):
                         curr_move_matrix[rowPos][colPos] = player
 
+                    if player_type == 'O':
+                        player_type = 'X'
+                    else:
+                        player_type = 'O'
                     # if str(curr_move_matrix) not in board_states:
-                    #     scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
-                    #     scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
-                    #     scores_dens = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
-                    #     probs_block = get_prob_matrix(scores_block)
-                    #     probs_int = get_prob_matrix(scores_int)
-                    #     probs_dens = get_prob_matrix(scores_dens)
-                    #     scores_blocking.append(str(copy.deepcopy(probs_block)))
-                    #     scores_interaction.append(str(copy.deepcopy(probs_int)))
-                    #     scores_density.append(str(copy.deepcopy(probs_dens)))
-                    #     board_states.append(str(copy.deepcopy(curr_move_matrix)))
-                    #     player_list.append(player)
-                    #     boards.append(board_name)
+                    if str(curr_move_matrix) not in board_states:
+                        scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=True)
+                        scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=False)
+                        scores_lin = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=1, neighborhood_size=2, block=False)
+                        scores_dens = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=False,o_weight=0.5, exp=2, neighborhood_size=2, block=False, only_density=True)
+                        scores_block_density = scores_block
+                        scores_int_density = scores_int
+                        scores_lin_dens = scores_lin
+                        if player == 2:
+                            scores_block_density = scores_dens
+                            scores_int_density = scores_dens
+                            scores_lin_dens = scores_dens
+                        # probs_block = get_prob_matrix(scores_block)
+                        # probs_int = get_prob_matrix(scores_int)
+                        # probs_dens = get_prob_matrix(scores_dens)
+                        probs_block = scores_block
+                        probs_int = scores_int
+                        probs_dens = scores_dens
+                        # print np.sum(probs_block)
+                        # print np.sum(probs_int)
+                        # print np.sum(probs_dens)
+                        # if np.sum(probs_block) < 0.99:
+                        #     print 'wow'
+                        # if np.sum(probs_int) < 0.99:
+                        #     print 'wow'
+                        # if np.sum(probs_dens) < 0.99:
+                        #     print 'wow'
+                        scores_blocking.append(str(probs_block))
+                        scores_interaction.append(str(probs_int))
+                        scores_density.append(str(probs_dens))
+                        scores_blocking_density.append(str(scores_block_density))
+                        scores_interaction_density.append(str(scores_int_density))
+                        scores_linear.append(str(scores_lin))
+                        scores_linear_density.append(str(scores_lin_dens))
+                        board_states.append(str(curr_move_matrix))
+                        player_list.append(player)
+                        boards.append(board_name)
 
                 elif row['key'] == 'reset':
                     curr_move_matrix = copy.deepcopy(initial_board)
@@ -1053,7 +1091,7 @@ def transition_probs(output_file):
     print len(scores_interaction_density)
 
 
-    trans_dict = {'board_name':boards, 'player':player_list,'board_state':board_states,'probs_blocking':scores_blocking,'probs_interaction':scores_interaction,'probs_density':scores_density, 'probs_blocking_dens':scores_blocking_density,'probs_interaction_dens':scores_interaction_density}
+    trans_dict = {'board_name':boards, 'player':player_list,'board_state':board_states,'probs_blocking':scores_blocking,'probs_interaction':scores_interaction,'probs_density':scores_density, 'probs_blocking_dens':scores_blocking_density,'probs_interaction_dens':scores_interaction_density, 'probs_linear': scores_linear, 'probs_linear_dens':scores_linear_density}
 
     transitions =pd.DataFrame(trans_dict)
     print str(len(transitions['board_state'].unique()))
@@ -2603,7 +2641,7 @@ if __name__ == "__main__":
     # paths_stats(participants='wrong')
     # moves_stats('stats/dynamics09042018.csv')
     # check_participant_answer('63e5efe1')
-    transition_probs('stats/transitions_combinations')
+    transition_probs('stats/state_scores_heuristics_post')
     # explore_exploit('stats/exploreExploitTimesPathLength2603.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
