@@ -1569,7 +1569,17 @@ def explore_exploit(output_file):
 
                 if row['userid'] != curr_user:
                     user_counter += 1
-                    participant_answer = check_participant_answer(curr_user)
+                    if (exploit_time_start != None) & (explore_time_start != None):
+                        exploit_time = exploit_time_end - exploit_time_start
+                        explore_time = explore_time_end - explore_time_start
+                        curr_data['userid'] = curr_user
+                        curr_data['condition'] = condition
+                        curr_data['board_name'] = board_name
+                        curr_data['solved'] = participant_answer
+                        curr_data['explore_time'] = explore_time
+                        curr_data['exploit_time'] = exploit_time
+                        results_table.append(copy.deepcopy(curr_data))
+                        curr_data = {}
 
                     # reset all values for next user
                     prev_time = None
@@ -1580,6 +1590,7 @@ def explore_exploit(output_file):
                     curr_path = []
                     move_stack = []
                     curr_user = row['userid']
+                    participant_answer = check_participant_answer(curr_user)
                     initial_time = None
                     curr_move_matrix = copy.deepcopy(initial_board)
                     explore_time_start = None
@@ -1591,6 +1602,8 @@ def explore_exploit(output_file):
                     if reseted:
                         reset_count += 1
                     reseted = False
+
+
 
                 elif row['key'] == 'clickPos':
                     rowPos = int(row['value'][0])
@@ -1702,7 +1715,7 @@ def explore_exploit(output_file):
                     prev_time = row['time']
 
 
-                    if (exploit_time_start != None) & (explore_time_start != None) & (len(curr_path)==1):
+                    if (exploit_time_start != None) & (explore_time_start != None) & (len(curr_path)==0):
                         exploit_time = exploit_time_end - exploit_time_start
                         explore_time = explore_time_end - explore_time_start
                         curr_data['userid'] = curr_user
@@ -2641,8 +2654,8 @@ if __name__ == "__main__":
     # paths_stats(participants='wrong')
     # moves_stats('stats/dynamics09042018.csv')
     # check_participant_answer('63e5efe1')
-    transition_probs('stats/state_scores_heuristics_post')
-    # explore_exploit('stats/exploreExploitTimesPathLength2603.csv')
+    # transition_probs('stats/state_scores_heuristics_post')
+    explore_exploit('stats/exploreExploitTimesPathLength0416.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)

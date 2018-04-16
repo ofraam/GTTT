@@ -119,9 +119,8 @@ def change_width(ax, new_value) :
         patch.set_y(patch.get_y() + diff * .5)
 
 
-def get_user_stats():
-    dataset = pd.read_csv("stats/dynamics.csv")
-    exploreExploitData = pd.read_csv("stats/exploreExploit2603_avg.csv")
+def get_user_stats(dynamics, exploreExploitData):
+    dataset = dynamics
     all_data = []
     curr_data = {}
     for userid in dataset['userid'].unique():
@@ -131,9 +130,9 @@ def get_user_stats():
 
         curr_data['num_resets'] = user_data[user_data['action'] == 'reset'].shape[0]
         curr_data['num_restarts'] = user_data[(user_data['prev_action'] != '') & (user_data['move_number_in_path'] == 1)].shape[0]
-        curr_data['mean_score'] = user_data['score_move'].mean()
-        curr_data['median_score'] = user_data['score_move'].median()
-        curr_data['num_moves_win_score'] = user_data[(user_data['score_move'] == 10000) & (user_data['player'] == 1)].shape[0]
+        curr_data['mean_score'] = user_data['score_heuristic_x'].mean()
+        curr_data['median_score'] = user_data['score_heuristic_x'].median()
+        curr_data['num_moves_win_score'] = user_data[(user_data['score_heuristic_x'] == 100) & (user_data['player'] == 1)].shape[0]
         first_moves = user_data.loc[user_data['move_number_in_path'] == 1]
         curr_data['num_unique_first_moves'] = len(first_moves['position'].unique())
         curr_data['solved'] = user_data.iloc[0]['solved']
@@ -142,13 +141,13 @@ def get_user_stats():
         curr_data['solution_time'] = user_data['time_rel_sec'].max()
         curr_data['explore_time'] = None
         curr_data['exploit_time'] = None
-        curr_data['avg_first_move_score'] = first_moves['score_move'].mean()
-        curr_data['median_first_move_score'] = first_moves['score_move'].median()
+        curr_data['avg_first_move_score'] = first_moves['score_heuristic_x'].mean()
+        curr_data['median_first_move_score'] = first_moves['score_heuristic_x'].median()
         if exploreExploitData_user.shape[0]>0:
             curr_data['explore_time'] = exploreExploitData_user.iloc[0]['explore_time']
             curr_data['exploit_time'] = exploreExploitData_user.iloc[0]['exploit_time']
         all_data.append(copy.deepcopy(curr_data))
-    dataFile = open('stats\user_stats2603_3.csv', 'wb')
+    dataFile = open('stats\user_stats1604.csv', 'wb')
     dataWriter = csv.DictWriter(dataFile, fieldnames=curr_data.keys(), delimiter=',')
     dataWriter.writeheader()
     for record in all_data:
@@ -849,7 +848,7 @@ def tag_last_moves_in_path(dynamics):
 
 if __name__== "__main__":
     # compute_path_probabilities_participants();
-    # # get_user_stats()
+
     # print stats.wasserstein_distance([1,2,7], [3,1,6])
     # print stats.wasserstein_distance([0.1,0.2,0.7], [0.3,0.1,0.6])
     # compare_distributions_simulation_population();
@@ -891,7 +890,7 @@ if __name__== "__main__":
 
     # exploreExploit = pd.read_csv("stats/exploreExploit0311_avg.csv")
     # exploreExploit = pd.read_csv("stats/exploreExploitPath_avg.csv")
-    exploreExploit = pd.read_csv("stats/exploreExploitCombined2.csv")
+    exploreExploit = pd.read_csv("stats/explore_exploit_avg_1604.csv")
     # exploreExploit2 = pd.read_csv("stats/exploreExploitData2.csv")
     # exploreExploit2 = pd.read_csv("stats/exploreExploitDataNoUndo.csv")
     timeResets = pd.read_csv("stats/timeBeforeReset.csv")
@@ -901,6 +900,26 @@ if __name__== "__main__":
     # resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
     resetsDelta = pd.read_csv("stats/resetsFiltered2.csv")
 
+    # get_user_stats(dynamics,exploreExploit)
+
+    # exploreExploitRaw = pd.read_csv("stats/exploreExploitTimesPathLength0416.csv")
+    # f = {'explore_time':['mean','std'], 'exploit_time':['mean','std'], 'solved': ['first'], 'board_name': ['first']}
+    #
+    # exploreExploitAvg = exploreExploitRaw.groupby('userid').agg(f)
+    # exploreExploitAvg.to_csv('stats/explore_exploit_avg_1604.csv')
+    # print 1/0
+
+    # stop conditions exploration
+    # six = ['6_hard_full', '6_easy_full', '6_hard_pruned', '6_easy_pruned']
+    # dynamics_filtered = dynamics.loc[(dynamics['score_heuristic'] < 90) & (dynamics['score_heuristic'] > -90) & (dynamics['action'] == 'click') & (dynamics['player'] == 1) & (dynamics['move_number_in_path'] == 5) & (dynamics['board_size'] == 6)]
+    # # dynamics_filtered = dynamics.loc[ (dynamics['action'] == 'click')]
+    # g = sns.FacetGrid(dynamics_filtered, row="board_size", col="last_move", legend_out=False)
+    # # sns.barplot(data=dynamics_filtered, x='board_size', y='score_heuristic_x', hue='last_move', n_boot=1000)
+    # bins = np.linspace(-30, 30, 30)
+    # g.map(plt.hist, "potential_score_heuristic_x", color="steelblue", bins=bins, lw=0)
+    # # g.map(sns.distplot, "score_heuristic_x")
+    # plt.show()
+    # g.map()
     # # ten_to_win = ['6_hard_full', '10_hard_full', '10_medium_full']
     # # eight_to_win = ['6_hard_pruned', '10_hard_pruned', '10_medium_pruned', '10_easy_full', '6_easy_full']
     # # six_to_win = ['6_easy_pruned', '10_easy_pruned']
@@ -922,7 +941,7 @@ if __name__== "__main__":
     # print 1/0
 
     # -- explore-exploit correlation line
-    # user_stats_exploration = pd.read_csv("stats/user_stats2603_3.csv")
+    # user_stats_exploration = pd.read_csv("stats/user_stats1604.csv")
     # df = user_stats_exploration[['explore_time','exploit_time']]
     # lof = LocalOutlierFactor()
     # outliers =  lof.fit_predict(df)
@@ -970,7 +989,7 @@ if __name__== "__main__":
     #     distance = math.sqrt((math.pow(row['explore_time']-min_x_val,2) + math.pow(row['exploit_time']-min_y_val,2)))
     #     exploration.append(distance+min_explore)
     # user_stats_exploration_filtered['exploration'] = exploration
-    # user_stats_exploration_filtered.to_csv('stats/exploreExploitCombined2.csv')
+    # user_stats_exploration_filtered.to_csv('stats/exploreExploitCombined1604.csv')
     # print 1/0
     #
     # lr = LinearRegression()
@@ -996,21 +1015,21 @@ if __name__== "__main__":
     # clf = linear_model.Lasso()
     # scores = cross_val_score(clf, X, y, cv=10)
     # g = sns.FacetGrid(user_stats_exploration_filtered, col="correctness", margin_titles=True)
-    # user_stats_exploration = pd.read_csv("stats/exploreExploitCombined2.csv")
-    # # user_stats_exploration_filtered =user_stats_exploration.loc[user_stats_exploration['exploration']]
-    # # user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
-    # # user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
-    # g = sns.FacetGrid(user_stats_exploration, col="correct", margin_titles=True)
-    # # # #
+    user_stats_exploration = pd.read_csv("stats/exploreExploitCombined1604.csv")
+    # user_stats_exploration_filtered =user_stats_exploration.loc[user_stats_exploration['exploration']]
+    # user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
+    # user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
+    g = sns.FacetGrid(user_stats_exploration, row="board", margin_titles=True)
+    # # #
     # bins = np.linspace(0, 120, 20)
-    # # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
+    # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
     # g.map(sns.distplot, "exploration", bins=bins)
-    # test_char = "avg_first_move_score"
-    # # g.map(sns.regplot,"exploration", test_char);
-    # # print stats.spearmanr(user_stats_exploration_6hard['exploration'], user_stats_exploration_6hard[test_char])
-    # #
-    # # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration, n_boot=1000)
-    # plt.show()
+    test_char = "avg_first_move_score"
+    g.map(sns.regplot,"exploration", test_char);
+    print stats.spearmanr(user_stats_exploration['exploration'], user_stats_exploration[test_char])
+    #
+    # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration, n_boot=1000)
+    plt.show()
 
     # feature_names = ["num_moves", "solved"]
     # df = pd.DataFrame(user_stats_exploration_filtered, columns=feature_names)
