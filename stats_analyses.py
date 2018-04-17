@@ -13,10 +13,14 @@ from  sklearn.neighbors import LocalOutlierFactor
 from altair import Chart
 from IPython.display import display
 from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
 import math
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
+# from patsy import
 from replay import *
+
 # import Tkinter
 import ast
 
@@ -855,7 +859,7 @@ if __name__== "__main__":
     # probability_of_continuing_path()
     # states_cont = pd.read_csv("stats/states_continued.csv")
     # # # & (states_cont['board'] == '6_hard_full')
-    # states_cont_filtered = states_cont.loc[(states_cont['count'] > 4) & (states_cont['path_length'] <6) & (states_cont['path_length'] > 0)]
+    # states_cont_filtered = states_cont.loc[(states_cont['count'] > 4) & (states_cont['path_length'] <7) & (states_cont['path_length'] > 0)]
     # ax = sns.regplot(x="count", y="probability", data=states_cont_filtered, n_boot=1000)
     # # plt.hist(states_cont_filtered['probability'])
     # # g = sns.FacetGrid(states_cont_filtered, col="path_length", legend_out=False)
@@ -874,7 +878,7 @@ if __name__== "__main__":
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     # dynamics = pd.read_csv("stats/dynamics.csv")
-    dynamics = pd.read_csv("stats/moves_hueristic_scores_last.csv")
+    dynamics = pd.read_csv("stats/moves_hueristic_scores_explore.csv")
     transitions = pd.read_csv("stats/transitions_combinations_all.csv",dtype = {'board_state':str})
     scores = pd.read_csv("stats/state_scores_heuristics_post.csv",dtype = {'board_state':str})
     # fit_heuristic_user(transitions,dynamics)
@@ -910,15 +914,39 @@ if __name__== "__main__":
     # print 1/0
 
     # stop conditions exploration
+    # & (dynamics['move_number_in_path'] == 6)
+    # dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['board_name'] == '6_hard_full') & (dynamics['state_score_x'] > 9) & (dynamics['state_score_x'] < 100) &  (dynamics['last_move'] == True)]
+    # dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['state_score_x'] > 9) & (dynamics['state_score_x'] < 100) & (dynamics['move_number_in_path'] <4)]
+    # print dynamics_filtered.shape[0]
+    # print 1/0
+    # lr = LogisticRegression(class_weight='balanced')
+    # # lr = LogisticRegression()
+    # y = dynamics_filtered.last_move_ind
+    # # df = dynamics_filtered[['state_score_x','loss','win', 'explore','move_number_in_path']]
+    # df = dynamics_filtered[['move_number_in_path']]
+    # print np.mean(y)
+    # predicted = cross_val_predict(lr, df, y, cv=10)
+    # scores_lr = cross_val_score(lr, df, y, cv=10)
+    # print np.mean(predicted)
+    # print scores_lr
+    # print 'done'
+    # df = dynamics_filtered[['move_number_in_path','state_score_x', 'win','loss']]
+    # scores_lr = cross_val_score(lr, df, y, cv=10)
+    # print scores_lr
+    # print 1/0
     # six = ['6_hard_full', '6_easy_full', '6_hard_pruned', '6_easy_pruned']
-    # dynamics_filtered = dynamics.loc[(dynamics['score_heuristic'] < 90) & (dynamics['score_heuristic'] > -90) & (dynamics['action'] == 'click') & (dynamics['player'] == 1) & (dynamics['move_number_in_path'] == 5) & (dynamics['board_size'] == 6)]
-    # # dynamics_filtered = dynamics.loc[ (dynamics['action'] == 'click')]
-    # g = sns.FacetGrid(dynamics_filtered, row="board_size", col="last_move", legend_out=False)
-    # # sns.barplot(data=dynamics_filtered, x='board_size', y='score_heuristic_x', hue='last_move', n_boot=1000)
-    # bins = np.linspace(-30, 30, 30)
-    # g.map(plt.hist, "potential_score_heuristic_x", color="steelblue", bins=bins, lw=0)
-    # # g.map(sns.distplot, "score_heuristic_x")
-    # plt.show()
+    #  # & (dynamics['move_number_in_path'] == 5)
+    dynamics_filtered = dynamics.loc[(dynamics['state_score_x'] < 90) & (dynamics['state_score_x'] > 4) & (dynamics['action'] == 'click')  &  (dynamics['move_number_in_path'] < 10)]
+    # dynamics_filtered = dynamics.loc[(dynamics['score_heuristic'] < 90) & (dynamics['score_heuristic'] > -90) & (dynamics['action'] == 'click')  & (dynamics['move_number_in_path'] == 2) & (dynamics['last_move'] == True)]
+    # dynamics_filtered = dynamics.loc[ (dynamics['action'] == 'click')]
+    # g = sns.FacetGrid(dynamics_filtered, row="board_size", col="last_move",  legend_out=False)
+    sns.barplot(data=dynamics_filtered, x='state_score_x_5', y='last_move',n_boot=1000)
+    # bins = np.linspace(0, 30, 30)
+    # g.map(plt.hist, "state_score_x", color="steelblue", bins=bins, lw=0)
+    # ax = g.ax_joint
+    # g.set_yscale('symlog')
+    # g.map(sns.distplot, "score_heuristic_x")
+    plt.show()
     # g.map()
     # # ten_to_win = ['6_hard_full', '10_hard_full', '10_medium_full']
     # # eight_to_win = ['6_hard_pruned', '10_hard_pruned', '10_medium_pruned', '10_easy_full', '6_easy_full']
@@ -1015,21 +1043,21 @@ if __name__== "__main__":
     # clf = linear_model.Lasso()
     # scores = cross_val_score(clf, X, y, cv=10)
     # g = sns.FacetGrid(user_stats_exploration_filtered, col="correctness", margin_titles=True)
-    user_stats_exploration = pd.read_csv("stats/exploreExploitCombined1604.csv")
-    # user_stats_exploration_filtered =user_stats_exploration.loc[user_stats_exploration['exploration']]
-    # user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
-    # user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
-    g = sns.FacetGrid(user_stats_exploration, row="board", margin_titles=True)
-    # # #
-    # bins = np.linspace(0, 120, 20)
-    # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
-    # g.map(sns.distplot, "exploration", bins=bins)
-    test_char = "avg_first_move_score"
-    g.map(sns.regplot,"exploration", test_char);
-    print stats.spearmanr(user_stats_exploration['exploration'], user_stats_exploration[test_char])
-    #
-    # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration, n_boot=1000)
-    plt.show()
+    # user_stats_exploration = pd.read_csv("stats/exploreExploitCombined1604.csv")
+    # # user_stats_exploration_filtered =user_stats_exploration.loc[user_stats_exploration['exploration']]
+    # # user_stats_exploration_correct = user_stats_exploration.loc[user_stats_exploration['solved']=='validatedCorrect']
+    # # user_stats_exploration_6hard = user_stats_exploration.loc[user_stats_exploration['typeSize']=='6hard']
+    # g = sns.FacetGrid(user_stats_exploration, row="board", margin_titles=True)
+    # # # #
+    # # bins = np.linspace(0, 120, 20)
+    # # g.map(plt.hist, "exploration", color="steelblue", bins=bins, lw=0)
+    # # g.map(sns.distplot, "exploration", bins=bins)
+    # test_char = "avg_first_move_score"
+    # g.map(sns.regplot,"exploration", test_char);
+    # print stats.spearmanr(user_stats_exploration['exploration'], user_stats_exploration[test_char])
+    # #
+    # # ax = sns.regplot(x="exploration", y="num_resets",data=user_stats_exploration, n_boot=1000)
+    # plt.show()
 
     # feature_names = ["num_moves", "solved"]
     # df = pd.DataFrame(user_stats_exploration_filtered, columns=feature_names)
