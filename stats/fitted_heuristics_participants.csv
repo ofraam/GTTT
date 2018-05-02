@@ -1,0 +1,12 @@
+heuristic_subset,blocking_density,,,
+,,,,
+Row Labels,Count of userid,Average of likelihoods_block,Average of likelihoods_block_dens,
+solvedCorrect,27,-3.020580031,-2.734242721,
+validatedCorrect,80,-2.481585945,-2.091078349,
+wrong,91,-2.916305139,-2.562284225,
+Grand Total,198,-2.754880324,-2.395346898,
+,,,,
+,,,,
+,,,,
+,,,,0.273148148
+,,,,0.404040404

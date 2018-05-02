@@ -14,6 +14,12 @@ from altair import Chart
 from IPython.display import display
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import PolynomialFeatures
+from lmfit import minimize as lmmin
+from lmfit import Parameters
+
+
 from sklearn import metrics
 import math
 from sklearn.model_selection import cross_val_score
@@ -110,6 +116,14 @@ def bootstrap_t_pvalue(x, y, equal_var=False, B=10000, plot=False):
         plt.figure()
         plt.hist(sampling_distribution, bins="fd")
 
+
+def residual(p, x, data):
+    vmax = p['vmax'].value
+    # vmax = 1.0
+    km = p['km'].value
+    model = vmax * x / (km + x)
+    # model =  x / (km + x)
+    return (data - model)
 
 def change_width(ax, new_value) :
     for patch in ax.patches :
@@ -851,6 +865,35 @@ def tag_last_moves_in_path(dynamics):
 
 
 if __name__== "__main__":
+
+    states_cont = pd.read_csv("stats/states_continued.csv")
+    states_cont_filtered = states_cont.loc[(states_cont['count'] > 4) & (states_cont['path_length'] <7) & (states_cont['path_length'] > 0)]
+    s = states_cont_filtered['count']
+    v = states_cont_filtered['probability']
+    # s = np.float_(np.array(range(0,1201,1200/8)))
+    # v = np.round(120*s/(171+s) + np.random.uniform(size=9), 2)
+    p = Parameters()
+    p.add('vmax', value=1., min=0.)
+    p.add('km', value=1., min=0.)
+
+    out = lmmin(residual, p, args=(s, v))
+    sns.regplot(s,v, fit_reg = False)
+    ss = np.float_(np.array(range(0,300,1)))
+    y = out.params['vmax'].value * ss / (out.params['km'].value + ss)
+
+    # y =  ss / (out.params['km'].value + ss)
+    sns.regplot(ss,y, fit_reg = False, color='red')
+    # plt.show()
+    print out.params
+    plt.show()
+    print 1/0
+    # plot(s, v, 'bo')
+    # hold(True)
+    #
+    # ss = np.float_(np.array(range(0,1201,1200/100)))
+    # y = p['vmax'].value * ss / (p['km'].value + ss)
+    # plot(ss, y, 'r-')
+    # hold(False)
     # compute_path_probabilities_participants();
 
     # print stats.wasserstein_distance([1,2,7], [3,1,6])
@@ -916,13 +959,15 @@ if __name__== "__main__":
     # stop conditions exploration
     # & (dynamics['move_number_in_path'] == 6)
     # dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['board_name'] == '6_hard_full') & (dynamics['state_score_x'] > 9) & (dynamics['state_score_x'] < 100) &  (dynamics['last_move'] == True)]
-    # dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['state_score_x'] > 9) & (dynamics['state_score_x'] < 100) & (dynamics['move_number_in_path'] <4)]
-    # print dynamics_filtered.shape[0]
+    # & (dynamics['move_number_in_path'] == 6)
+    dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['state_score_x'] > -100) & (dynamics['state_score_x'] < 100) & (dynamics['board_name'] == '6_hard_full') & (dynamics['move_number_in_path'] == 5)]
+    print dynamics_filtered.shape[0]
     # print 1/0
-    # lr = LogisticRegression(class_weight='balanced')
-    # # lr = LogisticRegression()
-    # y = dynamics_filtered.last_move_ind
-    # # df = dynamics_filtered[['state_score_x','loss','win', 'explore','move_number_in_path']]
+    lr = LogisticRegression(class_weight='balanced')
+    rf = RandomForestClassifier(n_estimators=25,max_depth=10, class_weight='balanced')
+    # lr = LogisticRegression()
+    y = dynamics_filtered.last_move_ind
+    # df = dynamics_filtered[['state_score_x','loss','win', 'explore','move_number_in_path']]
     # df = dynamics_filtered[['move_number_in_path']]
     # print np.mean(y)
     # predicted = cross_val_predict(lr, df, y, cv=10)
@@ -930,10 +975,18 @@ if __name__== "__main__":
     # print np.mean(predicted)
     # print scores_lr
     # print 'done'
-    # df = dynamics_filtered[['move_number_in_path','state_score_x', 'win','loss']]
-    # scores_lr = cross_val_score(lr, df, y, cv=10)
-    # print scores_lr
-    # print 1/0
+    df = dynamics_filtered[[ 'state_score_x','move_number_in_path']]
+    poly = PolynomialFeatures(interaction_only=True,include_bias = False)
+    df1 = poly.fit_transform(df)
+    scores_lr = cross_val_score(lr, df1, y, cv=10)
+    print scores_lr
+    lr.fit(df1, y)
+    print lr.coef_
+    # df = dynamics_filtered[['explore','state_score_x', 'path_number']]
+    scores_rf = cross_val_score(rf, df, y, cv=10)
+    # print scores_rf
+    print np.mean(dynamics_filtered.last_move_ind)
+    print 1/0
     # six = ['6_hard_full', '6_easy_full', '6_hard_pruned', '6_easy_pruned']
     #  # & (dynamics['move_number_in_path'] == 5)
     dynamics_filtered = dynamics.loc[(dynamics['state_score_x'] < 90) & (dynamics['state_score_x'] > 4) & (dynamics['action'] == 'click')  &  (dynamics['move_number_in_path'] < 10)]
