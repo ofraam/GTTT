@@ -16,6 +16,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.model_selection import GroupKFold
+from sklearn.metrics import roc_curve
+from scipy import interp
 from lmfit import minimize as lmmin
 from lmfit import Parameters
 
@@ -866,27 +869,27 @@ def tag_last_moves_in_path(dynamics):
 
 if __name__== "__main__":
 
-    states_cont = pd.read_csv("stats/states_continued.csv")
-    states_cont_filtered = states_cont.loc[(states_cont['count'] > 4) & (states_cont['path_length'] <7) & (states_cont['path_length'] > 0)]
-    s = states_cont_filtered['count']
-    v = states_cont_filtered['probability']
-    # s = np.float_(np.array(range(0,1201,1200/8)))
-    # v = np.round(120*s/(171+s) + np.random.uniform(size=9), 2)
-    p = Parameters()
-    p.add('vmax', value=1., min=0.)
-    p.add('km', value=1., min=0.)
-
-    out = lmmin(residual, p, args=(s, v))
-    sns.regplot(s,v, fit_reg = False)
-    ss = np.float_(np.array(range(0,300,1)))
-    y = out.params['vmax'].value * ss / (out.params['km'].value + ss)
-
-    # y =  ss / (out.params['km'].value + ss)
-    sns.regplot(ss,y, fit_reg = False, color='red')
+    # states_cont = pd.read_csv("stats/states_continued.csv")
+    # states_cont_filtered = states_cont.loc[(states_cont['count'] > 4) & (states_cont['path_length'] <7) & (states_cont['path_length'] > 0)]
+    # s = states_cont_filtered['count']
+    # v = states_cont_filtered['probability']
+    # # s = np.float_(np.array(range(0,1201,1200/8)))
+    # # v = np.round(120*s/(171+s) + np.random.uniform(size=9), 2)
+    # p = Parameters()
+    # p.add('vmax', value=1., min=0.)
+    # p.add('km', value=1., min=0.)
+    #
+    # out = lmmin(residual, p, args=(s, v))
+    # sns.regplot(s,v, fit_reg = False)
+    # ss = np.float_(np.array(range(0,300,1)))
+    # y = out.params['vmax'].value * ss / (out.params['km'].value + ss)
+    #
+    # # y =  ss / (out.params['km'].value + ss)
+    # sns.regplot(ss,y, fit_reg = False, color='red')
+    # # plt.show()
+    # print out.params
     # plt.show()
-    print out.params
-    plt.show()
-    print 1/0
+    # print 1/0
     # plot(s, v, 'bo')
     # hold(True)
     #
@@ -960,7 +963,7 @@ if __name__== "__main__":
     # & (dynamics['move_number_in_path'] == 6)
     # dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['board_name'] == '6_hard_full') & (dynamics['state_score_x'] > 9) & (dynamics['state_score_x'] < 100) &  (dynamics['last_move'] == True)]
     # & (dynamics['move_number_in_path'] == 6)
-    dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['state_score_x'] > -100) & (dynamics['state_score_x'] < 100) & (dynamics['board_name'] == '6_hard_full') & (dynamics['move_number_in_path'] == 5)]
+    dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['state_score_x'] > -100) & (dynamics['state_score_x'] < 100)  & (dynamics['move_number_in_path'] > 3)]
     print dynamics_filtered.shape[0]
     # print 1/0
     lr = LogisticRegression(class_weight='balanced')
@@ -975,16 +978,63 @@ if __name__== "__main__":
     # print np.mean(predicted)
     # print scores_lr
     # print 'done'
-    df = dynamics_filtered[[ 'state_score_x','move_number_in_path']]
+    df = dynamics_filtered[['explore_norm','move_number_in_path']]
+    # df = dynamics_filtered[[ 'explore_norm','move_number_in_path','state_score_x']]
     poly = PolynomialFeatures(interaction_only=True,include_bias = False)
     df1 = poly.fit_transform(df)
-    scores_lr = cross_val_score(lr, df1, y, cv=10)
+    gkf = GroupKFold(n_splits=10)
+    cv= gkf.split(df1, y, groups=dynamics_filtered[[ 'userid']])
+        # print("%s %s" % (train, test))
+
+    scores_lr = cross_val_score(lr, df1, y, cv=cv, scoring='roc_auc')
     print scores_lr
+
+
+
     lr.fit(df1, y)
     print lr.coef_
     # df = dynamics_filtered[['explore','state_score_x', 'path_number']]
-    scores_rf = cross_val_score(rf, df, y, cv=10)
+    cv= gkf.split(df1, y, groups=dynamics_filtered[[ 'userid']])
+    # scores_rf = cross_val_score(rf, df1, y, cv=cv, scoring='roc_auc')
     # print scores_rf
+
+    tprs = []
+    base_fpr = np.linspace(0, 1, 101)
+    y = dynamics_filtered[['last_move_ind']].values
+    plt.figure(figsize=(5, 5))
+    cv= gkf.split(df1, y, groups=dynamics_filtered[[ 'userid']])
+    aucs = []
+    for i, (train, test) in enumerate(cv):
+        model = lr.fit(df1[train], y[train])
+        y_score = model.predict_proba(df1[test])
+
+        fpr, tpr, _ = roc_curve(y[test], y_score[:, 1])
+        aucs.append(metrics.auc(fpr, tpr))
+        plt.plot(fpr, tpr, 'b', alpha=0.15)
+        tpr = interp(base_fpr, fpr, tpr)
+        tpr[0] = 0.0
+        tprs.append(tpr)
+
+    tprs = np.array(tprs)
+    mean_tprs = tprs.mean(axis=0)
+    std = tprs.std(axis=0)
+
+    tprs_upper = np.minimum(mean_tprs + std, 1)
+    tprs_lower = mean_tprs - std
+
+
+    plt.plot(base_fpr, mean_tprs, 'b')
+    plt.fill_between(base_fpr, tprs_lower, tprs_upper, color='grey', alpha=0.3)
+
+    plt.plot([0, 1], [0, 1],'r--')
+    plt.xlim([0, 1])
+    plt.ylim([0, 1])
+    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate')
+    plt.axes().set_aspect('equal', 'datalim')
+    plt.title(np.mean(aucs))
+    plt.show()
+
     print np.mean(dynamics_filtered.last_move_ind)
     print 1/0
     # six = ['6_hard_full', '6_easy_full', '6_hard_pruned', '6_easy_pruned']
