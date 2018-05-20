@@ -456,7 +456,7 @@ def fit_heuristic_user(transitions,dynamics):
                 heuristic.append('density')
     heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int, 'likelihood_linear': likelihoods_linear, 'likelihoods_linear_dens':likelihoods_linear_dens,'likelihoods_block_dens':likelihoods_block_dens,'likelihoods_int_dens':likelihoods_int_dens,'likelihoods_density':likelihoods_dens,'heuristic':heuristic}
     heuristics_df = pd.DataFrame(heuristic_vals)
-    heuristics_df.to_csv('stats/heuristics_fitted_combinations_13042018.csv')
+    heuristics_df.to_csv('stats/heuristics_fitted_combinations_20052018.csv')
 
 
 def fit_heuristic_user_path(transitions,dynamics):
@@ -845,7 +845,7 @@ def add_score_heuristic(dynamics, scores):
 
     dynamics['score_heuristic'] = scores_list
     dynamics['potential_score_heuristic'] = potential_scores
-    dynamics.to_csv('stats/moves_hueristic_scores.csv')
+    dynamics.to_csv('stats/moves_hueristic_scores_200518.csv')
 
 
 def tag_last_moves_in_path(dynamics):
@@ -926,11 +926,11 @@ if __name__== "__main__":
     # dynamics = pd.read_csv("stats/dynamics.csv")
     dynamics = pd.read_csv("stats/moves_hueristic_scores_explore.csv")
     transitions = pd.read_csv("stats/transitions_combinations_all.csv",dtype = {'board_state':str})
-    scores = pd.read_csv("stats/state_scores_heuristics_post.csv",dtype = {'board_state':str})
+    scores = pd.read_csv("stats/state_scores_heuristics_post_0520_fix.csv",dtype = {'board_state':str})
     # fit_heuristic_user(transitions,dynamics)
-    # add_score_heuristic(dynamics,scores)
+    add_score_heuristic(dynamics,scores)
     # tag_last_moves_in_path(dynamics)
-    # print 1/0
+    print 1/0
 
     states = pd.read_csv("stats/states.csv")
     # dynamics = pd.read_csv("stats/dynamicsFirstMoves1.csv")
@@ -963,7 +963,12 @@ if __name__== "__main__":
     # & (dynamics['move_number_in_path'] == 6)
     # dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['board_name'] == '6_hard_full') & (dynamics['state_score_x'] > 9) & (dynamics['state_score_x'] < 100) &  (dynamics['last_move'] == True)]
     # & (dynamics['move_number_in_path'] == 6)
-    dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['state_score_x'] > -100) & (dynamics['state_score_x'] < 100)  & (dynamics['move_number_in_path'] > 3)]
+    board_size = 10
+    moves_to_win = 10
+    # & (dynamics['board_size'] == board_size) & (dynamics['moves_to_win'] == moves_to_win)
+    # & (dynamics['move_number_in_path'] >2) & (dynamics['move_number_in_path'] < 4)
+    # & (dynamics['state_score_x'] > -100) & (dynamics['state_score_x'] < 100)
+    dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['heuristic'] == 'blocking') & ((dynamics['move_number_in_path'] % 2) == 1) & (dynamics['move_number_in_path'] < 9)]
     print dynamics_filtered.shape[0]
     # print 1/0
     lr = LogisticRegression(class_weight='balanced')
@@ -978,7 +983,8 @@ if __name__== "__main__":
     # print np.mean(predicted)
     # print scores_lr
     # print 'done'
-    df = dynamics_filtered[['explore_norm','move_number_in_path']]
+    # df = dynamics_filtered[['explore_norm','moves_to_win','board_size']]
+    df = dynamics_filtered[['explore_norm','move_number_in_path','win_now','loss_now','moves_to_win', 'state_score_x']]
     # df = dynamics_filtered[[ 'explore_norm','move_number_in_path','state_score_x']]
     poly = PolynomialFeatures(interaction_only=True,include_bias = False)
     df1 = poly.fit_transform(df)
@@ -986,13 +992,13 @@ if __name__== "__main__":
     cv= gkf.split(df1, y, groups=dynamics_filtered[[ 'userid']])
         # print("%s %s" % (train, test))
 
-    scores_lr = cross_val_score(lr, df1, y, cv=cv, scoring='roc_auc')
-    print scores_lr
+    # scores_lr = cross_val_score(lr, df1, y, cv=cv, scoring='roc_auc')
+    # print scores_lr
 
 
 
-    lr.fit(df1, y)
-    print lr.coef_
+    # lr.fit(df1, y)
+    # print lr.coef_
     # df = dynamics_filtered[['explore','state_score_x', 'path_number']]
     cv= gkf.split(df1, y, groups=dynamics_filtered[[ 'userid']])
     # scores_rf = cross_val_score(rf, df1, y, cv=cv, scoring='roc_auc')
@@ -1006,6 +1012,8 @@ if __name__== "__main__":
     aucs = []
     for i, (train, test) in enumerate(cv):
         model = lr.fit(df1[train], y[train])
+        print model.coef_
+        # print model.summary()
         y_score = model.predict_proba(df1[test])
 
         fpr, tpr, _ = roc_curve(y[test], y_score[:, 1])
