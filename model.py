@@ -1988,6 +1988,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                     counter += 1.0
                     if density_score_matrix[r][j] > 0:
                         sum_scores += density_score_matrix[r][j]
+                    sum_scores_exp += np.exp(density_score_matrix[r][j])
 
         if normalized:
             for r in range(len(density_score_matrix)):
@@ -2007,7 +2008,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                                 else:
                                     density_score_matrix[r][c] = 0
                         else:
-                            density_score_matrix[r][c] = density_score_matrix[r][c]/sum_scores_exp
+                            density_score_matrix[r][c] = np.exp(density_score_matrix[r][c])/sum_scores_exp
         return density_score_matrix
     # compute maximal density score for filtering
     max_density_score = -1000000
@@ -2071,6 +2072,8 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                     square_score = square_score_x + square_score_o
                 elif o_weight== 0:
                     square_score = square_score_x
+                elif o_weight == 1.0:
+                    square_score = square_score_o
                 if square_score > WIN_SCORE:
                     square_score = WIN_SCORE
                 # if player == 'O':
@@ -2081,9 +2084,10 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 #TODO: remember to change if we want to:
                 if square_score > 0:
                     sum_scores += square_score
-                if lamb!=None:
-                    score_matrix[r][c] = math.pow(math.e,lamb*square_score)
-                    sum_scores_exp += math.pow(math.e,lamb*square_score)
+                 #TODO: remember to change if we want to:
+                # if lamb!=None:
+                #     score_matrix[r][c] = math.pow(math.e,lamb*square_score)
+                #     sum_scores_exp += math.pow(math.e,lamb*square_score)
 
     # x_paths_data = []
     # for path in x_paths[1]:
@@ -2098,11 +2102,13 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
 
 
     # check for immediate win/loss
+
     winning_moves = check_immediate_win(board_matrix, player)
     if len(winning_moves) > 0:
         for move in winning_moves:
             move_row, move_col = convert_position(move, len(board_matrix))
-            score_matrix[move_row][move_col] = WIN_SCORE
+            if ((player!='O') | (o_weight<1)):
+                score_matrix[move_row][move_col] = WIN_SCORE
 
     else:
         other_player = 'O'
@@ -2113,14 +2119,16 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
             for row in range(len(board_matrix)):
                 for col in range(len(board_matrix[row])):
                     if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
-                        score_matrix[row][col] = -1*WIN_SCORE
+                        if ((player!='X') | (o_weight>0)):
+                            score_matrix[row][col] = -1*WIN_SCORE
         elif len(winning_moves_opp) == 1:
             move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
             for row in range(len(board_matrix)):
                 for col in range(len(board_matrix[row])):
                     if (move_row != row) | (move_col != col):
                         if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
-                            score_matrix[row][col] = -1*WIN_SCORE
+                            if ((player!='X') | (o_weight>0)):
+                                score_matrix[row][col] = -1*WIN_SCORE
 
     if dominance:
         score_matrix = compute_square_scores_dominance(board_matrix, score_matrix)
@@ -2134,6 +2142,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
 
     # heatmaps
     sum_scores = 0.0
+    sum_scores_exp = 0.0
     counter = 0.0
     for r in range(0,len(score_matrix)):
         for j in range(0,len(score_matrix[r])):
@@ -2145,6 +2154,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 counter += 1.0
                 if score_matrix[r][j] > 0:
                     sum_scores += score_matrix[r][j]
+                sum_scores_exp += np.exp(score_matrix[r][j])
 
     if normalized:
         for r in range(len(score_matrix)):
@@ -2161,7 +2171,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                             else:
                                 score_matrix[r][c] = 0
                     else:
-                        score_matrix[r][c] = score_matrix[r][c]/sum_scores_exp
+                        score_matrix[r][c] = np.exp(score_matrix[r][c])/sum_scores_exp
         if (np.sum(score_matrix) < 0.99) & (np.sum(score_matrix) > 0):
             print 'why'
 

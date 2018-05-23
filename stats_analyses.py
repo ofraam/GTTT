@@ -456,7 +456,7 @@ def fit_heuristic_user(transitions,dynamics):
                 heuristic.append('density')
     heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int, 'likelihood_linear': likelihoods_linear, 'likelihoods_linear_dens':likelihoods_linear_dens,'likelihoods_block_dens':likelihoods_block_dens,'likelihoods_int_dens':likelihoods_int_dens,'likelihoods_density':likelihoods_dens,'heuristic':heuristic}
     heuristics_df = pd.DataFrame(heuristic_vals)
-    heuristics_df.to_csv('stats/heuristics_fitted_combinations_20052018.csv')
+    heuristics_df.to_csv('stats/heuristics_fitted_combinations_o_blindness_blockMod.csv')
 
 
 def fit_heuristic_user_path(transitions,dynamics):
@@ -809,7 +809,7 @@ def add_score_heuristic(dynamics, scores):
                 # print board_str
                 score_mat_str = state_scores['probs_density'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
-                potential_score = np.max(scores_mat)
+                # potential_score = np.max(scores_mat)
             elif heuristic == 'blocking':
                 score_mat_str = state_scores['probs_blocking'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
@@ -823,7 +823,7 @@ def add_score_heuristic(dynamics, scores):
                 # print board_str
                 score_mat_str = state_scores['probs_blocking'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
-                potential_score = np.max(scores_mat)
+                # potential_score = np.max(scores_mat)
             elif heuristic == 'blocking_density':
                 score_mat_str = state_scores['probs_blocking_dens'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
@@ -836,7 +836,11 @@ def add_score_heuristic(dynamics, scores):
                 # print board_str
                 score_mat_str = state_scores['probs_blocking_dens'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
-                potential_score = np.max(scores_mat)
+            # player = int(row['player'])
+            scores_mat[scores_mat==-0.00001] = -100000
+            scores_mat[scores_mat==-0.00002] = -200000
+            potential_score = np.max(scores_mat)
+
 
         scores_list.append(score)
         potential_scores.append(potential_score)
@@ -924,11 +928,11 @@ if __name__== "__main__":
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     # dynamics = pd.read_csv("stats/dynamics.csv")
-    dynamics = pd.read_csv("stats/moves_hueristic_scores_explore.csv")
-    transitions = pd.read_csv("stats/transitions_combinations_all.csv",dtype = {'board_state':str})
-    scores = pd.read_csv("stats/state_scores_heuristics_post_0520_fix.csv",dtype = {'board_state':str})
-    # fit_heuristic_user(transitions,dynamics)
-    add_score_heuristic(dynamics,scores)
+    dynamics = pd.read_csv("stats/moves_hueristic_scores_200518.csv")
+    transitions = pd.read_csv("stats/state_scores_heuristics_o_blind_normalized_blockFixed.csv",dtype = {'board_state':str})
+    scores = pd.read_csv("stats/state_scores_heuristics_post_0520.csv",dtype = {'board_state':str})
+    fit_heuristic_user(transitions,dynamics)
+    # add_score_heuristic(dynamics,scores)
     # tag_last_moves_in_path(dynamics)
     print 1/0
 
@@ -954,9 +958,13 @@ if __name__== "__main__":
 
     # exploreExploitRaw = pd.read_csv("stats/exploreExploitTimesPathLength0416.csv")
     # f = {'explore_time':['mean','std'], 'exploit_time':['mean','std'], 'solved': ['first'], 'board_name': ['first']}
-    #
-    # exploreExploitAvg = exploreExploitRaw.groupby('userid').agg(f)
-    # exploreExploitAvg.to_csv('stats/explore_exploit_avg_1604.csv')
+    # exploreExploitAvg = pd.read_csv("stats/explore_exploit_avg_1604.csv")
+    # exploreExploitAvg = exploreExploitAvg.sort_values(by='explore_time')
+    # ax = sns.pointplot(x="userid", y="explore_time", data=exploreExploitRaw,join=False, order=exploreExploitAvg['userid'])
+    # plt.show()
+    # #
+    # # exploreExploitAvg = exploreExploitRaw.groupby('userid').agg(f)
+    # # exploreExploitAvg.to_csv('stats/explore_exploit_avg_1604.csv')
     # print 1/0
 
     # stop conditions exploration
@@ -968,9 +976,12 @@ if __name__== "__main__":
     # & (dynamics['board_size'] == board_size) & (dynamics['moves_to_win'] == moves_to_win)
     # & (dynamics['move_number_in_path'] >2) & (dynamics['move_number_in_path'] < 4)
     # & (dynamics['state_score_x'] > -100) & (dynamics['state_score_x'] < 100)
-    dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['heuristic'] == 'blocking') & ((dynamics['move_number_in_path'] % 2) == 1) & (dynamics['move_number_in_path'] < 9)]
+    # & ((dynamics['move_number_in_path'] % 2) == 1)
+    dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['move_number_in_path'] < 9) & (dynamics['loss_x']==1) & (dynamics['last_move_ind']==1)]
+    # dynamics_filtered = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['move_number_in_path'] < 9) & (dynamics['loss_x']==1)]
+
     print dynamics_filtered.shape[0]
-    # print 1/0
+    print 1/0
     lr = LogisticRegression(class_weight='balanced')
     rf = RandomForestClassifier(n_estimators=25,max_depth=10, class_weight='balanced')
     # lr = LogisticRegression()
@@ -984,7 +995,7 @@ if __name__== "__main__":
     # print scores_lr
     # print 'done'
     # df = dynamics_filtered[['explore_norm','moves_to_win','board_size']]
-    df = dynamics_filtered[['explore_norm','move_number_in_path','win_now','loss_now','moves_to_win', 'state_score_x']]
+    df = dynamics_filtered[['explore_norm','move_number_in_path','win_x','loss_x','moves_to_win', 'state_score_x','blocking','blocking_density','density']]
     # df = dynamics_filtered[[ 'explore_norm','move_number_in_path','state_score_x']]
     poly = PolynomialFeatures(interaction_only=True,include_bias = False)
     df1 = poly.fit_transform(df)
@@ -1011,7 +1022,7 @@ if __name__== "__main__":
     cv= gkf.split(df1, y, groups=dynamics_filtered[[ 'userid']])
     aucs = []
     for i, (train, test) in enumerate(cv):
-        model = lr.fit(df1[train], y[train])
+        model = lr.fit(df1[train], y[train].ravel())
         print model.coef_
         # print model.summary()
         y_score = model.predict_proba(df1[test])
