@@ -2062,10 +2062,12 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 if block & (x_paths[2] == (streak_size-1)) & x_turn:  # give score for blocking O
                     # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
                     square_score_o = INFINITY_O
+                    square_score_x += INFINITY_O
 
                 elif block & (o_paths[2] == (streak_size-1)) & o_turn:  # give score for blocking O
                     # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
                     square_score_x = INFINITY_O
+                    square_score_o += INFINITY_O
                 # if x_paths[2] == (streak_size-1):
                 #     square_score_o =0
                 if o_weight == 0.5:
@@ -2073,7 +2075,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 elif o_weight== 0:
                     square_score = square_score_x
                 elif o_weight == 1.0:
-                    square_score = square_score_o
+                    square_score = square_score_x
                 if square_score > WIN_SCORE:
                     square_score = WIN_SCORE
                 # if player == 'O':
@@ -2110,7 +2112,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
             if ((player!='O') | (o_weight<1)):
                 score_matrix[move_row][move_col] = WIN_SCORE
 
-    else:
+    if (len(winning_moves) == 0) | (o_weight==1.0):
         other_player = 'O'
         if player == 'O':
             other_player = 'X'
@@ -2121,6 +2123,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                     if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
                         if ((player!='X') | (o_weight>0)):
                             score_matrix[row][col] = -1*WIN_SCORE
+
         elif len(winning_moves_opp) == 1:
             move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
             for row in range(len(board_matrix)):
@@ -2129,6 +2132,8 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                         if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
                             if ((player!='X') | (o_weight>0)):
                                 score_matrix[row][col] = -1*WIN_SCORE
+                    else:
+                        score_matrix[row][col] = INFINITY_O
 
     if dominance:
         score_matrix = compute_square_scores_dominance(board_matrix, score_matrix)

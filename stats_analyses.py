@@ -343,6 +343,8 @@ def fit_heuristic_user(transitions,dynamics):
     boards = []
 
     for userid in dynamics['userid'].unique():
+        # if userid!= '49e6113d':
+        #     continue
         user_data = dynamics.loc[(dynamics['userid'] == userid) & (dynamics['action'] == 'click')]
         if user_data.shape[0] > 0:
             boards.append(user_data['board_name'].iloc[0])
@@ -411,6 +413,8 @@ def fit_heuristic_user(transitions,dynamics):
                 prob_user_interaction = prob_user_interaction*prob_interaction
                 prob_user_linear = prob_user_linear*prob_linear
                 prob_user_block_dens = prob_user_block_dens*prob_block_dens
+
+
                 prob_user_interaction_dens = prob_user_interaction_dens*prob_int_dens
                 prob_user_linear_dens = prob_user_linear_dens*prob_linear_dens
                 prob_user_density = prob_user_density*prob_density
@@ -456,7 +460,7 @@ def fit_heuristic_user(transitions,dynamics):
                 heuristic.append('density')
     heuristic_vals = {'board':boards, 'userid':userids,'likelihoods_block':likelihoods_block,'likelihoods_interaction':likelihoods_int, 'likelihood_linear': likelihoods_linear, 'likelihoods_linear_dens':likelihoods_linear_dens,'likelihoods_block_dens':likelihoods_block_dens,'likelihoods_int_dens':likelihoods_int_dens,'likelihoods_density':likelihoods_dens,'heuristic':heuristic}
     heuristics_df = pd.DataFrame(heuristic_vals)
-    heuristics_df.to_csv('stats/heuristics_fitted_combinations_o_blindness_blockMod.csv')
+    heuristics_df.to_csv('stats/heuristics_fitted_combinations_o_blindness_29052018_4.csv')
 
 
 def fit_heuristic_user_path(transitions,dynamics):
@@ -929,7 +933,7 @@ if __name__== "__main__":
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     # dynamics = pd.read_csv("stats/dynamics.csv")
     dynamics = pd.read_csv("stats/moves_hueristic_scores_200518.csv")
-    transitions = pd.read_csv("stats/state_scores_heuristics_o_blind_normalized_blockFixed.csv",dtype = {'board_state':str})
+    transitions = pd.read_csv("stats/state_scores_heuristics_o_blind_normalized_29052018_4.csv",dtype = {'board_state':str})
     scores = pd.read_csv("stats/state_scores_heuristics_post_0520.csv",dtype = {'board_state':str})
     fit_heuristic_user(transitions,dynamics)
     # add_score_heuristic(dynamics,scores)

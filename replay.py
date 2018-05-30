@@ -968,6 +968,9 @@ def transition_probs_o_blind(output_file):
                         o_weight = 0.0
                         if player == 2:
                             o_weight = 1.0
+
+                    # if str(curr_move_matrix) == '[[0, 2, 1, 1, 1, 2], [0, 2, 1, 2, 0, 0], [1, 1, 1, 2, 0, 0], [2, 1, 2, 2, 0, 0], [1, 1, 1, 0, 0, 0], [0, 2, 0, 2, 2, 0]]':
+                    #     print 'here'
                         scores_block = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=o_weight, exp=2, neighborhood_size=2, block=True, lamb=None)
                         scores_int = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=o_weight, exp=2, neighborhood_size=2, block=False, lamb=None)
                         scores_lin = compute_scores_layers_for_matrix(curr_move_matrix,player=player_type, normalized=True,o_weight=o_weight, exp=1, neighborhood_size=2, block=False, lamb=None)
@@ -1015,6 +1018,8 @@ def transition_probs_o_blind(output_file):
                         curr_move_matrix[rowPos][colPos] = player
 
                     # if (str(curr_move_matrix) == '[[0, 2, 1, 1, 1, 2], [0, 2, 1, 2, 0, 0], [0, 1, 1, 0, 0, 0], [2, 1, 0, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 2, 0, 0, 2, 0]]'):
+                    #     print 'here'
+                    # if str(curr_move_matrix) == '[[0, 2, 1, 1, 1, 2], [0, 2, 1, 2, 0, 0], [1, 1, 1, 2, 0, 0], [2, 1, 2, 2, 0, 0], [1, 1, 1, 0, 0, 0], [0, 2, 0, 2, 2, 0]]':
                     #     print 'here'
                     if player_type == 'O':
                         player_type = 'X'
@@ -1307,7 +1312,7 @@ def transition_probs(output_file):
                     if (curr_move_matrix[rowPos][colPos]!=1) & (curr_move_matrix[rowPos][colPos]!=2):
                         curr_move_matrix[rowPos][colPos] = player
 
-                    if (str(curr_move_matrix) == '[[0, 2, 1, 1, 1, 2], [0, 2, 1, 2, 0, 0], [0, 1, 1, 0, 0, 0], [2, 1, 0, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 2, 0, 0, 2, 0]]'):
+                    if (str(curr_move_matrix) == '[[0, 2, 1, 1, 1, 2], [0, 2, 1, 2, 0, 0], [1, 1, 1, 2, 0, 0], [2, 1, 2, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 2, 0, 0, 2, 0]]'):
                         print 'here'
                     if player_type == 'O':
                         player_type = 'X'
@@ -2972,8 +2977,8 @@ if __name__ == "__main__":
     # paths_stats(participants='wrong')
     # moves_stats('stats/dynamics09042018.csv')
     # check_participant_answer('63e5efe1')
-    # transition_probs('stats/state_scores_heuristics_normalized_softmax_0521')
-    transition_probs_o_blind('stats/state_scores_heuristics_o_blind_normalized_blockFixed')
+    # transition_probs('stats/state_scores_heuristics_normalized_test2805')
+    transition_probs_o_blind('stats/state_scores_heuristics_o_blind_normalized_29052018_5')
     # explore_exploit('stats/exploreExploitTimesPathLength0416.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
