@@ -828,8 +828,8 @@ def add_score_heuristic(dynamics, scores):
                 score_mat_str = state_scores['probs_blocking'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
                 # potential_score = np.max(scores_mat)
-            elif heuristic == 'blocking_density':
-                score_mat_str = state_scores['probs_blocking_dens'].iloc[0]
+            elif heuristic == 'interaction_blind':
+                score_mat_str = state_scores['probs_interaction_oBlind'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
                 score = scores_mat[row_pos][col_pos]
                 board_mat[row_pos][col_pos] = int(row['player'])
@@ -838,7 +838,19 @@ def add_score_heuristic(dynamics, scores):
                 board_str = str(board_str).replace(",,", ",")
                 state_scores = scores.loc[scores['board_state'] == str(board_str)]
                 # print board_str
-                score_mat_str = state_scores['probs_blocking_dens'].iloc[0]
+                score_mat_str = state_scores['probs_interaction_oBlind'].iloc[0]
+                scores_mat = np.array(ast.literal_eval(score_mat_str))
+            elif heuristic == 'blocking_blind':
+                score_mat_str = state_scores['probs_blocking_oBlind'].iloc[0]
+                scores_mat = np.array(ast.literal_eval(score_mat_str))
+                score = scores_mat[row_pos][col_pos]
+                board_mat[row_pos][col_pos] = int(row['player'])
+                board_str = str(board_mat).replace("\n", ",")
+                board_str = str(board_str).replace(" ", ", ")
+                board_str = str(board_str).replace(",,", ",")
+                state_scores = scores.loc[scores['board_state'] == str(board_str)]
+                # print board_str
+                score_mat_str = state_scores['probs_blocking_oBlind'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
             # player = int(row['player'])
             scores_mat[scores_mat==-0.00001] = -100000
@@ -853,7 +865,7 @@ def add_score_heuristic(dynamics, scores):
 
     dynamics['score_heuristic'] = scores_list
     dynamics['potential_score_heuristic'] = potential_scores
-    dynamics.to_csv('stats/moves_hueristic_scores_200518.csv')
+    dynamics.to_csv('stats/moves_heuristic_scores_060518.csv')
 
 
 def tag_last_moves_in_path(dynamics):
@@ -932,11 +944,11 @@ if __name__== "__main__":
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     # dynamics = pd.read_csv("stats/dynamics.csv")
-    dynamics = pd.read_csv("stats/moves_hueristic_scores_200518.csv")
+    dynamics = pd.read_csv("stats/moves_hueristic_050618.csv")
     transitions = pd.read_csv("stats/state_scores_heuristics_o_blind_normalized_29052018_4.csv",dtype = {'board_state':str})
-    scores = pd.read_csv("stats/state_scores_heuristics_post_0520.csv",dtype = {'board_state':str})
-    fit_heuristic_user(transitions,dynamics)
-    # add_score_heuristic(dynamics,scores)
+    scores = pd.read_csv("stats/state_scores_raw_060518.csv",dtype = {'board_state':str})
+    # fit_heuristic_user(transitions,dynamics)
+    add_score_heuristic(dynamics,scores)
     # tag_last_moves_in_path(dynamics)
     print 1/0
 

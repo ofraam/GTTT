@@ -1957,23 +1957,23 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                 move_row, move_col = convert_position(move, len(board_matrix))
                 density_score_matrix[move_row][move_col] = WIN_SCORE
 
-        else:
-            other_player = 'O'
-            if player == 'O':
-                other_player = 'X'
-            winning_moves_opp = check_immediate_win(board_matrix, other_player)
-            if len(winning_moves_opp) > 1:
-                for row in range(len(board_matrix)):
-                    for col in range(len(board_matrix[row])):
-                        if (density_score_matrix[row][col] != 'X') & (density_score_matrix[row][col] != 'O'):
-                            density_score_matrix[row][col] = -1*WIN_SCORE
-            elif len(winning_moves_opp) == 1:
-                move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
-                for row in range(len(board_matrix)):
-                    for col in range(len(board_matrix[row])):
-                        if (move_row != row) | (move_col != col):
-                            if (density_score_matrix[row][col] != 'X') & (density_score_matrix[row][col] != 'O'):
-                                density_score_matrix[row][col] = -1*WIN_SCORE
+        # else:
+        #     other_player = 'O'
+        #     if player == 'O':
+        #         other_player = 'X'
+        #     winning_moves_opp = check_immediate_win(board_matrix, other_player)
+        #     if len(winning_moves_opp) > 1:
+        #         for row in range(len(board_matrix)):
+        #             for col in range(len(board_matrix[row])):
+        #                 if (density_score_matrix[row][col] != 'X') & (density_score_matrix[row][col] != 'O'):
+        #                     density_score_matrix[row][col] = -1*WIN_SCORE
+        #     elif len(winning_moves_opp) == 1:
+        #         move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
+        #         for row in range(len(board_matrix)):
+        #             for col in range(len(board_matrix[row])):
+        #                 if (move_row != row) | (move_col != col):
+        #                     if (density_score_matrix[row][col] != 'X') & (density_score_matrix[row][col] != 'O'):
+        #                         density_score_matrix[row][col] = -1*WIN_SCORE
 
         # heatmaps
         sum_scores = 0.0
@@ -2076,6 +2076,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                     square_score = square_score_x
                 elif o_weight == 1.0:
                     square_score = square_score_x
+
                 if square_score > WIN_SCORE:
                     square_score = WIN_SCORE
                 # if player == 'O':
@@ -2109,10 +2110,13 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
     if len(winning_moves) > 0:
         for move in winning_moves:
             move_row, move_col = convert_position(move, len(board_matrix))
-            if ((player!='O') | (o_weight<1)):
-                score_matrix[move_row][move_col] = WIN_SCORE
+            # if ((player!='O') | (o_weight<1)):
+            # if ((player!='O')):
+            score_matrix[move_row][move_col] = WIN_SCORE
 
-    if (len(winning_moves) == 0) | (o_weight==1.0):
+    # if (len(winning_moves) == 0) & (o_weight<1.0):
+    #TODO: comment out for o blindness
+    if (len(winning_moves) == 0):
         other_player = 'O'
         if player == 'O':
             other_player = 'X'
