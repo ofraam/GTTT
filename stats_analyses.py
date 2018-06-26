@@ -3,6 +3,7 @@ import bootstrapped.bootstrap as bs
 import bootstrapped.compare_functions as bs_compare
 import bootstrapped.stats_functions as bs_stats
 import seaborn as sns
+from utils import *
 import pandas as pd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
@@ -229,6 +230,84 @@ def probs_clicks(dynamics):
         data_matrics[board] = copy.deepcopy(board_matrix)
 
     write_matrices_to_file(data_matrics, 'data_matrices/cogsci/first_pruned.json')
+
+
+def merge_undos_to_reset(dynamics):
+    first_undo_index = -1
+    curr_undo_list = []
+    undo_index_list = []
+    curr_user = ""
+    for index, row in dynamics.iterrows():
+        if curr_user != row['userid']: # reset undos if new user
+            curr_user = row['userid']
+            first_undo_index = -1
+            curr_undo_list = []
+
+        if row['action'] == 'undo':
+            if first_undo_index == -1:
+                first_undo_index = index
+                curr_undo_list.append(index)
+            else:
+                curr_undo_list.append(index)
+            if row['move_number_in_path'] == 1:  # undos lead to reset, replace
+                dynamics.loc[index, 'action'] = 'reset'
+                curr_undo_list.pop()
+                undo_index_list.extend(copy.deepcopy(curr_undo_list))
+                first_undo_index = -1
+                curr_undo_list = []
+        else:
+            first_undo_index = -1
+            curr_undo_list = []
+    print dynamics.shape[0]
+    dynamics.drop(undo_index_list,inplace=True)
+    print dynamics.shape[0]
+    dynamics.to_csv('stats/dynamics_undosReplaced.csv')
+
+
+def add_aperture_values(dynamics):
+    aperture_values = []
+    open_path_values = []
+    for index, row in dynamics.iterrows():
+        if (row['move_number_in_path'] == 1) | (row['action'] != 'click'):
+            aperture_values.append(0)
+            open_path_values.append(False)
+            continue
+        path = np.array(ast.literal_eval(row['path']))
+        prev_ind = len(path) - 1
+        player = 'O'
+        if row['player'] == 1:
+            prev_ind -= 1
+            player = 'X'
+        # print index
+        # print path
+        prev_move_row = path[prev_ind][0]
+        prev_move_col = path[prev_ind][1]
+        # neighbors = get_neighboring_squares(row['board_size'], [prev_move_row,prev_move_col], 2)
+        active_squares = get_open_paths_through_square(prev_move_row, prev_move_col, np.array(ast.literal_eval(row['board_state'])), 1)
+        square = row['position'].split('_')
+        square_row = int(square[0])
+        square_col = int(square[1])
+        square = [square_row,square_col]
+        aperture = 1
+        open_path = True
+        if len(active_squares) == 0:
+            open_path = False
+            active_squares.append([prev_move_row, prev_move_col])
+        while check_square_in_list(square, active_squares) == False:
+            active_squares = expand_neighborhood(active_squares, row['board_size'])
+            aperture += 1
+
+        # print aperture
+        aperture_values.append(aperture)
+        open_path_values.append(open_path)
+
+        # print 'here'
+        # print row['player']
+        # print str(prev_move_row) + ',' + str(prev_move_col)
+        # print 'here'
+    dynamics['aperture'] = aperture_values
+    dynamics['open_path'] = open_path_values
+    dynamics.to_csv('stats/moves_hueristic_scores_aperture.csv')
 
 
 def fit_heuristic_user_moves(transitions,dynamics):
@@ -943,13 +1022,15 @@ if __name__== "__main__":
     distances = pd.read_csv("stats/distanceFirstMoves.csv")
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
-    # dynamics = pd.read_csv("stats/dynamics.csv")
-    dynamics = pd.read_csv("stats/moves_hueristic_050618.csv")
+    dynamics = pd.read_csv("stats/moves_hueristic_scores_last190618.csv")
+    # dynamics = pd.read_csv("stats/moves_hueristic_050618.csv")
     transitions = pd.read_csv("stats/state_scores_heuristics_o_blind_normalized_29052018_4.csv",dtype = {'board_state':str})
     scores = pd.read_csv("stats/state_scores_raw_060518.csv",dtype = {'board_state':str})
     # fit_heuristic_user(transitions,dynamics)
-    add_score_heuristic(dynamics,scores)
+    # add_score_heuristic(dynamics,scores)
     # tag_last_moves_in_path(dynamics)
+    # merge_undos_to_reset(dynamics)
+    add_aperture_values(dynamics)
     print 1/0
 
     states = pd.read_csv("stats/states.csv")
@@ -970,7 +1051,7 @@ if __name__== "__main__":
     # resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
     resetsDelta = pd.read_csv("stats/resetsFiltered2.csv")
 
-    # get_user_stats(dynamics,exploreExploit)
+    get_user_stats(dynamics,exploreExploit)
 
     # exploreExploitRaw = pd.read_csv("stats/exploreExploitTimesPathLength0416.csv")
     # f = {'explore_time':['mean','std'], 'exploit_time':['mean','std'], 'solved': ['first'], 'board_name': ['first']}

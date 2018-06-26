@@ -2975,7 +2975,7 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    # moves_stats('stats/dynamics09042018.csv')
+    # moves_stats('stats/dynamics19062018.csv')
     # check_participant_answer('63e5efe1')
     transition_probs('stats/state_scores_heuristics_raw_050618')
     # transition_probs_o_blind('stats/state_scores_heuristics_o_blind_norm_050618_2')
