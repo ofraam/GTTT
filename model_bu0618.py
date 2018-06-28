@@ -41,141 +41,8 @@ MOVES_TO_WIN = [10,8,10,8,8,6,8,6,10,8]
 INFINITY_O = 10
 IMMEDIATE_THREAT_SCORE = 20
 
-BOARDS_MINUS_1 = []
+BOARDS_MINUS_1 =[]
 WIN_SCORE = 100
-
-
-def convert_matrix_xo(board_matrix):
-    for i in range(len(board_matrix)):
-        for j in range(len(board_matrix[i])):
-            if (board_matrix[i][j] != 1) & (board_matrix[i][j] != 2):
-                board_matrix[i][j] = int(board_matrix[i][j])
-            elif board_matrix[i][j] == 1:
-                board_matrix[i][j] = 'X'
-            elif board_matrix[i][j] == 2:
-                board_matrix[i][j] = 'O'
-    return board_matrix
-
-
-def normalize_matrix(score_matrix, with_negative=False):
-    sum_scores = 0.0
-    counter = 0.0
-    for r in range(0,len(score_matrix)):
-        for j in range(0,len(score_matrix[r])):
-            if score_matrix[r][j] == 'X':
-                score_matrix[r][j] = -0.00001
-            elif score_matrix[r][j] == 'O':
-                score_matrix[r][j] = -0.00002
-            else:
-                counter += 1.0
-                if score_matrix[r][j] > 0:
-                    sum_scores += score_matrix[r][j]
-
-    for r in range(len(score_matrix)):
-        for c in range(len(score_matrix[r])):
-            if (score_matrix[r][c] != -0.00001) & (score_matrix[r][c] != -0.00002):
-                if sum_scores == 0:
-                    score_matrix[r][c] = 1.0/counter
-                else:
-                    # TODO: change if we don't want to eliminate negative scores
-                    if score_matrix[r][c] >= 0:
-                        score_matrix[r][c] = score_matrix[r][c]/sum_scores
-                    else:
-                        score_matrix[r][c] = 0
-
-
-def compute_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True,
-                              block=False):
-    """
-    computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
-    :param exp: parameter creates the non-linearity (i.e., 2 --> squared)
-    :param o_weight says how much weight to give for blocking O paths
-    :param player: which player is playing now
-    :param normalized: whether to normalize scorse to sum up to 1 (for transition probabilities)
-    :param board_mat: the board
-    :param interaction: whether the heuristic considers interaction between paths
-    :param block: whether to use blocking heuristic (extra points for threatning)
-    """
-
-    board_matrix = convert_matrix_xo(board_mat)
-
-    # compute path scores
-    score_matrix = copy.deepcopy(board_matrix)
-
-    paths_data = copy.deepcopy(board_matrix)
-
-    x_turn = True
-    o_turn = False
-    if player == 'O':
-        x_turn = False
-        o_turn = True
-
-    for r in range(len(board_matrix)):
-        for c in range(len(board_matrix[r])):
-            if board_matrix[r][c] == 0:  # only check if free & passed threshold
-                x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction)
-                square_score_x = x_paths[0]
-                x_paths_data = []
-                for path in x_paths[1]:
-                    x_paths_data.append(path[2])
-                paths_data[r][c] = copy.deepcopy(x_paths_data)
-                o_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player='O', player_turn=o_turn, exp=exp, interaction=interaction)
-                square_score_o = o_paths[0]
-
-                streak_size = 4
-                if len(board_matrix) == 10:
-                    streak_size = 5
-                if block & (x_paths[2] == (streak_size-1)) & x_turn:  # give score for blocking O
-                    square_score_o = INFINITY_O
-                    square_score_x += INFINITY_O
-                elif block & (o_paths[2] == (streak_size-1)) & o_turn:  # give score for blocking X
-                    square_score_x = INFINITY_O
-                    square_score_o += INFINITY_O
-                if o_weight == 0.5:
-                    square_score = square_score_x + square_score_o
-                elif o_weight == 0:
-                    square_score = square_score_x  # o blindness - just use for score how good it would be to block x
-
-                if square_score > WIN_SCORE:
-                    square_score = WIN_SCORE
-
-    # check for immediate win/loss
-    winning_moves = check_immediate_win(board_matrix, player)
-    if len(winning_moves) > 0:
-        for move in winning_moves:
-            move_row, move_col = convert_position(move, len(board_matrix))
-            score_matrix[move_row][move_col] = WIN_SCORE
-
-    if len(winning_moves) == 0:  # if can't win immediately, check if opponent can win immediately
-        other_player = 'O'
-        if player == 'O':
-            other_player = 'X'
-        winning_moves_opp = check_immediate_win(board_matrix, other_player)
-        if len(winning_moves_opp) > 1:
-            for row in range(len(board_matrix)):
-                for col in range(len(board_matrix[row])):
-                    if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
-                        # update scores for losing moves, except if we are in o blindness mode
-                        if (player != 'X') | (o_weight > 0):
-                            score_matrix[row][col] = -1*WIN_SCORE
-
-        elif len(winning_moves_opp) == 1:  # give high score to blocking winning move, and losing score to rest
-            move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
-            for row in range(len(board_matrix)):
-                for col in range(len(board_matrix[row])):
-                    if (move_row != row) | (move_col != col):
-                        if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
-                            if (player != 'X') | (o_weight > 0):
-                                score_matrix[row][col] = -1*WIN_SCORE
-                    else:
-                        score_matrix[row][col] = INFINITY_O
-
-    if normalized:
-        normalize_matrix(score_matrix, False)
-
-    return score_matrix
-
-
 
 '''
 computes the density score for a cell
@@ -849,10 +716,11 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
     return (score, open_paths_data, max_length_path)
 
 
-def compute_open_paths_data_interaction_new(row, col, board, exp=1, player='X', player_turn=True, interaction=True):
+def compute_open_paths_data_interaction_new(row, col, board, exp=1, player = 'X', player_turn=True, interaction=True):
     other_player = 'O'
     if player == 'O':
         other_player = 'X'
+
 
     max_length_path = 0
     threshold = 0
@@ -890,13 +758,12 @@ def compute_open_paths_data_interaction_new(row, col, board, exp=1, player='X', 
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((player_turn) & (path_x_count+1)>threshold)):
-            # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)):  # add the path if it's not blocked and if there is already at least one X on it
             if player_turn:
-                open_paths_data.append((path_x_count+1, empty_squares, path))
+                open_paths_data.append((path_x_count+1,empty_squares, path))
                 if (path_x_count+1) > max_length_path:
                     max_length_path = path_x_count+1
-            elif path_x_count > threshold:
+            elif (path_x_count>threshold):
                 open_paths_data.append((path_x_count,empty_squares, path))
 
     # check left-down diagonal
@@ -924,7 +791,7 @@ def compute_open_paths_data_interaction_new(row, col, board, exp=1, player='X', 
             square_col -= 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((player_turn) & path_x_count+1>threshold)): # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)): # add the path if it's not blocked and if there is already at least one X on it
             if player_turn:
                 open_paths_data.append((path_x_count+1,empty_squares, path))
                 if (path_x_count+1) > max_length_path:
@@ -959,7 +826,7 @@ def compute_open_paths_data_interaction_new(row, col, board, exp=1, player='X', 
 
 
 
-        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((player_turn) & path_x_count+1>threshold)): # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)): # add the path if it's not blocked and if there is already at least one X on it
             if player_turn:
                 open_paths_data.append((path_x_count+1,empty_squares, path))
                 if (path_x_count+1) > max_length_path:
@@ -992,7 +859,7 @@ def compute_open_paths_data_interaction_new(row, col, board, exp=1, player='X', 
             square_col += 1
             path_length += 1
 
-        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((player_turn) & path_x_count+1>threshold)):  # add the path if it's not blocked and if there is already at least one X on it
+        if (path_length == streak_size) & (not blocked) & ((path_x_count>threshold) | ((other_player == 'O') & path_x_count+1>threshold)):  # add the path if it's not blocked and if there is already at least one X on it
             if player_turn:
                 open_paths_data.append((path_x_count+1,empty_squares, path))
                 if (path_x_count+1) > max_length_path:

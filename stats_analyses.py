@@ -293,18 +293,13 @@ def add_aperture_values(dynamics):
         if len(active_squares) == 0:
             open_path = False
             active_squares.append([prev_move_row, prev_move_col])
-        while check_square_in_list(square, active_squares) == False:
+        while not check_square_in_list(square, active_squares):
             active_squares = expand_neighborhood(active_squares, row['board_size'])
             aperture += 1
 
-        # print aperture
         aperture_values.append(aperture)
         open_path_values.append(open_path)
 
-        # print 'here'
-        # print row['player']
-        # print str(prev_move_row) + ',' + str(prev_move_col)
-        # print 'here'
     dynamics['aperture'] = aperture_values
     dynamics['open_path'] = open_path_values
     dynamics.to_csv('stats/moves_hueristic_scores_aperture.csv')
