@@ -176,6 +176,38 @@ def compute_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_
     return score_matrix
 
 
+def compute_scores_density_new(board_mat, player='X', normalized=False, neighborhood_size=1, density = 'reg', sig=3):
+
+    board_matrix = convert_matrix_xo(board_mat)
+
+    density_score_matrix = copy.deepcopy(board_matrix)
+
+    if density=='guassian':
+        # create guassians for each X square
+        guassian_kernel = []
+        for r in range(len(board_matrix)):
+            for c in range(len(board_matrix[r])):
+                if board_matrix[r][c] == 'X':
+                    guassian_kernel.append(makeGaussian(len(board_matrix),fwhm=sig,center=[r,c]))
+
+    for r in range(len(board_matrix)):
+        for c in range(len(board_matrix[r])):
+            if board_matrix[r][c] == 0:  # only check if free
+                if density == 'guassian':
+                    square_score = compute_density_guassian(r, c, board_matrix, guassian_kernel)  # check neighborhood
+                else:
+                    square_score = compute_density(r, c, board_matrix, neighborhood_size, player=player)  # check neighborhood
+                density_score_matrix[r][c] = square_score
+
+    winning_moves = check_immediate_win(board_matrix, player)
+    if len(winning_moves) > 0:
+        for move in winning_moves:
+            move_row, move_col = convert_position(move, len(board_matrix))
+            density_score_matrix[move_row][move_col] = WIN_SCORE
+
+    if normalized:
+        normalize_matrix(density_score_matrix, False)
+
 
 '''
 computes the density score for a cell
