@@ -46,6 +46,7 @@ WIN_SCORE = 100
 
 
 def convert_matrix_xo(board_matrix):
+    # print board_matrix
     for i in range(len(board_matrix)):
         for j in range(len(board_matrix[i])):
             if (board_matrix[i][j] != 1) & (board_matrix[i][j] != 2):
@@ -54,7 +55,6 @@ def convert_matrix_xo(board_matrix):
                 board_matrix[i][j] = 'X'
             elif board_matrix[i][j] == 2:
                 board_matrix[i][j] = 'O'
-    return board_matrix
 
 
 def normalize_matrix(score_matrix, with_negative=False):
@@ -84,8 +84,7 @@ def normalize_matrix(score_matrix, with_negative=False):
                         score_matrix[r][c] = 0
 
 
-def compute_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True,
-                              block=False):
+def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False):
     """
     computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
     :param exp: parameter creates the non-linearity (i.e., 2 --> squared)
@@ -96,8 +95,8 @@ def compute_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_
     :param interaction: whether the heuristic considers interaction between paths
     :param block: whether to use blocking heuristic (extra points for threatning)
     """
-
-    board_matrix = convert_matrix_xo(board_mat)
+    board_matrix = copy.deepcopy(board_mat)
+    convert_matrix_xo(board_matrix)
 
     # compute path scores
     score_matrix = copy.deepcopy(board_matrix)
@@ -134,14 +133,17 @@ def compute_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_
                 if o_weight == 0.5:
                     square_score = square_score_x + square_score_o
                 elif o_weight == 0:
-                    square_score = square_score_x  # o blindness - just use for score how good it would be to block x
-
+                    square_score = square_score_x  # o blindness for x player disregard O
+                elif o_weight == 1.0:
+                    square_score = square_score_x # o blindness - just use for score how good it would be to block x
                 if square_score > WIN_SCORE:
                     square_score = WIN_SCORE
 
+                score_matrix[r][c] = square_score
+
     # check for immediate win/loss
     winning_moves = check_immediate_win(board_matrix, player)
-    if len(winning_moves) > 0:
+    if (len(winning_moves) > 0) & ((player != 'O') | (o_weight > 0)):
         for move in winning_moves:
             move_row, move_col = convert_position(move, len(board_matrix))
             score_matrix[move_row][move_col] = WIN_SCORE
@@ -178,7 +180,8 @@ def compute_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_
 
 def compute_scores_density_new(board_mat, player='X', normalized=False, neighborhood_size=1, density = 'reg', sig=3):
 
-    board_matrix = convert_matrix_xo(board_mat)
+    board_matrix = copy.deepcopy(board_mat)
+    convert_matrix_xo(board_matrix)
 
     density_score_matrix = copy.deepcopy(board_matrix)
 
@@ -207,6 +210,8 @@ def compute_scores_density_new(board_mat, player='X', normalized=False, neighbor
 
     if normalized:
         normalize_matrix(density_score_matrix, False)
+
+    return density_score_matrix
 
 
 '''
