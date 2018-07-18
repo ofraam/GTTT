@@ -125,17 +125,21 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                 if len(board_matrix) == 10:
                     streak_size = 5
                 if block & (x_paths[2] == (streak_size-1)) & x_turn:  # give score for blocking O
-                    square_score_o = INFINITY_O
+                    # square_score_o = INFINITY_O
                     square_score_x += INFINITY_O
                 elif block & (o_paths[2] == (streak_size-1)) & o_turn:  # give score for blocking X
-                    square_score_x = INFINITY_O
+                    # square_score_x = INFINITY_O
                     square_score_o += INFINITY_O
                 if o_weight == 0.5:
                     square_score = square_score_x + square_score_o
+                    # if x_turn:
+                    #     square_score = square_score_x
+                    # else:
+                    #     square_score = square_score_o
                 elif o_weight == 0:
                     square_score = square_score_x  # o blindness for x player disregard O
                 elif o_weight == 1.0:
-                    square_score = square_score_x # o blindness - just use for score how good it would be to block x
+                    square_score = square_score_x  # o blindness - just use for score how good it would be to block x
                 if square_score > WIN_SCORE:
                     square_score = WIN_SCORE
 

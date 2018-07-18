@@ -548,6 +548,8 @@ def compute_log_likelihood_heuristic(transitions, user_data, heuristic):
         board_state = row['board_state']
         state = np.array(ast.literal_eval(board_state))
         probs_data = transitions.loc[transitions['board_state'] == board_state]
+        if probs_data[heuristic].shape[0] == 0:
+            print board_state
         probs_heuristic = np.array(ast.literal_eval(probs_data[heuristic].iloc[0]))
 
         last_move = row['position'].split('_')
@@ -564,7 +566,7 @@ def compute_log_likelihood_heuristic(transitions, user_data, heuristic):
     return log_likelihoods_heuristic/counter
 
 
-def fit_heuristic_user_list(transitions, dynamics, heuristics):
+def fit_heuristic_user_list(transitions, dynamics, heuristics, filename):
     userids = []
     heuristic_fitted = []
     boards = []
@@ -573,12 +575,16 @@ def fit_heuristic_user_list(transitions, dynamics, heuristics):
         log_likelihoods_dict[heuristic] = []
 
     for userid in dynamics['userid'].unique():
+         # & (dynamics['player'] == 2)
         user_data = dynamics.loc[(dynamics['userid'] == userid) & (dynamics['action'] == 'click')]
+        # print userid
+        if user_data.shape[0] == 0:
+            continue
         boards.append(user_data['board_name'].iloc[0])
         userids.append(userid)
         max_log_likelihood = -1000
         best_heuristic = ""
-        user_transitions = transitions.loc[transitions['size_type'] == user_data['board_name'].iloc[0]]
+        user_transitions = transitions.loc[transitions['size_type'] == user_data['size_type'].iloc[0]]
         for heuristic in heuristics:
             log_likelihood_heuristic = compute_log_likelihood_heuristic(user_transitions, user_data, heuristic)
             log_likelihoods_dict[heuristic].append(log_likelihood_heuristic)
@@ -592,7 +598,7 @@ def fit_heuristic_user_list(transitions, dynamics, heuristics):
     for k,v in log_likelihoods_dict.iteritems():
         heuristic_vals[k] = v
     heuristics_df = pd.DataFrame(heuristic_vals)
-    heuristics_df.to_csv('stats/heuristics_fitted_300618.csv')
+    heuristics_df.to_csv(filename)
 
 
 def fit_heuristic_user_path(transitions,dynamics):
@@ -1075,15 +1081,16 @@ if __name__== "__main__":
     distances = pd.read_csv("stats/distanceFirstMoves.csv")
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
-    dynamics = pd.read_csv("stats/moves_hueristic_scores_last190618.csv")
+    dynamics = pd.read_csv("stats/moves_hueristic_scores_aperture.csv")
     # dynamics = pd.read_csv("stats/moves_hueristic_050618.csv")
-    transitions = pd.read_csv("stats/state_scores_heuristics_o_blind_normalized_29052018_4.csv",dtype = {'board_state':str})
+    transitions = pd.read_csv("stats/state_scores_heuristics_180718normalized_all.csv",dtype = {'board_state':str})
     scores = pd.read_csv("stats/state_scores_raw_060518.csv",dtype = {'board_state':str})
-    fit_heuristic_user(transitions,dynamics)
+    # fit_heuristic_user(transitions,dynamics)
     # add_score_heuristic(dynamics,scores)
     # tag_last_moves_in_path(dynamics)
     # merge_undos_to_reset(dynamics)
-    add_aperture_values(dynamics)
+    # add_aperture_values(dynamics)
+    fit_heuristic_user_list(transitions,dynamics,['blocking','density','blocking_blind'],'stats/heuristics_fitted_170818_fewer.csv')
     print 1/0
 
     states = pd.read_csv("stats/states.csv")
@@ -1104,7 +1111,7 @@ if __name__== "__main__":
     # resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
     resetsDelta = pd.read_csv("stats/resetsFiltered2.csv")
 
-    get_user_stats(dynamics,exploreExploit)
+    # get_user_stats(dynamics,exploreExploit)
 
     # exploreExploitRaw = pd.read_csv("stats/exploreExploitTimesPathLength0416.csv")
     # f = {'explore_time':['mean','std'], 'exploit_time':['mean','std'], 'solved': ['first'], 'board_name': ['first']}

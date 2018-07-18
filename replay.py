@@ -952,7 +952,7 @@ def transition_probs_o_blind(output_file, normalized=False):
                         scores_block = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=o_weight, exp=2, block=True)
                         scores_int = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=o_weight, exp=2, block=False)
                         scores_lin = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=o_weight, exp=1,block=False)
-                        scores_dens = compute_scores_density_new(initial_board,player=player_type, normalized=normalized, neighborhood_size=2)
+                        scores_dens = compute_scores_density_new(curr_move_matrix,player=player_type, normalized=normalized, neighborhood_size=2)
 
                         scores_blocking.append(str(scores_block))
                         scores_interaction.append(str(scores_int))
@@ -967,8 +967,8 @@ def transition_probs_o_blind(output_file, normalized=False):
                     if (curr_move_matrix[rowPos][colPos]!=1) & (curr_move_matrix[rowPos][colPos]!=2):
                         curr_move_matrix[rowPos][colPos] = player
 
-                    # if (str(curr_move_matrix) == '[[0, 2, 1, 1, 1, 2], [0, 2, 1, 2, 0, 0], [0, 1, 1, 0, 0, 0], [2, 1, 0, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 2, 0, 0, 2, 0]]'):
-                    #     print 'here'
+                    if (str(curr_move_matrix) == '[[0, 2, 0, 0, 1, 0], [0, 2, 1, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 1, 0, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 2, 1, 0, 2, 0]]'):
+                        print 'here'
                     # if str(curr_move_matrix) == '[[0, 2, 1, 1, 1, 2], [0, 2, 1, 2, 0, 0], [1, 1, 1, 2, 0, 0], [2, 1, 2, 2, 0, 0], [1, 1, 1, 0, 0, 0], [0, 2, 0, 2, 2, 0]]':
                     #     print 'here'
                     if player_type == 'O':
@@ -985,7 +985,7 @@ def transition_probs_o_blind(output_file, normalized=False):
                         scores_block = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=o_weight, exp=2, block=True)
                         scores_int = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=o_weight, exp=2, block=False)
                         scores_lin = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=o_weight, exp=1, block=False)
-                        scores_dens = compute_scores_density_new(initial_board,player=player_type, normalized=normalized, neighborhood_size=2)
+                        scores_dens = compute_scores_density_new(curr_move_matrix,player=player_type, normalized=normalized, neighborhood_size=2)
 
                         scores_blocking.append(str(scores_block))
                         scores_interaction.append(str(scores_int))
@@ -1168,12 +1168,14 @@ def transition_probs(output_file, normalized=False):
                     # scores computation
                     # curr_data['board_state'] = copy.deepcopy(curr_move_matrix)
 
+                    if (str(curr_move_matrix) == '[[1, 2, 0, 0, 1, 0], [0, 2, 1, 2, 0, 0], [0, 1, 2, 1, 0, 0], [0, 1, 0, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 2, 1, 2, 2, 0]]'):
+                        print 'here'
 
                     if str(curr_move_matrix) not in board_states:
-                        scores_block = compute_paths_scores_for_matrix(initial_board,player=player_type, normalized=normalized,o_weight=0.5, exp=2, block=True)
-                        scores_int = compute_paths_scores_for_matrix(initial_board,player=player_type, normalized=normalized,o_weight=0.5, exp=2, block=False)
-                        scores_lin = compute_paths_scores_for_matrix(initial_board,player=player_type, normalized=normalized,o_weight=0.5, exp=1,block=False)
-                        scores_dens = compute_scores_density_new(initial_board,player=player_type, normalized=normalized, neighborhood_size=2)
+                        scores_block = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=0.5, exp=2, block=True)
+                        scores_int = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=0.5, exp=2, block=False)
+                        scores_lin = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=0.5, exp=1,block=False)
+                        scores_dens = compute_scores_density_new(curr_move_matrix,player=player_type, normalized=normalized, neighborhood_size=2)
 
                         scores_block_density = scores_block
                         scores_int_density = scores_int
@@ -1211,8 +1213,8 @@ def transition_probs(output_file, normalized=False):
                     if (curr_move_matrix[rowPos][colPos]!=1) & (curr_move_matrix[rowPos][colPos]!=2):
                         curr_move_matrix[rowPos][colPos] = player
 
-                    # if (str(curr_move_matrix) == '[[0, 2, 1, 1, 1, 2], [0, 2, 1, 2, 0, 0], [1, 1, 1, 2, 0, 0], [2, 1, 2, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 2, 0, 0, 2, 0]]'):
-                    #     print 'here'
+                    if (str(curr_move_matrix) == '[[1, 2, 0, 0, 1, 0], [0, 2, 1, 2, 0, 0], [0, 1, 2, 1, 0, 0], [0, 1, 0, 2, 0, 0], [0, 1, 0, 0, 0, 0], [0, 2, 1, 2, 2, 0]]'):
+                        print 'here'
                     if player_type == 'O':
                         player_type = 'X'
                         player = 1
@@ -1221,10 +1223,10 @@ def transition_probs(output_file, normalized=False):
                         player = 2
                     # if str(curr_move_matrix) not in board_states:
                     if str(curr_move_matrix) not in board_states:
-                        scores_block = compute_paths_scores_for_matrix(initial_board,player=player_type, normalized=normalized,o_weight=0.5, exp=2, block=True)
-                        scores_int = compute_paths_scores_for_matrix(initial_board,player=player_type, normalized=normalized,o_weight=0.5, exp=2, block=False)
-                        scores_lin = compute_paths_scores_for_matrix(initial_board,player=player_type, normalized=normalized,o_weight=0.5, exp=1,block=False)
-                        scores_dens = compute_scores_density_new(initial_board,player=player_type, normalized=normalized, neighborhood_size=2)
+                        scores_block = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=0.5, exp=2, block=True)
+                        scores_int = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=0.5, exp=2, block=False)
+                        scores_lin = compute_paths_scores_for_matrix(curr_move_matrix,player=player_type, normalized=normalized,o_weight=0.5, exp=1,block=False)
+                        scores_dens = compute_scores_density_new(curr_move_matrix,player=player_type, normalized=normalized, neighborhood_size=2)
 
                         scores_block_density = scores_block
                         scores_int_density = scores_int
@@ -2863,8 +2865,8 @@ if __name__ == "__main__":
     # paths_stats(participants='wrong')
     # moves_stats('stats/dynamics19062018.csv')
     # check_participant_answer('63e5efe1')
-    transition_probs('stats/state_scores_heuristics_300618', normalized=False)
-    # transition_probs_o_blind('stats/state_scores_heuristics_o_blind_300618', normalized=False)
+    transition_probs('stats/state_scores_heuristics_180718', normalized=True)
+    # transition_probs_o_blind('stats/state_scores_heuristics_o_blind_180718', normalized=True)
     # explore_exploit('stats/exploreExploitTimesPathLength0416.csv')
     # seperate_log('logs/fullLogCogSci.csv')
     # # entropy_board()
