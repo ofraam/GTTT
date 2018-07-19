@@ -1,0 +1,25 @@
+Row Labels,solvedCorrect,,validatedCorrect,,wrong,,Grand Total
+blocking,12,0.210526316,27,0.175324675,66,0.198795181,105
+blocking_blind,25,0.438596491,80,0.519480519,96,0.289156627,201
+density,12,0.210526316,2,0.012987013,53,0.159638554,67
+interaction,3,0.052631579,8,0.051948052,17,0.051204819,28
+interaction_blind,5,0.087719298,33,0.214285714,83,0.25,121
+linear,,0,4,0.025974026,17,0.051204819,21
+Grand Total,57,,154,,332,,543
+,,,,,,,
+,,,,,,,
+,wrong/notValidated,correct,,,,,
+blocking/interaction,98,35,,,,,
+blocking_blind/interaction_blind,209,113,,,,,
+linear,17,4,,,,,
+density,65,2,,,,,
+,,,,,,,
+,,,,,,,
+,wrong/notValidated,,correct,,,,
+blocking/interaction,98,0.251928021,35,0.227272727,,,
+blocking_blind/interaction_blind,209,0.537275064,113,0.733766234,,,
+linear,17,0.043701799,4,0.025974026,,,
+density,65,0.167095116,2,0.012987013,,,
+total,389,,154,,,,
+,,,,,,,
+,,,0.283609576,,,,

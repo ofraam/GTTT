@@ -2865,7 +2865,7 @@ if __name__ == "__main__":
     # paths_stats(participants='wrong')
     # moves_stats('stats/dynamics19062018.csv')
     # check_participant_answer('63e5efe1')
-    transition_probs('stats/state_scores_heuristics_180718', normalized=True)
+    transition_probs('stats/state_scores_heuristics_180718_playerCentric', normalized=False)
     # transition_probs_o_blind('stats/state_scores_heuristics_o_blind_180718', normalized=True)
     # explore_exploit('stats/exploreExploitTimesPathLength0416.csv')
     # seperate_log('logs/fullLogCogSci.csv')

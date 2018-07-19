@@ -938,62 +938,6 @@ def add_score_heuristic(dynamics, scores):
             col_pos = int(move[1])
             score = 0
             potential_score = 0
-
-            score_mat_str = state_scores[heuristic].iloc[0]
-            scores_mat = np.array(ast.literal_eval(score_mat_str))
-            score = scores_mat[row_pos][col_pos]
-            board_mat[row_pos][col_pos] = int(row['player'])
-            board_str = str(board_mat).replace("\n", ",")
-            board_str = str(board_str).replace(" ", ", ")
-            board_str = str(board_str).replace(",,", ",")
-            state_scores = scores.loc[scores['board_state'] == board_str]
-            # if state_scores['board_state'].shape[0] == :
-            # print board_str
-            score_mat_str = state_scores['probs_density'].iloc[0]
-            scores_mat = np.array(ast.literal_eval(score_mat_str))
-
-
-            scores_mat[scores_mat==-0.00001] = -100000
-            scores_mat[scores_mat==-0.00002] = -200000
-            potential_score = np.max(scores_mat)
-
-
-        scores_list.append(score)
-        potential_scores.append(potential_score)
-
-        # else:
-
-    dynamics['score_heuristic'] = scores_list
-    dynamics['potential_score_heuristic'] = potential_scores
-    dynamics.to_csv('stats/moves_heuristic_scores_060518.csv')
-
-
-def add_score_heuristic_list(dynamics, scores, likelihoods, heuristic_list):
-    scores_list = []
-    potential_scores = []
-    likelihoods['fitted_heuristic'] = likelihoods[heuristic_list].idxmax(axis=1)
-    heuristics_users = likelihoods[['userid','fitted_heuristic']]
-    #
-    # heuristics_users.set_index(['userid'], inplace=True)
-    # dynamics.set_index(['userid'], inplace=True)
-
-    # dynamics.join(heuristics_users).reset_index()
-    dynamics = pd.merge(dynamics, heuristics_users, on = 'userid', how = 'left')
-
-    for i, (index, row) in enumerate(dynamics.iterrows()):
-        if row['action'] == 'click':
-            state = row['board_state']
-
-            heuristic = row['heuristic']
-            state_scores = scores.loc[scores['board_state'] == state]
-            # print state
-            board_mat = np.array(ast.literal_eval(state))
-            move = row['position'].split('_')
-            # print move
-            row_pos = int(move[0])
-            col_pos = int(move[1])
-            score = 0
-            potential_score = 0
             if heuristic == 'density':
                 score_mat_str = state_scores['probs_density'].iloc[0]
                 scores_mat = np.array(ast.literal_eval(score_mat_str))
@@ -1060,6 +1004,61 @@ def add_score_heuristic_list(dynamics, scores, likelihoods, heuristic_list):
     dynamics['score_heuristic'] = scores_list
     dynamics['potential_score_heuristic'] = potential_scores
     dynamics.to_csv('stats/moves_heuristic_scores_060518.csv')
+
+
+def add_score_heuristic_list(dynamics, scores, likelihoods, heuristic_list):
+    scores_list = []
+    potential_scores = []
+    likelihoods['fitted_heuristic'] = likelihoods[heuristic_list].idxmax(axis=1)
+    heuristics_users = likelihoods[['userid','fitted_heuristic']]
+    #
+    # heuristics_users.set_index(['userid'], inplace=True)
+    # dynamics.set_index(['userid'], inplace=True)
+
+    # dynamics.join(heuristics_users).reset_index()
+    dynamics = pd.merge(dynamics, heuristics_users, on = 'userid', how = 'left')
+
+    for i, (index, row) in enumerate(dynamics.iterrows()):
+        if row['action'] == 'click':
+            state = row['board_state']
+
+            heuristic = row['fitted_heuristic']
+            state_scores = scores.loc[scores['board_state'] == state]
+            # print state
+            board_mat = np.array(ast.literal_eval(state))
+            move = row['position'].split('_')
+            # print move
+            row_pos = int(move[0])
+            col_pos = int(move[1])
+            score = 0
+            potential_score = 0
+
+            score_mat_str = state_scores[heuristic].iloc[0]
+            scores_mat = np.array(ast.literal_eval(score_mat_str))
+            score = scores_mat[row_pos][col_pos]
+            board_mat[row_pos][col_pos] = int(row['player'])
+            board_str = str(board_mat).replace("\n", ",")
+            board_str = str(board_str).replace(" ", ", ")
+            board_str = str(board_str).replace(",,", ",")
+            state_scores = scores.loc[scores['board_state'] == board_str]
+            # if state_scores['board_state'].shape[0] == :
+            # print board_str
+            score_mat_str = state_scores[heuristic].iloc[0]
+            # score_mat_str.replace("X", "-100000")
+            # score_mat_str.replace("O", "-200000")
+            scores_mat = np.array(ast.literal_eval(score_mat_str))
+
+            # player = int(row['player'])
+            # scores_mat[scores_mat=='X'] = -100000
+            # scores_mat[scores_mat=='O'] = -200000
+            potential_score = np.max(scores_mat)
+
+        scores_list.append(score)
+        potential_scores.append(potential_score)
+
+    dynamics['score_heuristic'] = scores_list
+    dynamics['potential_score_heuristic'] = potential_scores
+    dynamics.to_csv('stats/moves_heuristic_scores_190718.csv')
 
 
 def tag_last_moves_in_path(dynamics):
@@ -1137,18 +1136,20 @@ if __name__== "__main__":
     distances = pd.read_csv("stats/distanceFirstMoves.csv")
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
-    dynamics = pd.read_csv("stats/moves_hueristic_scores_aperture.csv")
+    dynamics = pd.read_csv("stats/moves_heuristic_scores_190718.csv")
     # dynamics = pd.read_csv("stats/moves_hueristic_050618.csv")
     transitions = pd.read_csv("stats/state_scores_heuristics_180718normalized_all.csv",dtype = {'board_state':str})
-    scores = pd.read_csv("stats/state_scores_heuristics_180718raw_all.csv",dtype = {'board_state':str})
-    likelihoods = pd.read_csv("stats/heuristics_fitted_170818_all.csv")
+    scores = pd.read_csv("stats/state_scores_heuristics_180718raw_all_xo.csv",dtype = {'board_state':str})
+    likelihoods = pd.read_csv("stats/heuristics_fitted_180718_all.csv")
     # fit_heuristic_user(transitions,dynamics)
     # add_score_heuristic(dynamics,scores)
     # tag_last_moves_in_path(dynamics)
     # merge_undos_to_reset(dynamics)
     # add_aperture_values(dynamics)
-    # fit_heuristic_user_list(transitions,dynamics,['density','linear','interaction','blocking','interaction_blind','blocking_blind'],'stats/heuristics_fitted_170818_all.csv')
-    add_score_heuristic_list(dynamics,scores,likelihoods,['density','linear','interaction','blocking','interaction_blind','blocking_blind'])
+    fit_heuristic_user_list(transitions,dynamics,['density','linear','interaction','blocking','interaction_blind','blocking_blind','blocking_player','interaction_player'],'stats/heuristics_fitted_170818_all_player.csv')
+    # add_score_heuristic_list(dynamics,scores,likelihoods,['density','linear','interaction','blocking','interaction_blind','blocking_blind'])
+    # unique_users = dynamics.drop_duplicates(subset='userid', keep='first', inplace=False)
+    # unique_users.to_csv('stats/users_heuristics.csv')
     print 1/0
 
     states = pd.read_csv("stats/states.csv")
