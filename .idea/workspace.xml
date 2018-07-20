@@ -5,15 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f27e7977-f565-4ab6-8925-e8910730b8bd" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/heuristics_fitted_170818.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/heuristics_fitted_170818.xlsx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/heuristics_fitted_170818_all.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/heuristics_fitted_170818_all.xlsx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/heuristics_fitted_170818_fewer.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/heuristics_fitted_170818_fewer.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_easy_verify_dec19.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/10_hard_verify_dec19.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_easy_verify_dec19.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_250318.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_250318.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_260318.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_260318.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_260318_bu.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_full_dec19 - Copy.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_250318.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_250318.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_260318.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_260318.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19 - Copy (2).csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19 - Copy.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_pruned_dec19_fixed.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/logs/6_hard_verify_dec19.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/heuristics_fitted_180718_all.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/heuristics_fitted_180718_all.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/state_scores_heuristics_180718_playerCentricnormalized.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/stats/state_scores_heuristics_180718_playerCentricraw.csv" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/users_heuristics.xlsx" afterPath="$PROJECT_DIR$/stats/users_heuristics.xlsx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/replay.py" afterPath="$PROJECT_DIR$/replay.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/moves_heuristic_scores_190718.csv" afterPath="$PROJECT_DIR$/stats/moves_heuristic_scores_190718.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/state_scores_heuristics_180718normalized_all.csv" afterPath="$PROJECT_DIR$/stats/state_scores_heuristics_180718normalized_all.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/state_scores_heuristics_180718raw_all.csv" afterPath="$PROJECT_DIR$/stats/state_scores_heuristics_180718raw_all.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/state_scores_heuristics_180718raw_all_xo.csv" afterPath="$PROJECT_DIR$/stats/state_scores_heuristics_180718raw_all_xo.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats/users_heuristics.csv" afterPath="$PROJECT_DIR$/stats/users_heuristics.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stats_analyses.py" afterPath="$PROJECT_DIR$/stats_analyses.py" />
     </list>
     <ignored path=".idea/dataSources.local.xml" />
@@ -33,9 +53,9 @@
     <SUITE FILE_PATH="coverage/GTTT$Unittest_TicTacToeTest_test_basic_game_play.coverage" NAME="Unittest TicTacToeTest.test_basic_game_play Coverage Results" MODIFIED="1490667105400" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$Unittests_in_computational_model.coverage" NAME="Unittests in computational_model Coverage Results" MODIFIED="1515839066274" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$gen_winning_paths.coverage" NAME="gen_winning_paths Coverage Results" MODIFIED="1494872363873" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$stats_analyses.coverage" NAME="stats_analyses Coverage Results" MODIFIED="1531995805701" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$stats_analyses.coverage" NAME="stats_analyses Coverage Results" MODIFIED="1532005811468" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/GTTT$board_mcts.coverage" NAME="board_mcts Coverage Results" MODIFIED="1517489416335" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/GTTT$replay.coverage" NAME="replay Coverage Results" MODIFIED="1531995427858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/GTTT$replay.coverage" NAME="replay Coverage Results" MODIFIED="1532104111688" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -53,11 +73,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.24959217">
-              <caret line="134" column="32" selection-start-line="134" selection-start-column="32" selection-end-line="134" selection-end-column="32" />
+            <state vertical-scroll-proportion="89.68965">
+              <caret line="892" column="4" selection-start-line="892" selection-start-column="4" selection-end-line="892" selection-end-column="4" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -65,11 +85,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="replay.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="replay.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/replay.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="1097" column="47" selection-start-line="1097" selection-start-column="47" selection-end-line="1097" selection-end-column="47" />
+            <state vertical-scroll-proportion="0.63784665">
+              <caret line="1123" column="24" selection-start-line="1123" selection-start-column="24" selection-end-line="1123" selection-end-column="24" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -80,11 +100,11 @@
       <file leaf-file-name="stats_analyses.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/stats_analyses.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-13.4827585">
-              <caret line="1148" column="213" selection-start-line="1148" selection-start-column="213" selection-end-line="1148" selection-end-column="213" />
+            <state vertical-scroll-proportion="-16.413794">
+              <caret line="561" column="33" selection-start-line="561" selection-start-column="8" selection-end-line="561" selection-end-column="33" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <marker date="1531995805695" expanded="true" signature="92639:92783" placeholder="..." />
+                <marker date="1532099651679" expanded="true" signature="92597:92741" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -187,9 +207,9 @@
         <option value="$PROJECT_DIR$/ab_config1.json" />
         <option value="$PROJECT_DIR$/board.py" />
         <option value="$PROJECT_DIR$/utils.py" />
-        <option value="$PROJECT_DIR$/replay.py" />
-        <option value="$PROJECT_DIR$/stats_analyses.py" />
         <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/stats_analyses.py" />
+        <option value="$PROJECT_DIR$/replay.py" />
       </list>
     </option>
   </component>
@@ -277,7 +297,7 @@
       <recent name="$PROJECT_DIR$/predefinedBoards" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.stats_analyses">
+  <component name="RunManager" selected="Python.replay">
     <configuration default="false" name="replay" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -570,8 +590,8 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.stats_analyses" />
-        <item index="1" class="java.lang.String" itemvalue="Python.replay" />
+        <item index="0" class="java.lang.String" itemvalue="Python.replay" />
+        <item index="1" class="java.lang.String" itemvalue="Python.stats_analyses" />
         <item index="2" class="java.lang.String" itemvalue="Python.model" />
         <item index="3" class="java.lang.String" itemvalue="Python.computational_model" />
         <item index="4" class="java.lang.String" itemvalue="Python.board_mcts" />
@@ -676,12 +696,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2704</line>
+          <line>2838</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2700</line>
+          <line>2834</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -711,17 +731,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2641</line>
+          <line>2775</line>
           <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2650</line>
+          <line>2784</line>
           <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2720</line>
+          <line>2854</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -731,7 +751,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2752</line>
+          <line>2886</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -746,7 +766,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2552</line>
+          <line>2686</line>
           <option name="timeStamp" value="59" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -901,7 +921,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2243</line>
+          <line>2377</line>
           <option name="timeStamp" value="557" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1041,7 +1061,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1300</line>
+          <line>1434</line>
           <option name="timeStamp" value="651" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1136,7 +1156,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1216</line>
+          <line>1350</line>
           <option name="timeStamp" value="764" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1191,7 +1211,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>2868</line>
+          <line>3003</line>
           <option name="timeStamp" value="855" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1201,7 +1221,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
           <url>file://$PROJECT_DIR$/replay.py</url>
-          <line>1171</line>
+          <line>1305</line>
           <option name="timeStamp" value="873" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="python-line">
@@ -1229,8 +1249,18 @@
           <line>1035</line>
           <option name="timeStamp" value="885" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/replay.py</url>
+          <line>1162</line>
+          <option name="timeStamp" value="886" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/replay.py</url>
+          <line>1177</line>
+          <option name="timeStamp" value="887" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="886" />
+      <option name="time" value="889" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="tests">
@@ -1608,33 +1638,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/replay.py">
+    <entry file="file://$PROJECT_DIR$/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="1097" column="47" selection-start-line="1097" selection-start-column="47" selection-end-line="1097" selection-end-column="47" />
+        <state vertical-scroll-proportion="89.68965">
+          <caret line="892" column="4" selection-start-line="892" selection-start-column="4" selection-end-line="892" selection-end-column="4" />
           <folding>
-            <element signature="e#0#10#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stats_analyses.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-13.4827585">
-          <caret line="1148" column="213" selection-start-line="1148" selection-start-column="213" selection-end-line="1148" selection-end-column="213" />
+        <state vertical-scroll-proportion="-16.413794">
+          <caret line="561" column="33" selection-start-line="561" selection-start-column="8" selection-end-line="561" selection-end-column="33" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <marker date="1531995805695" expanded="true" signature="92639:92783" placeholder="..." />
+            <marker date="1532099651679" expanded="true" signature="92597:92741" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model.py">
+    <entry file="file://$PROJECT_DIR$/replay.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.24959217">
-          <caret line="134" column="32" selection-start-line="134" selection-start-column="32" selection-end-line="134" selection-end-column="32" />
+        <state vertical-scroll-proportion="0.63784665">
+          <caret line="1123" column="24" selection-start-line="1123" selection-start-column="24" selection-end-line="1123" selection-end-column="24" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>
