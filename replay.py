@@ -1079,6 +1079,7 @@ def compute_transition_probs_heuristic(heuristic, board, player, normalized=Fals
 
 
 def fit_heuristics(heuristics_list, output_file, win_scores=[100], blocking_vals=[10]):
+
     write_header = True
     for win_score in win_scores:
         for blocking_val in blocking_vals:
@@ -1124,6 +1125,7 @@ def fit_heuristics(heuristics_list, output_file, win_scores=[100], blocking_vals
                             curr_user = row['userid']
 
                         if row['userid'] != curr_user:
+
                             # save prev user's data
                             if user_move_count > 0:
                                 curr_data['userid'] = curr_user
@@ -1150,6 +1152,7 @@ def fit_heuristics(heuristics_list, output_file, win_scores=[100], blocking_vals
                             for heuristic in heuristics_list:
                                 heuristics_log_likelihoods[heuristic] = 0.0
                             curr_user = row['userid']
+
                             move_stack = []
                             user_move_count = 0.0
                             curr_move_matrix = copy.deepcopy(initial_board)
@@ -1206,6 +1209,25 @@ def fit_heuristics(heuristics_list, output_file, win_scores=[100], blocking_vals
 
                             else:
                                 print 'problem undo'
+                    # save last user
+                    if user_move_count > 0:
+                        curr_data['userid'] = curr_user
+                        curr_data['board_name'] = board_name
+                        curr_data['board_size'] = board_size
+                        curr_data['board_type'] = board_type
+                        curr_data['condition'] = condition
+                        curr_data['win_score'] = win_score
+                        curr_data['blocking_score'] = blocking_val
+                        max_log_likelihood = -10000000
+                        max_heuristic = None
+                        for heuristic in heuristics_list:
+                            avg_log_likelihood = heuristics_log_likelihoods[heuristic] / user_move_count
+                            curr_data[heuristic] = avg_log_likelihood
+                            if avg_log_likelihood > max_log_likelihood:
+                                max_heuristic = heuristic
+                                max_log_likelihood = avg_log_likelihood
+                        curr_data['fitted_heuristic'] = max_heuristic
+                        results_table.append(curr_data)
 
             dataFile = open(output_file, 'ab')
             fieldnames = ['userid','board_name','board_size','board_type','condition','fitted_heuristic', 'blocking_score', 'win_score']
@@ -3030,12 +3052,16 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    # moves_stats('stats/test.csv')
+    moves_stats('stats/test.csv')
     # win_scores = [25,50,100,200,400,800,1600,3200,6400,12800]
     # blocking_vals = [5,10,20,40,80,160,320]
-    win_scores = [1600,3200,6400,12800]
+    win_scores = [25,50,100]
     blocking_vals = [5,10,20,40,80,160]
-    fit_heuristics(['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'], 'stats/heuristic_fit_sensitivity_1600on.csv',win_scores=win_scores,blocking_vals=blocking_vals)
+    # win_scores = [200,400,800]
+    # blocking_vals = [5,10,20,40,80,160]
+    # ,'linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'
+    # fit_heuristics(['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'], 'stats/missing_parts_heuristics.csv',win_scores=win_scores,blocking_vals=blocking_vals)
+    # fit_heuristics(['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'], 'stats/missing_parts_heuristics_25.csv',win_scores=win_scores,blocking_vals=blocking_vals)
     # fit_heuristics(['linear','non-linear','interaction','interaction_shutter_0','blocking_shutter_0','blocking','density'], 'stats/heuristic_fit_shutter_test_noBline.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics(['linear','non-linear','interaction','interaction_blind','blocking_blind','blocking','density'], 'stats/heuristic_fit_reg.csv',win_scores=[100],blocking_vals=[10])
 

@@ -1141,16 +1141,36 @@ if __name__== "__main__":
     transitions = pd.read_csv("stats/state_scores_heuristics_180718normalized_all.csv",dtype = {'board_state':str})
     scores = pd.read_csv("stats/state_scores_heuristics_180718raw_all_xo.csv",dtype = {'board_state':str})
     likelihoods = pd.read_csv("stats/heuristics_fitted_190718_all.csv")
+    cogsci_participants = pd.read_csv("stats/cogsci_participants.csv")
+    heuristics_sensitivity = pd.read_csv("stats/cogsci_heuristics2.csv")
+
+    heuristics_part_list = heuristics_sensitivity['userid'].unique().tolist()
+    # dynamics_filtered = dynamics.loc[dynamics['userid'].isin(cogsci_part_list)]
+    # dynamics_filtered.to_csv('stats/dynamics_cogscidata_220718.csv')
+
+    dynamics_filtered = pd.read_csv('stats/dynamics_cogscidata_220718.csv')
+    # dynamics_list = dynamics_filtered['userid'].unique().tolist()
+    # print len(heuristics_part_list)
+    # print len(dynamics_list)
+    # for part in heuristics_part_list:
+    #     if part not in dynamics_list:
+    #         print part
+    #         # print heuristics_sensitivity.loc[heuristics_sensitivity['userid'] == part]
+
+    # heuristics_sensitivity_filtered = heuristics_sensitivity.loc[heuristics_sensitivity['userid'].isin(cogsci_part_list)]
+    # # cogsci_heuristics = pd.merge(cogsci_participants, heuristics_sensitivity, on = 'userid', how = 'left')
+    # heuristics_sensitivity_filtered.to_csv('stats/cogsci_heuristics.csv')
+
     # fit_heuristic_user(transitions,dynamics)
     # add_score_heuristic(dynamics,scores)
     # tag_last_moves_in_path(dynamics)
     # merge_undos_to_reset(dynamics)
     # add_aperture_values(dynamics)
-    fit_heuristic_user_list(transitions,dynamics,['density','non-linear','interaction','blocking','interaction_blind','blocking_blind'],'stats/heuristics_fitted_190718_all.csv')
+    # fit_heuristic_user_list(transitions,dynamics,['density','non-linear','interaction','blocking','interaction_blind','blocking_blind'],'stats/heuristics_fitted_190718_all.csv')
     # add_score_heuristic_list(dynamics,scores,likelihoods,['density','non-linear','interaction','blocking','interaction_blind','blocking_blind'])
-    unique_users = dynamics.drop_duplicates(subset='userid', keep='first', inplace=False)
-    unique_users.to_csv('stats/users_heuristics.csv')
-    print 1/0
+    # unique_users = dynamics.drop_duplicates(subset='userid', keep='first', inplace=False)
+    # unique_users.to_csv('stats/users_heuristics.csv')
+    # print 1/0
 
     states = pd.read_csv("stats/states.csv")
     # dynamics = pd.read_csv("stats/dynamicsFirstMoves1.csv")
@@ -1169,6 +1189,57 @@ if __name__== "__main__":
     # resetsDelta = pd.read_csv("stats/resetsDeltaData.csv")
     # resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
     resetsDelta = pd.read_csv("stats/resetsFiltered2.csv")
+
+
+    # --------heuristic fit analysis-------------
+    # aggregations = {
+    #     'userid': 'count'
+    #     # 'userid': 'sum'
+    # }
+
+    # heuristics_fit_paramters = heuristics_sensitivity.groupby(['win_score','blocking_score','fitted_heuristic','board_name']).agg(aggregations)
+    # heuristics_fit_paramters.to_csv("stats/heuristic_fit_agg_boards.csv")
+
+    # sensitivity analysis
+    # heuristics_fit_paramters = pd.read_csv("stats/heuristic_fit_agg.csv")
+    # heuristics = ['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind']
+    # for heuristic in heuristics:
+    #     print heuristic
+    #     heuristics_fit_paramters_filter = heuristics_fit_paramters.loc[heuristics_fit_paramters['fitted_heuristic'] == heuristic]
+    #     print bs.bootstrap(heuristics_fit_paramters_filter['proportion_participants'].values, stat_func=bs_stats.mean, is_pivotal=False)
+
+    # participant heuristic fit figure-----
+    heuristics_sensitivity_filtered = heuristics_sensitivity.loc[(heuristics_sensitivity['win_score'] == 100) & (heuristics_sensitivity['blocking_score'] == 10)]
+
+    heuristics_sensitivity_filtered["heuristic_correct"] = zip(heuristics_sensitivity_filtered.user_count, heuristics_sensitivity_filtered.num_participants)
+
+
+    def weighted_mean(x, **kws):
+        user_count, correct = map(np.asarray, zip(*x))
+
+        return user_count.sum() / float(correct[0])
+
+    # lambda x: True if x % 2 == 0 else False
+    ax = sns.barplot(x = 'fitted_heuristic', y = 'heuristic_correct', hue="correct",   n_boot=1000, data = heuristics_sensitivity_filtered,  estimator=weighted_mean, orient="v",order=['density','linear','non-linear', 'interaction_blind', 'interaction','blocking_blind','blocking'])
+    # ax = sns.barplot(x = 'fitted_heuristic', y = 'blocking', hue="correct",   n_boot=1000, data = heuristics_sensitivity_filtered)
+
+    # ax = sns.factorplot(x="board", y="solutionAndValidationCorrectPercent", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=['o','^'], legend_out=False, legend=False)
+    # data['board'] = data['board'].map({'6 MC': 'MC6','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
+    # ax = sns.barplot(x="board", y="solutionAndValidationCorrectPercent",  hue="condition", data=data, n_boot=1000, order=['MC6', 'MC10', 'HC6', 'HC10', 'DC10'])
+    #
+    # ax.set(xlabel='Board', ylabel='Percent Correct')
+    # lw = ax.ax.lines[0].get_linewidth()
+    # plt.setp(ax.ax.lines,linewidth=lw)
+    plt.ylim([0, 1])
+    plt.legend(loc='best')
+    plt.show()
+    # participant success rate figure end-----
+
+
+    # print heuristics_fit_paramters
+    print 1/0
+    # --------end heuristic fit analysis------
+
 
     # get_user_stats(dynamics,exploreExploit)
 
