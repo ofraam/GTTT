@@ -13,6 +13,7 @@ import os
 from scipy.optimize import minimize
 from board import *
 from mpl_toolkits.axes_grid1 import AxesGrid
+from utils import *
 
 
 import board as b
@@ -39,10 +40,21 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
 MOVES_TO_WIN = [10,8,10,8,8,6,8,6,10,8]
 
 INFINITY_O = 10
-IMMEDIATE_THREAT_SCORE = 20
 
 BOARDS_MINUS_1 = []
 WIN_SCORE = 100
+
+
+def get_positions_shutter(row, col, board_matrix, shutter_size=0):
+    active_squares = get_open_paths_through_square(row, col, board_matrix, player=1)
+    if len(active_squares) > 0:
+        for i in range(1, shutter_size+1):
+            active_squares.extend(expand_neighborhood(active_squares, len(board_matrix)))
+    else:
+        return []
+    active_squares = remove_duplicates(active_squares)
+
+    return active_squares
 
 
 def convert_matrix_xo(board_matrix):
@@ -84,7 +96,7 @@ def normalize_matrix(score_matrix, with_negative=False):
                         score_matrix[r][c] = 0
 
 
-def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False):
+def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None):
     """
     computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
     :param exp: parameter creates the non-linearity (i.e., 2 --> squared)
@@ -93,7 +105,9 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
     :param normalized: whether to normalize scorse to sum up to 1 (for transition probabilities)
     :param board_mat: the board
     :param interaction: whether the heuristic considers interaction between paths
-    :param block: whether to use blocking heuristic (extra points for threatning)
+    :param block: whether to use blocking heuristic (extra points for threatening)
+    :param shutter: whether to use a shutter for pruning the space
+    :param shutter_size: if using shutter, what radius to look at
     """
     board_matrix = copy.deepcopy(board_mat)
     convert_matrix_xo(board_matrix)
@@ -109,9 +123,19 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
         x_turn = False
         o_turn = True
 
+    active_squares = []
+    if shutter:
+        if prev_x_move is not None:
+            active_squares = get_positions_shutter(prev_x_move[0], prev_x_move[1], board_matrix, shutter_size)
+
     for r in range(len(board_matrix)):
         for c in range(len(board_matrix[r])):
             if board_matrix[r][c] == 0:  # only check if free & passed threshold
+                if ([r, c] not in active_squares) & shutter & (len(active_squares) > 0):  # if there are available positions within shutter, and square is not in them, give score 0
+                    square_score = 0
+                    score_matrix[r][c] = square_score
+                    continue
+
                 x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction)
                 square_score_x = x_paths[0]
                 x_paths_data = []

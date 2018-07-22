@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import math
 import json
 from model import *
+import model
 import pandas as pd
 import ast
 
@@ -1048,7 +1049,7 @@ def transition_probs_o_blind(output_file, normalized=False):
         #     dataWriter.writerow(record)
 
 
-def compute_transition_probs_heuristic(heuristic, board, player, normalized=False):
+def compute_transition_probs_heuristic(heuristic, board, player, normalized=False, prev_x_move=None):
     if heuristic == 'density':
         return compute_scores_density_new(board, player=player, normalized=normalized, neighborhood_size=2)
     elif heuristic == 'linear':
@@ -1069,121 +1070,153 @@ def compute_transition_probs_heuristic(heuristic, board, player, normalized=Fals
         if player == 'O':
             o_weight = 1.0
         return compute_paths_scores_for_matrix(board, player=player, normalized=normalized, o_weight=o_weight, exp=2, block=True, interaction=True)
+    elif heuristic.startswith('blocking_shutter'):  # if use shutter, define heuristic as blocking_shutter_k, where k is shutter size
+        shutter_size = int(heuristic[len(heuristic)-1])
+        return compute_paths_scores_for_matrix(board, player=player, normalized=normalized, o_weight=0.5, exp=2, block=True, interaction=True, shutter=True, shutter_size=shutter_size, prev_x_move=prev_x_move)
+    elif heuristic.startswith('interaction_shutter'):  # if use shutter, define heuristic as blocking_shutter_k, where k is shutter size
+        shutter_size = int(heuristic[len(heuristic)-1])
+        return compute_paths_scores_for_matrix(board, player=player, normalized=normalized, o_weight=0.5, exp=2, block=False, interaction=True, shutter=True, shutter_size=shutter_size, prev_x_move=prev_x_move)
 
 
-def fit_heuristics(heuristics_list, output_file):
-    results_table = []
-    for g in range(len(LOGFILE)):
-        # print g
-        initial_board = copy.deepcopy(START_POSITION[g])
+def fit_heuristics(heuristics_list, output_file, win_scores=[100], blocking_vals=[10]):
+    write_header = True
+    for win_score in win_scores:
+        for blocking_val in blocking_vals:
+            model.WIN_SCORE = win_score
+            model.INFINITY_O = blocking_val
+            results_table = []
+            for g in range(len(LOGFILE)):
+                # print g
+                initial_board = copy.deepcopy(START_POSITION[g])
 
-        move_matrix = copy.deepcopy(initial_board)
+                move_matrix = copy.deepcopy(initial_board)
 
-        curr_move_matrix = copy.deepcopy(move_matrix)
+                curr_move_matrix = copy.deepcopy(move_matrix)
 
-        with open(LOGFILE[g], 'rb') as csvfile:
-            print LOGFILE[g]
-            cond = LOGFILE[g][5:-10].replace("_",",")
-            cond = cond.split(',')
-            board_size = cond[0]
-            board_type = cond[1]
-            condition = cond[2]
-            board_name = LOGFILE[g]
-            board_name = board_name[:-4]
-            board_name = board_name[5:-6]
+                with open(LOGFILE[g], 'rb') as csvfile:
+                    print LOGFILE[g]
+                    cond = LOGFILE[g][5:-10].replace("_",",")
+                    cond = cond.split(',')
+                    board_size = cond[0]
+                    board_type = cond[1]
+                    condition = cond[2]
+                    board_name = LOGFILE[g]
+                    board_name = board_name[:-4]
+                    board_name = board_name[5:-6]
 
-            log_reader = csv.DictReader(csvfile)
-            curr_path = []
-            curr_user = ''
-            prev_x_move = None
-            user_move_count = 0.0
-            heuristics_log_likelihoods = {}
-            for heuristic in heuristics_list:
-                heuristics_log_likelihoods[heuristic] = 0.0
-
-            move_stack = []
-
-            i = 0
-            for row in log_reader:
-                # print i
-                # i += 1
-                curr_data = {}
-                if curr_user == '':
-                    curr_user = row['userid']
-
-                if row['userid'] != curr_user:
-                    # save prev user's data
-                    if user_move_count > 0:
-                        curr_data['userid'] = curr_user
-                        curr_data['board_name'] = board_name
-                        curr_data['board_size'] = board_size
-                        curr_data['board_type'] = board_type
-                        curr_data['condition'] = condition
-                        for heuristic in heuristics_list:
-                            curr_data[heuristic] = heuristics_log_likelihoods[heuristic] / user_move_count
-                        results_table.append(curr_data)
-                    # reset all values for next user
+                    log_reader = csv.DictReader(csvfile)
                     curr_path = []
+                    curr_user = ''
                     prev_x_move = None
+                    user_move_count = 0.0
                     heuristics_log_likelihoods = {}
                     for heuristic in heuristics_list:
                         heuristics_log_likelihoods[heuristic] = 0.0
-                    curr_user = row['userid']
-                    move_stack = []
-                    user_move_count = 0.0
-                    curr_move_matrix = copy.deepcopy(initial_board)
 
-                elif row['key'] == 'clickPos':
-                    user_move_count += 1
-                    rowPos = int(row['value'][0])
-                    colPos = int(row['value'][2])
-
-                    player = int(row['value'][4])
-                    if player == 1:
-                        prev_x_move = [rowPos, colPos]
-                    player_type = 'X'
-                    if player == 2:
-                        player_type = 'O'
-
-                    for heuristic in heuristics_list:
-                        probs = compute_transition_probs_heuristic(heuristic, curr_move_matrix, player_type, normalized=True)
-                        prob_move = probs[rowPos][colPos]
-                        if prob_move <= 0.0:
-                            prob_move = 0.0001
-                        heuristics_log_likelihoods[heuristic] += math.log(prob_move)
-
-                    if (curr_move_matrix[rowPos][colPos] != 1) & (curr_move_matrix[rowPos][colPos] != 2):
-                        curr_move_matrix[rowPos][colPos] = player
-                        curr_path.append([rowPos, colPos, player])
-                        move_stack.append((rowPos, colPos))
-
-                        if len(curr_path) == 1:
-                            first_move = True
-                    else:
-                        print 'weird'
-
-                elif row['key'] == 'reset':
-                    curr_move_matrix = copy.deepcopy(initial_board)
-                    curr_path = []
-                    prev_x_move = None
                     move_stack = []
 
-                elif row['key'] == 'undo':
-                    if len(move_stack) > 0:
-                        undo_move = move_stack.pop()
-                        curr_move_matrix[undo_move[0]][undo_move[1]] = 0
-                        curr_path = curr_path[:-1]
+                    i = 0
+                    for row in log_reader:
+                        # print i
+                        # i += 1
+                        curr_data = {}
+                        if curr_user == '':
+                            curr_user = row['userid']
 
-                    else:
-                        print 'problem undo'
+                        if row['userid'] != curr_user:
+                            # save prev user's data
+                            if user_move_count > 0:
+                                curr_data['userid'] = curr_user
+                                curr_data['board_name'] = board_name
+                                curr_data['board_size'] = board_size
+                                curr_data['board_type'] = board_type
+                                curr_data['condition'] = condition
+                                curr_data['win_score'] = win_score
+                                curr_data['blocking_score'] = blocking_val
+                                max_log_likelihood = -10000000
+                                max_heuristic = None
+                                for heuristic in heuristics_list:
+                                    avg_log_likelihood = heuristics_log_likelihoods[heuristic] / user_move_count
+                                    curr_data[heuristic] = avg_log_likelihood
+                                    if avg_log_likelihood > max_log_likelihood:
+                                        max_heuristic = heuristic
+                                        max_log_likelihood = avg_log_likelihood
+                                curr_data['fitted_heuristic'] = max_heuristic
+                                results_table.append(curr_data)
+                            # reset all values for next user
+                            curr_path = []
+                            prev_x_move = None
+                            heuristics_log_likelihoods = {}
+                            for heuristic in heuristics_list:
+                                heuristics_log_likelihoods[heuristic] = 0.0
+                            curr_user = row['userid']
+                            move_stack = []
+                            user_move_count = 0.0
+                            curr_move_matrix = copy.deepcopy(initial_board)
 
-    dataFile = open(output_file, 'wb')
-    fieldnames = ['userid','board_name','board_size','board_type','condition']
-    fieldnames.extend(heuristics_list)
-    dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
-    dataWriter.writeheader()
-    for record in results_table:
-        dataWriter.writerow(record)
+                        elif row['key'] == 'clickPos':
+                            user_move_count += 1
+                            rowPos = int(row['value'][0])
+                            colPos = int(row['value'][2])
+
+                            player = int(row['value'][4])
+
+                            player_type = 'X'
+                            if player == 2:
+                                player_type = 'O'
+
+                            for heuristic in heuristics_list:
+                                # print heuristic
+                                probs = compute_transition_probs_heuristic(heuristic, curr_move_matrix, player_type, normalized=True, prev_x_move=prev_x_move)
+                                prob_move = probs[rowPos][colPos]
+                                if prob_move <= 0.0:
+                                    prob_move = 0.0001
+                                heuristics_log_likelihoods[heuristic] += math.log(prob_move)
+
+                            if player == 1:
+                                prev_x_move = [rowPos, colPos]
+
+                            if (curr_move_matrix[rowPos][colPos] != 1) & (curr_move_matrix[rowPos][colPos] != 2):
+                                curr_move_matrix[rowPos][colPos] = player
+                                curr_path.append([rowPos, colPos, player])
+                                move_stack.append((rowPos, colPos))
+
+                                if len(curr_path) == 1:
+                                    first_move = True
+                            else:
+                                print 'weird'
+
+                        elif row['key'] == 'reset':
+                            curr_move_matrix = copy.deepcopy(initial_board)
+                            curr_path = []
+                            prev_x_move = None
+                            move_stack = []
+
+                        elif row['key'] == 'undo':
+                            if len(move_stack) > 0:
+                                undo_move = move_stack.pop()
+                                curr_move_matrix[undo_move[0]][undo_move[1]] = 0
+                                curr_path = curr_path[:-1]
+                                prev_x_move = None
+                                if len(curr_path) > 0:
+                                    if len(curr_path) % 2 == 0:  # last move is O move, get one before
+                                        prev_x_move = curr_path[len(curr_path)-2]
+                                    else:  # last move is X move, get it
+                                        prev_x_move = curr_path[len(curr_path)-1]
+
+                            else:
+                                print 'problem undo'
+
+            dataFile = open(output_file, 'ab')
+            fieldnames = ['userid','board_name','board_size','board_type','condition','fitted_heuristic', 'blocking_score', 'win_score']
+            fieldnames.extend(heuristics_list)
+            dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
+            if write_header:
+                dataWriter.writeheader()
+                write_header = False
+            for record in results_table:
+                dataWriter.writerow(record)
+            dataFile.close()
 
 def transition_probs(output_file, normalized=False):
     moves_data_matrics = {}
@@ -2998,7 +3031,15 @@ if __name__ == "__main__":
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
     # moves_stats('stats/test.csv')
-    fit_heuristics(['density','blocking'], 'stats/test_heuristic_fit.csv')
+    # win_scores = [25,50,100,200,400,800,1600,3200,6400,12800]
+    # blocking_vals = [5,10,20,40,80,160,320]
+    win_scores = [1600,3200,6400,12800]
+    blocking_vals = [5,10,20,40,80,160]
+    fit_heuristics(['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'], 'stats/heuristic_fit_sensitivity_1600on.csv',win_scores=win_scores,blocking_vals=blocking_vals)
+    # fit_heuristics(['linear','non-linear','interaction','interaction_shutter_0','blocking_shutter_0','blocking','density'], 'stats/heuristic_fit_shutter_test_noBline.csv',win_scores=[100],blocking_vals=[10])
+    # fit_heuristics(['linear','non-linear','interaction','interaction_blind','blocking_blind','blocking','density'], 'stats/heuristic_fit_reg.csv',win_scores=[100],blocking_vals=[10])
+
+    # fit_heuristics(['density','blocking'], 'stats/test_heuristic_fit_1000.csv',win_scores=[10,50,100,200,400,800,1600,3200,6400,12800],blocking_vals=[5,10,20,40,80,160,320])
     # check_participant_answer('63e5efe1')
     # transition_probs('stats/state_scores_heuristics_180718_linearNoInteraction_', normalized=True)
     # transition_probs_o_blind('stats/state_scores_heuristics_o_blind_180718', normalized=True)

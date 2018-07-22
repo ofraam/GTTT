@@ -2,11 +2,11 @@ import random
 import numpy as np
 import copy
 
-def get_open_paths_through_square(row, col, board, player='X'):
+
+def get_open_paths_through_square(row, col, board, player=1):
     other_player = 2
     if player == 2:
         other_player = 1
-
 
     max_length_path = 0
     threshold = -1
@@ -150,13 +150,18 @@ def get_open_paths_through_square(row, col, board, player='X'):
                 open_paths_data.extend(path)
                 if (path_x_count+1) > max_length_path:
                     max_length_path = path_x_count+1
-            elif (path_x_count>threshold):
+            elif path_x_count > threshold:
                 open_paths_data.extend(path)
 
+    return remove_duplicates(open_paths_data)
 
 
-
-    return open_paths_data
+def remove_duplicates(square_list):
+    unique_squares = []
+    for square in square_list:
+        if not check_square_in_list(square, unique_squares):
+            unique_squares.append(square)
+    return unique_squares
 
 
 def expand_neighborhood(squares, size):
@@ -168,8 +173,9 @@ def expand_neighborhood(squares, size):
             for neighbor in neighbors:
                 if not check_square_in_list(neighbor,new_neighborhood):
                     new_neighborhood.append(neighbor)
+            checked.append(str(square))
             # new_neighborhood.extend(get_neighboring_squares(size, square, 1))
-    return new_neighborhood
+    return remove_duplicates(new_neighborhood)
 
 
 def check_square_in_list(square, squares_list):
