@@ -1894,11 +1894,12 @@ def moves_stats(output_file):
                     prev_time = row['time']
                     initial_time = int(prev_row['time'])
 
+
                 prev_row = copy.deepcopy(row)
     dataFile = open(output_file, 'wb')
     fieldnames = ['userid','board_name','board_size','board_type','condition','solved', 'action','time','time_rel',
                   'player','score_move','move_ranking','top_possible_score', 'second_possible_score', 'num_possible_moves','delta_score','potential_score','path','move_prob', 'path_prob', 'path_number','board_state',
-                  'position','path_after', 'time_from_action','time_from_click','prev_action','move_number','move_number_in_path','first_move_in_path','time_prev_action']
+                  'position','path_after', 'time_from_action','time_from_click','prev_action','move_number','move_number_in_path','first_move_in_path','time_prev_action','solution']
     dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
     dataWriter.writeheader()
     for record in results_table:
@@ -3052,11 +3053,11 @@ if __name__ == "__main__":
     # paths_stats(participants='solvedCorrect')
     # paths_stats(participants='wrong')
     # paths_stats(participants='wrong')
-    moves_stats('stats/test.csv')
+    moves_stats('stats/cogsci_moves_230718_solution.csv')
     # win_scores = [25,50,100,200,400,800,1600,3200,6400,12800]
     # blocking_vals = [5,10,20,40,80,160,320]
-    win_scores = [25,50,100]
-    blocking_vals = [5,10,20,40,80,160]
+    # win_scores = [25,50,100]
+    # blocking_vals = [5,10,20,40,80,160]
     # win_scores = [200,400,800]
     # blocking_vals = [5,10,20,40,80,160]
     # ,'linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'
