@@ -174,7 +174,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
     if (len(winning_moves) > 0) & ((player != 'O') | (o_weight > 0)):
         for move in winning_moves:
             move_row, move_col = convert_position(move, len(board_matrix))
-            score_matrix[move_row][move_col] += WIN_SCORE
+            score_matrix[move_row][move_col] = WIN_SCORE
 
     if len(winning_moves) == 0:  # if can't win immediately, check if opponent can win immediately
         other_player = 'O'
@@ -187,7 +187,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                     if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
                         # update scores for losing moves, except if we are in o blindness mode
                         if (player != 'X') | (o_weight > 0):
-                            score_matrix[row][col] += -1*WIN_SCORE
+                            score_matrix[row][col] = -1*WIN_SCORE
 
         elif len(winning_moves_opp) == 1:  # give high score to blocking winning move, and losing score to rest
             move_row, move_col = convert_position(winning_moves_opp[0], len(board_matrix))
@@ -196,7 +196,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                     if (move_row != row) | (move_col != col):
                         if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
                             if (player != 'X') | (o_weight > 0):
-                                score_matrix[row][col] += -1*WIN_SCORE
+                                score_matrix[row][col] = -1*WIN_SCORE
                     else:
                         score_matrix[row][col] = INFINITY_O
 
@@ -230,11 +230,11 @@ def compute_scores_density_new(board_mat, player='X', normalized=False, neighbor
                     square_score = compute_density(r, c, board_matrix, neighborhood_size, player=player)  # check neighborhood
                 density_score_matrix[r][c] = square_score
 
-    # winning_moves = check_immediate_win(board_matrix, player)
-    # if len(winning_moves) > 0:
-    #     for move in winning_moves:
-    #         move_row, move_col = convert_position(move, len(board_matrix))
-    #         density_score_matrix[move_row][move_col] = WIN_SCORE
+    winning_moves = check_immediate_win(board_matrix, player)
+    if len(winning_moves) > 0:
+        for move in winning_moves:
+            move_row, move_col = convert_position(move, len(board_matrix))
+            density_score_matrix[move_row][move_col] = WIN_SCORE
 
     if normalized:
         normalize_matrix(density_score_matrix, False)

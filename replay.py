@@ -1371,8 +1371,8 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                         curr_data = {}
                         if row['userid'] not in cogsci_part_list:
                             continue
-                        # if row['userid'] != '12ebbfd2':
-                        #     continue
+                        if row['userid'] != 'bed50a1d':
+                            continue
                         if curr_user == '':
                             curr_user = row['userid']
 
@@ -3517,7 +3517,7 @@ if __name__ == "__main__":
     # fit_heuristics_conf(['density','blocking','blocking_blind'], 'stats/test_conf_heuristics_soph_pval.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics_conf(['density','blocking'], 'stats/test_conf_heuristics_pval_densityBlocking.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics_conf(['density','blocking'], 'stats/test_conf_heuristics_blockDensity_DensWin.csv',win_scores=[100],blocking_vals=[10])
-    fit_heuristics_by_move(['interaction_blind','blocking_blind'], 'stats/heuristics_byMove_Blind.csv',win_scores=[100],blocking_vals=[10])
+    fit_heuristics_by_move(['blocking','blocking_blind'], 'stats/heuristics_byMove_Blind.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics(['blocking'], 'stats/test.csv',win_scores=win_scores, blocking_vals=blocking_vals)
     # fit_heuristics(['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'], 'stats/missing_parts_heuristics_25.csv',win_scores=win_scores,blocking_vals=blocking_vals)
     # fit_heuristics(['linear','non-linear','interaction','interaction_shutter_0','blocking_shutter_0','blocking','density'], 'stats/heuristic_fit_shutter_test_noBline.csv',win_scores=[100],blocking_vals=[10])
