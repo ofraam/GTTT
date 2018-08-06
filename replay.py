@@ -1371,8 +1371,8 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                         curr_data = {}
                         if row['userid'] not in cogsci_part_list:
                             continue
-                        if row['userid'] != 'bed50a1d':
-                            continue
+                        # if row['userid'] != 'bed50a1d':
+                        #     continue
                         if curr_user == '':
                             curr_user = row['userid']
 
@@ -1456,6 +1456,8 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                                 # print heuristic
                                 probs = compute_transition_probs_heuristic(heuristic, curr_move_matrix, player_type, normalized=True, prev_x_move=prev_x_move)
                                 prob_move = probs[rowPos][colPos]
+                                max_prob = np.max(probs)
+                                move_prob_ratio = prob_move/max_prob
 
                                 move_rank = get_move_rank(probs, prob_move)
 
@@ -1467,10 +1469,12 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                                 curr_data['board_size'] = board_size
                                 curr_data['board_type'] = board_type
                                 curr_data['condition'] = condition
+                                curr_data['player'] = player
                                 curr_data['win_score'] = win_score
                                 curr_data['blocking_score'] = blocking_val
                                 curr_data['heuristic'] = heuristic
                                 curr_data['prob_move'] = prob_move
+                                curr_data['prob_move_to_best_ratio'] = move_prob_ratio
                                 curr_data['log_move'] = math.log(prob_move)
                                 curr_data['rank_move'] = move_rank
                                 curr_data['move_number'] = num_moves_user
@@ -1512,7 +1516,7 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                                 print 'problem undo'
 
             dataFile = open(output_file, 'ab')
-            fieldnames = ['userid','board_name','board_size','board_type','condition', 'blocking_score', 'win_score','heuristic','prob_move', 'log_move','rank_move','move_number','move_number_in_path','path_number']
+            fieldnames = ['userid','board_name','board_size','board_type','condition', 'player', 'blocking_score', 'win_score','heuristic','prob_move','prob_move_to_best_ratio', 'log_move','rank_move','move_number','move_number_in_path','path_number']
             # fieldnames.extend(heuristics_list)
             # fieldnames.extend(heuristic_rank_list)
             dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
@@ -3517,7 +3521,7 @@ if __name__ == "__main__":
     # fit_heuristics_conf(['density','blocking','blocking_blind'], 'stats/test_conf_heuristics_soph_pval.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics_conf(['density','blocking'], 'stats/test_conf_heuristics_pval_densityBlocking.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics_conf(['density','blocking'], 'stats/test_conf_heuristics_blockDensity_DensWin.csv',win_scores=[100],blocking_vals=[10])
-    fit_heuristics_by_move(['blocking','blocking_blind'], 'stats/heuristics_byMove_Blind.csv',win_scores=[100],blocking_vals=[10])
+    fit_heuristics_by_move(['density','linear','non-linear','interaction','blocking'], 'stats/heuristics_byMove_player.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics(['blocking'], 'stats/test.csv',win_scores=win_scores, blocking_vals=blocking_vals)
     # fit_heuristics(['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'], 'stats/missing_parts_heuristics_25.csv',win_scores=win_scores,blocking_vals=blocking_vals)
     # fit_heuristics(['linear','non-linear','interaction','interaction_shutter_0','blocking_shutter_0','blocking','density'], 'stats/heuristic_fit_shutter_test_noBline.csv',win_scores=[100],blocking_vals=[10])

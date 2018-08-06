@@ -96,7 +96,7 @@ def normalize_matrix(score_matrix, with_negative=False):
                         score_matrix[r][c] = 0
 
 
-def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None):
+def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None, board_obj=None):
     """
     computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
     :param exp: parameter creates the non-linearity (i.e., 2 --> squared)
@@ -170,7 +170,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                 score_matrix[r][c] = square_score
 
     # check for immediate win/loss
-    winning_moves = check_immediate_win(board_matrix, player)
+    winning_moves = check_immediate_win(board_matrix, player, board_obj=board_obj)
     if (len(winning_moves) > 0) & ((player != 'O') | (o_weight > 0)):
         for move in winning_moves:
             move_row, move_col = convert_position(move, len(board_matrix))
@@ -180,7 +180,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
         other_player = 'O'
         if player == 'O':
             other_player = 'X'
-        winning_moves_opp = check_immediate_win(board_matrix, other_player)
+        winning_moves_opp = check_immediate_win(board_matrix, other_player, board_obj=board_obj)
         if len(winning_moves_opp) > 1:
             for row in range(len(board_matrix)):
                 for col in range(len(board_matrix[row])):
@@ -2082,18 +2082,21 @@ def convert_matrix_to_board_obj(board_matrix):
     return game_board
 
 
-def check_immediate_win(board_matrix, player):
+def check_immediate_win(board_matrix, player, board_obj=None):
     if player == 'X':
         p = 1
     else:
         p = 2
-    b = convert_matrix_to_board_obj(board_matrix)
+    if board_obj is None:
+        b = convert_matrix_to_board_obj(board_matrix)
+    else:
+        b = board_obj
     winning_moves = b.immediate_threats(p)
     return winning_moves
 
 
 def convert_position(pos, dimension):
-    col = ((pos - 1) % dimension)
+    col = int(((pos - 1) % dimension))
     row = (float(pos)/float(dimension))-1
     row = int(math.ceil(row))
     return row, col

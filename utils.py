@@ -1,7 +1,29 @@
 import random
 import numpy as np
 import copy
+import math
 
+
+def convert_ab_board_to_matrix(ab_board):
+    board_matrix = []
+    dimension = int(math.sqrt(len(ab_board)))
+    i = 1
+    for row in range(dimension):
+        board_matrix.append([])
+        for col in range(dimension):
+            board_matrix[row].append(ab_board[i])
+            i += 1
+    return board_matrix
+
+
+def convert_position_to_row_col(pos, dimension):
+    col = ((pos - 1) % dimension)
+    row = (float(pos)/float(dimension))-1
+    row = int(math.ceil(row))
+    return row, col
+
+def convert_position_to_int(row, col, dimension):
+    return row * dimension + col + 1
 
 def get_open_paths_through_square(row, col, board, player=1):
     other_player = 2
@@ -241,3 +263,10 @@ def rand_max(iterable, key=None):
             max_v = value
 
     return random.choice(max_l)
+
+if __name__== "__main__":
+    row, col = convert_position_to_row_col(23, 10)
+    num = convert_position_to_int(row, col, 10)
+    print row
+    print col
+    print num
