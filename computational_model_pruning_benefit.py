@@ -362,7 +362,9 @@ class Game:
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       # moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
-      moves = board.get_free_spaces_ranked_heuristic(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
+      # moves = board.get_free_spaces_ranked_heuristic(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
+      moves = board.get_free_spaces_ranked_heuristic_model(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=True, prev_move_x=prev_space_x)
+
       # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)[:5]:
@@ -375,14 +377,14 @@ class Game:
         score = self.minimax_min_alphabeta_DL(alpha, beta, new_board, depth - 1, prev_space_x = prev_space_x)[0]
         if score > max_child[0]:
           max_child = (score, space)
-        if max_child[0] >= beta:
+        if (max_child[0] >= beta):
           return max_child # Shouldn't help anyway
 
         # if max_child[1] is None:
         #     # print depth
         #     print 'max none_' +str(depth)
-        # if max_child[0] >= c.LOSE_SCORE:
-        #   return max_child # Shouldn't help anyway
+        if max_child[0] >= c.LOSE_SCORE:
+          return max_child # Shouldn't help anyway
         alpha = max(alpha, score)
       return max_child
 
@@ -651,7 +653,7 @@ if __name__ == "__main__":
 
     results = []
     header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
-    game_configs_file = "ab_config1.json"
+    game_configs_file = "ab_config_shutter.json"
     configs = get_game_configs(game_configs_file)
     for conf in configs:
       data_matrices = {}
@@ -659,7 +661,7 @@ if __name__ == "__main__":
         if filename.startswith("6"):
           file_path = "examples/board_6_4.txt"
           # continue
-          # if not(filename.startswith("6_easy")):
+          # if not(filename.startswith("6_hard")):
           #   continue
 
         else:
@@ -719,7 +721,7 @@ if __name__ == "__main__":
     for i in range(len(results)):
       print results[i]
 
-    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_' + str(game.max_moves) + '.csv'
+    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_' + str(game.max_moves) + '_k3_Shutter_070818.csv'
     write_results(output_name, results, header)
       #
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path

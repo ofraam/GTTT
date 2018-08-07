@@ -1210,7 +1210,7 @@ if __name__== "__main__":
     population = pd.read_csv("stats/cogsciPopulation1.csv")
     likelihood = pd.read_csv("stats/logLikelihood.csv")
     dynamics = pd.read_csv("stats/moves_hueristic_scores_shutter230718.csv")
-    # dynamics = pd.read_csv("stats/moves_hueristic_050618.csv")
+    # dynamics = pd.read_csv("stats/moves_hueristic_scores_aperture.csv")
     transitions = pd.read_csv("stats/state_scores_heuristics_180718normalized_all.csv",dtype = {'board_state':str})
     scores = pd.read_csv("stats/state_scores_heuristics_180718raw_all_xo.csv",dtype = {'board_state':str})
     likelihoods = pd.read_csv("stats/heuristics_fitted_230718_all.csv")
@@ -1263,150 +1263,194 @@ if __name__== "__main__":
     # resetsDelta = pd.read_csv("stats/resetsDeltaData.csv")
     # resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
     resetsDelta = pd.read_csv("stats/resetsFiltered2.csv")
-    move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_player.csv')
+    move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_player.csv')  # only cogsci data
+    move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_player_allData.csv')  # all data
 
     userids_sig = []
     fitted_heuristics_sig = []
 
+
+    # ------- shutter correlation blindness
+    players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
+    players = players_heuristics['userid'].unique()
+    players_data = dynamics.loc[(dynamics['userid'].isin(players))]
+    # moves = players_data.loc[(players_data['action'] == 'click')]
+    moves = pd.read_csv('stats/test_moves.csv')
+    search_sizes = moves.groupby(['userid'], as_index=False)['action'].count()
+
+    moves = moves.loc[moves['open_path'] == True]
+    # moves.to_csv('stats/test_moves.csv')
+    shutter_means = moves.groupby(['userid'], as_index=False)['shutter'].mean()
+
+    shutter_medians = moves.groupby(['userid'], as_index=False)['shutter'].median()
+    o_blindness_df = pd.read_csv('stats/blindness_metrics_players.csv')
+    shutter_blindness_df = pd.merge(o_blindness_df, shutter_means[['userid','shutter']], on = 'userid', how = 'left')
+    shutter_blindness_df = shutter_blindness_df.rename(columns={'shutter': 'shutter_mean'})
+    shutter_blindness_df = pd.merge(shutter_blindness_df, shutter_medians[['userid','shutter']], on = 'userid', how = 'left')
+    shutter_blindness_df = pd.merge(shutter_blindness_df, search_sizes[['userid','action']], on = 'userid', how = 'left')
+    shutter_blindness_df = shutter_blindness_df.rename(columns={'shutter': 'shutter_median'})
+    shutter_blindness_df = shutter_blindness_df.rename(columns={'action': 'search_size'})
+    shutter_blindness_df = shutter_blindness_df.loc[shutter_blindness_df['fitted_heuristic'] == 'blocking']
+    shutter_blindness_correct = shutter_blindness_df.loc[shutter_blindness_df['correct'] == 1]
+    shutter_blindness_wrong = shutter_blindness_df.loc[shutter_blindness_df['correct'] == 0]
+
+
+    print stats.pearsonr(shutter_blindness_df['search_size'].values, shutter_blindness_df['o_prob_mean'].values)
+    print stats.pearsonr(shutter_blindness_correct['search_size'].values, shutter_blindness_correct['o_prob_mean'].values)
+    print stats.pearsonr(shutter_blindness_wrong['search_size'].values, shutter_blindness_wrong['o_prob_mean'].values)
+    # print stats.pearsonr(shutter_blindness_df['o_prob_ratio_mean'].values, shutter_blindness_df['shutter_mean'].values)
+    # print stats.pearsonr(shutter_blindness_df['o_rank_mean'].values, shutter_blindness_df['shutter_mean'].values)
+    print stats.pearsonr(shutter_blindness_correct['o_rank_mean'].values, shutter_blindness_correct['o_prob_mean'].values)
+    print 1/0
+    # ------- shutter correlation blindness end
+
     # ----------o blindness - non-forced moves quality---------------
-    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
-    # heuristics = ['density','linear','non-linear','interaction', 'blocking']
-    # players = players_heuristics['userid'].unique()
-    # userids = []
-    # boards = []
-    # correct = []
-    # heuristic_players = []
-    # o_blind_prob_mean = []
-    # o_blind_prob_best_mean = []
-    # o_blind_rank_mean = []
-    # o_blind_prob_median = []
-    # o_blind_rank_median = []
-    # o_blind_prob_best_median = []
-    # x_blind_prob_mean = []
-    # x_blind_rank_mean = []
-    # x_blind_prob_best_mean = []
-    # x_blind_prob_median = []
-    # x_blind_rank_median = []
-    # x_blind_prob_best_median = []
-    # for player in players:
-    #     player_heuristic = players_heuristics.loc[players_heuristics['userid'] == player]
-    #     player_moves = move_probabilities_heuristics.loc[move_probabilities_heuristics['userid'] == player]
-    #     fitted_heuristic_player = player_heuristic['fitted_heuristic'].iloc[0]
-    #     if fitted_heuristic_player is not None:
-    #         move_probs_player = player_moves.loc[player_moves['heuristic'] == fitted_heuristic_player]
-    #         o_blind_metrics = compute_blindness_player(move_probs_player, player=2, include_forced=False)
-    #         x_blind_metrics = compute_blindness_player(move_probs_player, player=1, include_forced=False)
-    #         o_blind_prob_mean.append(o_blind_metrics[0])
-    #         o_blind_prob_best_mean.append(o_blind_metrics[4])
-    #         o_blind_prob_best_median.append(o_blind_metrics[5])
-    #         o_blind_rank_mean.append(o_blind_metrics[2])
-    #         o_blind_prob_median.append(o_blind_metrics[1])
-    #         o_blind_rank_median.append(o_blind_metrics[3])
-    #         x_blind_prob_mean.append(x_blind_metrics[0])
-    #         x_blind_rank_mean.append(x_blind_metrics[2])
-    #         x_blind_prob_median.append(x_blind_metrics[1])
-    #         x_blind_rank_median.append(x_blind_metrics[3])
-    #         x_blind_prob_best_mean.append(x_blind_metrics[4])
-    #         x_blind_prob_best_median.append(x_blind_metrics[5])
-    #         userids.append(player)
-    #         player_dynamics = dynamics.loc[dynamics['userid'] == player]
-    #         boards.append(player_dynamics['board_name'].iloc[0])
-    #         correct.append(player_dynamics['correct'].iloc[0])
-    #         heuristic_players.append(fitted_heuristic_player)
-    #
-    # blindness_metrics = {'userid': userids, 'board': boards, 'fitted_heuristic': heuristic_players,'correct': correct, 'o_prob_mean': o_blind_prob_mean,
-    #                      'o_prob_median': o_blind_prob_median, 'o_prob_ratio_mean': o_blind_prob_best_mean, 'o_prob_ratio_median': o_blind_prob_best_median,
-    #                      'o_rank_mean': o_blind_rank_mean, 'o_rank_median': o_blind_rank_median,
-    #                      'x_prob_mean': x_blind_prob_mean, 'x_prob_median': x_blind_prob_median,
-    #                      'x_prob_ratio_mean': x_blind_prob_best_mean, 'x_prob_ratio_median': x_blind_prob_best_median,
-    #                      'x_rank_mean': x_blind_rank_mean, 'x_rank_median': x_blind_rank_median}
-    # blindness_df = pd.DataFrame(blindness_metrics)
-    # blindness_df.to_csv('stats/blindness_metrics_players.csv')
-    # print blindness_df.shape[0]
-    # print 1/0
+    players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
+    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_allData_070818.csv')
+
+    heuristics = ['density','linear','non-linear','interaction', 'blocking']
+    players = players_heuristics['userid'].unique()
+    userids = []
+    boards = []
+    correct = []
+    heuristic_players = []
+    o_blind_prob_mean = []
+    o_blind_prob_best_mean = []
+    o_blind_rank_mean = []
+    o_blind_prob_median = []
+    o_blind_rank_median = []
+    o_blind_prob_best_median = []
+    x_blind_prob_mean = []
+    x_blind_rank_mean = []
+    x_blind_prob_best_mean = []
+    x_blind_prob_median = []
+    x_blind_rank_median = []
+    x_blind_prob_best_median = []
+    for player in players:
+        player_heuristic = players_heuristics.loc[players_heuristics['userid'] == player]
+        player_moves = move_probabilities_heuristics.loc[move_probabilities_heuristics['userid'] == player]
+        fitted_heuristic_player = player_heuristic['fitted_heuristic'].iloc[0]
+        if fitted_heuristic_player is not None:
+            move_probs_player = player_moves.loc[player_moves['heuristic'] == fitted_heuristic_player]
+            o_blind_metrics = compute_blindness_player(move_probs_player, player=2, include_forced=False)
+            x_blind_metrics = compute_blindness_player(move_probs_player, player=1, include_forced=False)
+            o_blind_prob_mean.append(o_blind_metrics[0])
+            o_blind_prob_best_mean.append(o_blind_metrics[4])
+            o_blind_prob_best_median.append(o_blind_metrics[5])
+            o_blind_rank_mean.append(o_blind_metrics[2])
+            o_blind_prob_median.append(o_blind_metrics[1])
+            o_blind_rank_median.append(o_blind_metrics[3])
+            x_blind_prob_mean.append(x_blind_metrics[0])
+            x_blind_rank_mean.append(x_blind_metrics[2])
+            x_blind_prob_median.append(x_blind_metrics[1])
+            x_blind_rank_median.append(x_blind_metrics[3])
+            x_blind_prob_best_mean.append(x_blind_metrics[4])
+            x_blind_prob_best_median.append(x_blind_metrics[5])
+            userids.append(player)
+            player_dynamics = dynamics.loc[dynamics['userid'] == player]
+            boards.append(player_dynamics['board_name'].iloc[0])
+            correct.append(player_dynamics['correct'].iloc[0])
+            heuristic_players.append(fitted_heuristic_player)
+
+    blindness_metrics = {'userid': userids, 'board': boards, 'fitted_heuristic': heuristic_players,'correct': correct, 'o_prob_mean': o_blind_prob_mean,
+                         'o_prob_median': o_blind_prob_median, 'o_prob_ratio_mean': o_blind_prob_best_mean, 'o_prob_ratio_median': o_blind_prob_best_median,
+                         'o_rank_mean': o_blind_rank_mean, 'o_rank_median': o_blind_rank_median,
+                         'x_prob_mean': x_blind_prob_mean, 'x_prob_median': x_blind_prob_median,
+                         'x_prob_ratio_mean': x_blind_prob_best_mean, 'x_prob_ratio_median': x_blind_prob_best_median,
+                         'x_rank_mean': x_blind_rank_mean, 'x_rank_median': x_blind_rank_median}
+    blindness_df = pd.DataFrame(blindness_metrics)
+    blindness_df.to_csv('stats/blindness_metrics_players_all.csv')
+    print blindness_df.shape[0]
+    print 1/0
     # ----------o blindness - non-forced moves quality end---------------
 
 
     # ----------o blindness and correctness---------------
     # compare blocking with blocking-blind, interaction with interaction-blind
-    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_withBlind_030818.csv')
-    # # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
-    # players = players_heuristics['userid'].unique()
-    # players_data = dynamics.loc[(dynamics['userid'].isin(players))]
-    # moves = players_data.loc[(players_data['action'] == 'click')]
-    # misses = []
-    # players = []
-    # users = []
-    # boards = []
-    # distances = []
-    # correct = []
-    # open = []
-    # heuristics_fitted = []
-    # for index, row in moves.iterrows():
-    #     if row['top_possible_score'] == 100:
-    #         if row['score_move'] < 100:
-    #             misses.append(1)
-    #         else:
-    #             misses.append(0)
-    #         players.append(row['player'])
-    #         users.append(row['userid'])
-    #         boards.append(row['board_name'])
-    #         distances.append(row['shutter'])
-    #         open.append(row['open_path'])
-    #         correct.append(row['correct'])
-    #         player_heuristic = players_heuristics.loc[players_heuristics['userid'] == row['userid']]
-    #         heuristics_fitted.append(player_heuristic['fitted_heuristic'].iloc[0])
-    #
-    # misses_data = {'userid': users,'board': boards, 'player':players, 'missed_win':misses, 'shutter':distances, 'open_path':open, 'correct': correct, 'fitted_heuristic': heuristics_fitted}
-    # misses_data = pd.DataFrame(misses_data)
-    # print misses_data.shape[0]
-    # # compute mean missed wins per player
-    # # missed_wins_averages = misses_data.groupby(['userid'], as_index=False)['missed_win'].mean()
-    # # misses_data = misses_data[['userid','board','player','shutter','fitted_heuristic','correct']]
-    # # misses_data = misses_data.drop_duplicates(subset='userid', keep='first', inplace=False)
-    # # misses_data = pd.merge(missed_wins_averages, misses_data[['userid','board','player','shutter','fitted_heuristic','correct']], on = 'userid', how = 'left')
-    # #
-    # #
-    # # print misses_data.shape[0]
-    # # misses_data = misses_data.loc[misses_data['fitted_heuristic'] == 'blocking_blind']
-    # # print missed_wins_averages['missed_win']
-    # # for board in LOGFILE:
-    # #     print '-----------------'
-    # #     print board
-    # #     misses_data_board = misses_data.loc[misses_data['board'] == board]
-    # missed_wins_x_correct = misses_data.loc[(misses_data['player'] == 1)  & (misses_data['correct'] == 1)]
-    # missed_wins_x_wrong = misses_data.loc[(misses_data['player'] == 1) & (misses_data['correct'] == 0)]
-    # missed_wins_o_correct = misses_data.loc[(misses_data['player'] == 2)  & (misses_data['correct'] == 1)]
-    # missed_wins_o_wrong = misses_data.loc[(misses_data['player'] == 2) & (misses_data['correct'] == 0)]
-    # missed_wins_x = misses_data.loc[(misses_data['player'] == 1) ]
-    # missed_wins_o = misses_data.loc[(misses_data['player'] == 2)]
-    # # print bootstrap_t_pvalue(missed_wins_o_correct['missed_win'].values, missed_wins_o_wrong['missed_win'].values)
-    # print bs.bootstrap(missed_wins_x['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print bs.bootstrap(missed_wins_o['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print '---'
-    # print missed_wins_x_correct.shape[0]
-    # if missed_wins_x_correct.shape[0] > 0:
-    #     print bs.bootstrap(missed_wins_x_correct['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print missed_wins_o_correct.shape[0]
-    # if missed_wins_o_correct.shape[0] > 0:
-    #     print bs.bootstrap(missed_wins_o_correct['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print missed_wins_x_wrong.shape[0]
-    # if missed_wins_x_wrong.shape[0] > 0:
-    #     print bs.bootstrap(missed_wins_x_wrong['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print missed_wins_o_wrong.shape[0]
-    # if missed_wins_o_wrong.shape[0] > 0:
-    #     print bs.bootstrap(missed_wins_o_wrong['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    #
+    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_allData_070818.csv')
+    players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
+    players = players_heuristics['userid'].unique()
+    players_data = dynamics.loc[(dynamics['userid'].isin(players))]
+    moves = players_data.loc[(players_data['action'] == 'click')]
+    misses = []
+    players = []
+    users = []
+    boards = []
+    distances = []
+    correct = []
+    open = []
+    heuristics_fitted = []
+    for index, row in moves.iterrows():
+        if row['top_possible_score'] == 100:
+            if row['score_move'] < 100:
+                misses.append(1)
+            else:
+                misses.append(0)
+            players.append(row['player'])
+            users.append(row['userid'])
+            boards.append(row['board_name'])
+            distances.append(row['shutter'])
+            open.append(row['open_path'])
+            correct.append(row['correct'])
+            player_heuristic = players_heuristics.loc[players_heuristics['userid'] == row['userid']]
+            heuristics_fitted.append(player_heuristic['fitted_heuristic'].iloc[0])
+
+    misses_data = {'userid': users,'board': boards, 'player':players, 'missed_win':misses, 'shutter':distances, 'open_path':open, 'correct': correct, 'fitted_heuristic': heuristics_fitted}
+    # misses_data = {'userid': users,'board': boards, 'player':players, 'missed_win':misses, 'correct': correct, 'fitted_heuristic': heuristics_fitted}
+    misses_data = pd.DataFrame(misses_data)
+    # misses_data.to_csv('stats/misses_data_all.csv')
+    print misses_data.shape[0]
+    # compute mean missed wins per player
+    missed_wins_averages = misses_data.groupby(['userid','player'], as_index=False)['missed_win'].mean()
+    misses_data = misses_data[['userid','board','player','shutter','fitted_heuristic','correct']]
+    # misses_data = misses_data[['userid','board','fitted_heuristic','correct']]
+    misses_data = misses_data.drop_duplicates(subset='userid', keep='first', inplace=False)
+    misses_data = pd.merge(missed_wins_averages, misses_data[['userid','board','player','shutter','fitted_heuristic','correct']], on = 'userid', how = 'left')
+    # misses_data = pd.merge(missed_wins_averages, misses_data[['userid','board','fitted_heuristic','correct']], on = 'userid', how = 'left')
+
+    # misses_data.to_csv('stats/misses_data_averages_all.csv')
+    print misses_data.shape[0]
+    misses_data = misses_data.loc[misses_data['fitted_heuristic'] == 'blocking']
+    # print missed_wins_averages['missed_win']
+    # for board in LOGFILE:
+    #     print '-----------------'
+    #     print board
+    #     misses_data_board = misses_data.loc[misses_data['board'] == board]
+    missed_wins_x_correct = misses_data.loc[(misses_data['player'] == 1)  & (misses_data['correct'] == 1)]
+    missed_wins_x_wrong = misses_data.loc[(misses_data['player'] == 1) & (misses_data['correct'] == 0)]
+    missed_wins_o_correct = misses_data.loc[(misses_data['player'] == 2)  & (misses_data['correct'] == 1)]
+    missed_wins_o_wrong = misses_data.loc[(misses_data['player'] == 2) & (misses_data['correct'] == 0)]
+    missed_wins_x = misses_data.loc[(misses_data['player'] == 1) ]
+    missed_wins_o = misses_data.loc[(misses_data['player'] == 2)]
+
+    print bs.bootstrap(missed_wins_x['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    print bs.bootstrap(missed_wins_o['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    print '---'
+    print missed_wins_x_correct.shape[0]
+    if missed_wins_x_correct.shape[0] > 0:
+        print bs.bootstrap(missed_wins_x_correct['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    print missed_wins_o_correct.shape[0]
+    if missed_wins_o_correct.shape[0] > 0:
+        print bs.bootstrap(missed_wins_o_correct['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    print missed_wins_x_wrong.shape[0]
+    if missed_wins_x_wrong.shape[0] > 0:
+        print bs.bootstrap(missed_wins_x_wrong['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    print missed_wins_o_wrong.shape[0]
+    if missed_wins_o_wrong.shape[0] > 0:
+        print bs.bootstrap(missed_wins_o_wrong['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+
+    print bootstrap_t_pvalue(missed_wins_o_correct['missed_win'].values, missed_wins_o_wrong['missed_win'].values)
     # plt.hist(missed_wins_x['missed_win'])
     # print np.std(missed_wins_x['missed_win'].values)
     # plt.show()
     # plt.hist(missed_wins_o['missed_win'])
     # print np.std(missed_wins_o['missed_win'].values)
     # plt.show()
-    # print 1/0
+    print 1/0
     # # ----------o blindness and correctness end---------------
     #
-    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_withBlind_030818.csv')
+    # # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_withBlind_030818.csv')
+    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_allData_070818.csv')
     # # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
     # players = players_heuristics['userid'].unique()
     # players_data = dynamics.loc[(dynamics['userid'].isin(players))]
@@ -1419,8 +1463,8 @@ if __name__== "__main__":
     # # dynamics.join(heuristics_users).reset_index()
     # data = pd.merge(players_heuristics, correctness_players, on = 'userid', how = 'left')
     # # data = data.loc[data['board_name'] == '10_medium_full']
-    # # heuristics = ['density','linear','non-linear','interaction', 'blocking', 'interaction_blind', 'blocking_blind']
-    # heuristics = ['interaction', 'blocking', 'interaction_blind', 'blocking_blind']
+    # heuristics = ['density','linear','non-linear','interaction', 'blocking']
+    # # heuristics = ['interaction', 'blocking', 'interaction_blind', 'blocking_blind']
     # # heuristics = ['blocking', 'blocking_blind']
     # for heuristic in heuristics:
     #     print heuristic
@@ -1445,7 +1489,7 @@ if __name__== "__main__":
     # print 1/0
 
     # ------- heuristic and search size
-    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
+    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_allData_070818.csv')
     # # players_heuristics = pd.read_csv('stats/fitted_heuristics_notFiltered_060818.csv')
     #
     # # players_heuristics = players_heuristics.loc[players_heuristics['log_likelihood'] > -2]
@@ -1489,41 +1533,41 @@ if __name__== "__main__":
     #
     # print 1/0
     # ------- shutter correlation correctness
-    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_withBlind_030818.csv')
-    # players_heuristics_filtered = players_heuristics.loc[players_heuristics['fitted_heuristic'] == 'blocking_blind']
-    # players = players_heuristics_filtered['userid'].unique()
-    # moves_on_path = dynamics.loc[(dynamics['open_path'] == True) & (dynamics['userid'].isin(players))]
-    # # players = moves_on_path['userid'].unique()
-    # mean_shutter_players = []
-    # median_shutter_players = []
-    # correctness = []
-    # userids = []
-    # heuristic_log_likelihoods = []
-    # for player in players:
-    #     player_data = moves_on_path.loc[(moves_on_path['userid'] == player)]
-    #     player_heuristic_data = players_heuristics_filtered.loc[players_heuristics_filtered['userid'] == player]
-    #     userids.append(player)
-    #     mean_shutter_players.append(player_data['shutter'].mean())
-    #     median_shutter_players.append(player_data['shutter'].median())
-    #     heuristic_log_likelihoods.append(player_heuristic_data['log_likelihood'].unique()[0])
-    #     correctness.append(player_data['correct'].unique()[0])
-    #
-    # shutter_correctness_dict = {'userid': userids, 'mean_shutter': mean_shutter_players, 'median_shutter': median_shutter_players, 'correct': correctness, 'log_likelihood':heuristic_log_likelihoods}
-    # shutter_correctness_df = pd.DataFrame(shutter_correctness_dict)
-    # correct_players = shutter_correctness_df.loc[shutter_correctness_df['correct'] == 1]
-    # wrong_players = shutter_correctness_df.loc[shutter_correctness_df['correct'] == 0]
-    # print correct_players['mean_shutter'].mean()
-    # print correct_players.shape[0]
-    # print wrong_players['mean_shutter'].mean()
-    # print wrong_players.shape[0]
-    # print bootstrap_t_pvalue(correct_players['mean_shutter'].values, wrong_players['mean_shutter'].values)
-    # print bs.bootstrap(correct_players['mean_shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print bs.bootstrap(wrong_players['mean_shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    #
-    # print bs.bootstrap(correct_players['log_likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print bs.bootstrap(wrong_players['log_likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    #
-    # print 1/0
+    players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_withBlind_030818.csv')
+    players_heuristics_filtered = players_heuristics.loc[players_heuristics['fitted_heuristic'] == 'blocking_blind']
+    players = players_heuristics_filtered['userid'].unique()
+    moves_on_path = dynamics.loc[(dynamics['open_path'] == True) & (dynamics['userid'].isin(players))]
+    # players = moves_on_path['userid'].unique()
+    mean_shutter_players = []
+    median_shutter_players = []
+    correctness = []
+    userids = []
+    heuristic_log_likelihoods = []
+    for player in players:
+        player_data = moves_on_path.loc[(moves_on_path['userid'] == player)]
+        player_heuristic_data = players_heuristics_filtered.loc[players_heuristics_filtered['userid'] == player]
+        userids.append(player)
+        mean_shutter_players.append(player_data['shutter'].mean())
+        median_shutter_players.append(player_data['shutter'].median())
+        heuristic_log_likelihoods.append(player_heuristic_data['log_likelihood'].unique()[0])
+        correctness.append(player_data['correct'].unique()[0])
+
+    shutter_correctness_dict = {'userid': userids, 'mean_shutter': mean_shutter_players, 'median_shutter': median_shutter_players, 'correct': correctness, 'log_likelihood':heuristic_log_likelihoods}
+    shutter_correctness_df = pd.DataFrame(shutter_correctness_dict)
+    correct_players = shutter_correctness_df.loc[shutter_correctness_df['correct'] == 1]
+    wrong_players = shutter_correctness_df.loc[shutter_correctness_df['correct'] == 0]
+    print correct_players['mean_shutter'].mean()
+    print correct_players.shape[0]
+    print wrong_players['mean_shutter'].mean()
+    print wrong_players.shape[0]
+    print bootstrap_t_pvalue(correct_players['mean_shutter'].values, wrong_players['mean_shutter'].values)
+    print bs.bootstrap(correct_players['mean_shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    print bs.bootstrap(wrong_players['mean_shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+
+    print bs.bootstrap(correct_players['log_likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    print bs.bootstrap(wrong_players['log_likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
+
+    print 1/0
     # ------- shutter correlation correctness end
 
     # --------heuristic fit population confidence intervals --------
@@ -1536,7 +1580,7 @@ if __name__== "__main__":
     players_to_include = []
 
     # filter out players with bad fit
-    log_likelihood_threshold = -5
+    log_likelihood_threshold = -3
     for player in players:
         # player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player) & (move_probabilities_heuristics['move_number'] % 2 == 0)]
         player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player)]
@@ -1599,7 +1643,7 @@ if __name__== "__main__":
 
     population_distributions_df = pd.DataFrame(population_distributions)
     heuristic_fitted_df = pd.DataFrame({'userid': players_list, 'fitted_heuristic': fitted_heuristic_list, 'log_likelihood': fitted_heuristic_likelihood})
-    heuristic_fitted_df.to_csv('stats/fitted_heuristics_notFiltered_060818.csv')
+    heuristic_fitted_df.to_csv('stats/fitted_heuristics_filtered_allData_070818.csv')
     for heuristic in heuristics:
         print heuristic
         print bs.bootstrap(population_distributions_df[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)

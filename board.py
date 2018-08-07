@@ -97,8 +97,18 @@ class Board:
   def get_path_dist(self,space1, space2):
     if self.get_is_on_same_path(space1, space2):
       return 0
+
     else:
-      return self.get_manhattan_dist(space1, space2)
+      min_manhattan_dist = 1000
+      for space in self.board:
+        if self.board[space] == 0:
+          if self.get_is_on_same_path(space,space2):
+            new_dist = self.get_manhattan_dist(space1,space)
+            if new_dist == 1:
+              return new_dist
+            if new_dist < min_manhattan_dist:
+              min_manhattan_dist = new_dist
+      return min_manhattan_dist
 
   def get_is_on_same_path(self,space1, space2):
     if self.get_manhattan_dist(space1, space2) > ((len(self.winning_paths[0])-1)*2):
@@ -244,7 +254,7 @@ class Board:
 
     return sorted_list
 
-  def get_free_spaces_ranked_heuristic_model(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, k=10, prev_move_x=None):
+  def get_free_spaces_ranked_heuristic_model(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, k=3, prev_move_x=None):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
     list_of_occupied = []
@@ -262,12 +272,12 @@ class Board:
     if player == 2:
       player_type = 'O'
     # probs = compute_transition_probs_heuristic('blocking', board_matrix, player_type, normalized=True)
-    probs = compute_paths_scores_for_matrix(board_matrix, player=player, normalized=True, o_weight=0.5, exp=2, block=True, interaction=True, board_obj=self)
-    if shutter:
+    probs = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=True, interaction=True, board_obj=self)
+    if (shutter) & (prev_move_x != None):
       pruned_list_of_moves = []
       for space in list_of_spaces:
         dist = self.get_path_dist(space, prev_move_x)
-        list_of_spaces_with_dist.apped((space, dist))
+        list_of_spaces_with_dist.append((space, dist))
       sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=False)
       list_of_spaces = []
       for sp in sorted_list:
