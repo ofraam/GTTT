@@ -46,15 +46,19 @@ WIN_SCORE = 100
 
 
 def get_positions_shutter(row, col, board_matrix, shutter_size=0):
-    active_squares = get_open_paths_through_square(row, col, board_matrix, player=1)
+    active_squares = get_open_paths_through_square(row, col, board_matrix, player='X')
     if len(active_squares) > 0:
         for i in range(1, shutter_size+1):
             active_squares.extend(expand_neighborhood(active_squares, len(board_matrix)))
     else:
         return []
     active_squares = remove_duplicates(active_squares)
-
-    return active_squares
+    # remove occupied spaces
+    active_free_squares = []
+    for square in active_squares:
+        if board_matrix[square[0]][square[1]] == 0:
+            active_free_squares.append(square)
+    return active_free_squares
 
 
 def convert_matrix_xo(board_matrix):
@@ -96,7 +100,7 @@ def normalize_matrix(score_matrix, with_negative=False):
                         score_matrix[r][c] = 0
 
 
-def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None, board_obj=None):
+def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None, board_obj=None, pruned_squares=None):
     """
     computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
     :param exp: parameter creates the non-linearity (i.e., 2 --> squared)
@@ -122,8 +126,11 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
     if player == 'O':
         x_turn = False
         o_turn = True
-
     active_squares = []
+    for r in range(len(board_matrix)):
+        for c in range(len(board_matrix[r])):
+            if board_matrix[r][c] == 0:
+                active_squares.append([r,c])
     if shutter:
         if prev_x_move is not None:
             active_squares = get_positions_shutter(prev_x_move[0], prev_x_move[1], board_matrix, shutter_size)
@@ -202,7 +209,9 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
 
     if normalized:
         normalize_matrix(score_matrix, False)
-
+    alpha_beta = True  # TODO: remove later
+    if alpha_beta:
+        return score_matrix, len(active_squares)
     return score_matrix
 
 

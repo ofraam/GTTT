@@ -49,7 +49,10 @@ class Game:
     self.prev_move_x_depth = 0
     self.max_depth = None
     self.max_moves = 35
+    self.max_nodes_computed = 35
+    self.nodes_computed_counter = 0.0
     self.shutter_size = 5
+    self.k = 5
     self.heuristic = heuristic
     self.prune = prune
     self.exp = exp
@@ -355,7 +358,7 @@ class Game:
   def minimax_max_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None, stochastic_choic=False):
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     # or ((depth==self.max_depth-1) & (beta==c.LOSE_SCORE))
-    if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves):
+    if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves) or (self.nodes_computed_counter >= self.max_nodes_computed):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
       return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0),exp=self.exp, interaction=self.interaction), None)  # Terminal (the space will be picked up via recursion)
     else:
@@ -366,7 +369,8 @@ class Game:
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       # moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
       # moves = board.get_free_spaces_ranked_heuristic(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
-      moves = board.get_free_spaces_ranked_heuristic_model(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, k=self.shutter_size)
+      moves, nodes_computed = board.get_free_spaces_ranked_heuristic_model(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, shutter_size=self.shutter_size, k=self.k)
+      self.nodes_computed_counter += nodes_computed
       # attempted_moves = []
       # top_moves = moves
       # print top_moves
@@ -395,7 +399,7 @@ class Game:
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     # if ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
     #   print 'happened'
-    if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves) or  ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
+    if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves) or (self.nodes_computed_counter >= self.max_nodes_computed) or  ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
       return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0),exp=self.exp, interaction=self.interaction),None)
 
@@ -414,7 +418,8 @@ class Game:
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       # TODO 6/8/2018: bring back next line
       # moves = board.get_free_spaces_ranked_heuristic(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
-      moves = board.get_free_spaces_ranked_heuristic_model(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, k=self.shutter_size)
+      moves, nodes_computed = board.get_free_spaces_ranked_heuristic_model(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, shutter_size=self.shutter_size, k=self.k)
+      self.nodes_computed_counter += nodes_computed
       # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
@@ -656,40 +661,45 @@ if __name__ == "__main__":
     # data = get_heatmaps_alpha_beta()
 
     results = []
-    header = ['iteration','board','shutter_size','max_moves','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
+    header = ['iteration','board','shutter_size','max_moves','max_heuristic_comp','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','numberOfHeuristicComp','answer','correct','exploredNodes']
     game_configs_file = "ab_config_shutter.json"
     configs = get_game_configs(game_configs_file)
-    shutter_sizes = [5]
-    move_limits = [50]
+    shutter_sizes = [0,1,2]
+    move_limits = [500]
+    node_limit = 100
+    k = 5
     for conf in configs:
       for i in range(500):
         if i % 100 == 0:
           print i
-        for k in shutter_sizes:
+        for shutter_size in shutter_sizes:
           for move_limit in move_limits:
             data_matrices = {}
             for filename in os.listdir("predefinedBoards/"):
               if filename.startswith("6"):
                 file_path = "examples/board_6_4.txt"
-                continue
-                # if not(filename.startswith("6_hard")):
-                  # continue
+                # continue
+                if not(filename.startswith("6_hard")):
+                  continue
 
               else:
                 # if filename.startswith("10by10_easy"):
-                if not(filename.startswith("10_medium")):
-                  continue
+                # if not(filename.startswith("10_medium")):
+                #   continue
                 file_path = "examples/board_10_5.txt"
-                # continue
+                continue
 
               game = start_game(file_path, conf)
-              game.shutter_size = k
-              game.max_moves = move_limit
+              game.shutter_size = shutter_size
+              game.k = 5
+              game.max_moves = node_limit
+              game.max_nodes_computed = move_limit
               board_results = []
               board_results.append(i)
               board_results.append(filename[:-5])
               board_results.append(game.shutter_size)
               board_results.append(game.max_moves)
+              board_results.append(game.max_nodes_computed)
               board_results.append(conf['name'])
               board_results.append(game.heuristic)
               board_results.append(game.prune)
@@ -706,6 +716,7 @@ if __name__ == "__main__":
               try:
                 nodes, solution = game.play_game(win_depth)
                 board_results.append(nodes)
+                board_results.append(game.nodes_computed_counter)
                 board_results.append(solution)
                 if solution in c.WIN_MOVES:
                   board_results.append(1)
@@ -742,7 +753,7 @@ if __name__ == "__main__":
     # for i in range(len(results)):
     #   print results[i]
 
-    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_stochastic_080818_5_50_10medium.csv'
+    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_stochastic_080818_test_shutter2.csv'
     write_results(output_name, results, header)
       #
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path

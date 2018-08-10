@@ -17,7 +17,7 @@ def convert_ab_board_to_matrix(ab_board):
 
 
 def convert_position_to_row_col(pos, dimension):
-    col = ((pos - 1) % dimension)
+    col = int(((pos - 1) % dimension))
     row = (float(pos)/float(dimension))-1
     row = int(math.ceil(row))
     return row, col
@@ -25,10 +25,10 @@ def convert_position_to_row_col(pos, dimension):
 def convert_position_to_int(row, col, dimension):
     return row * dimension + col + 1
 
-def get_open_paths_through_square(row, col, board, player=1):
-    other_player = 2
-    if player == 2:
-        other_player = 1
+def get_open_paths_through_square(row, col, board, player='X'):
+    other_player = 'O'
+    if player == 'O':
+        other_player = 'X'
 
     max_length_path = 0
     threshold = -1

@@ -256,7 +256,7 @@ class Board:
 
     return sorted_list
 
-  def get_free_spaces_ranked_heuristic_model(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, k=3, prev_move_x=None, stochastic_order=True):
+  def get_free_spaces_ranked_heuristic_model(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, shutter_size=2, k=3, prev_move_x=None, stochastic_order=True):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
     list_of_occupied = []
@@ -274,17 +274,22 @@ class Board:
     if player == 2:
       player_type = 'O'
     # probs = compute_transition_probs_heuristic('blocking', board_matrix, player_type, normalized=True)
-    probs = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=True, interaction=True, board_obj=self)
-    if (shutter) & (prev_move_x != None):
-      pruned_list_of_moves = []
-      for space in list_of_spaces:
-        dist = self.get_path_dist(space, prev_move_x)
-        list_of_spaces_with_dist.append((space, dist))
-      sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=False)
-      list_of_spaces = []
-      for sp in sorted_list:
-        list_of_spaces.append(sp[0])
-      list_of_spaces = list_of_spaces[ :k]
+    prev_move_x_row_col = None
+    if prev_move_x != None:
+      prev_move_x_row_col = convert_position_to_row_col(prev_move_x,math.sqrt(self.size))
+    probs, nodes_computed = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=True, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col)
+
+    # note to self: now done within the heuristic computation
+    # if (shutter) & (prev_move_x != None):
+    #   pruned_list_of_moves = []
+    #   for space in list_of_spaces:
+    #     dist = self.get_path_dist(space, prev_move_x)
+    #     list_of_spaces_with_dist.append((space, dist))
+    #   sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=False)
+    #   list_of_spaces = []
+    #   for sp in sorted_list:
+    #     list_of_spaces.append(sp[0])
+    #   list_of_spaces = list_of_spaces[ :k]
 
     list_of_spaces_with_dist = []
     for space in list_of_spaces:
@@ -299,7 +304,7 @@ class Board:
       ranked_list = []
       for sp in sorted_list:
           ranked_list.append(sp[0])
-    return ranked_list[ :k]
+    return ranked_list[ :k], nodes_computed
 
   def weighted_choice(self,weights):
       rnd = random.random() * sum(weights)
