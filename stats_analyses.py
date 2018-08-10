@@ -1270,23 +1270,31 @@ if __name__== "__main__":
     fitted_heuristics_sig = []
 
     # ----shutters alpha beta
-    alpha_beta_shutter = pd.read_csv('stats/ab_shutter_stochastic_080818_6boards.csv')
+    # alpha_beta_shutter = pd.read_csv('stats/ab_shutter_stochastic_080818_6boards.csv')
+    alpha_beta_shutter = pd.read_csv('stats/ab_config_shutter_cogsci_stochastic_080818_test_shutter2.csv')
 
     max_vals = alpha_beta_shutter['max_moves'].unique()
     k_vals = alpha_beta_shutter['shutter_size'].unique()
     boards = alpha_beta_shutter['board'].unique()
+
+    alpha_beta_shutter_0 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 0) & (alpha_beta_shutter['board'] == '6_hard_full')]
+    alpha_beta_shutter_1 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 1) & (alpha_beta_shutter['board'] == '6_hard_full')]
+    alpha_beta_shutter_2 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 2) & (alpha_beta_shutter['board'] == '6_hard_full')]
+    print bootstrap_t_pvalue(alpha_beta_shutter_0['correct'].values, alpha_beta_shutter_1['correct'].values)
+    print bootstrap_t_pvalue(alpha_beta_shutter_0['correct'].values, alpha_beta_shutter_2['correct'].values)
+    print bootstrap_t_pvalue(alpha_beta_shutter_1['correct'].values, alpha_beta_shutter_2['correct'].values)
     for m in max_vals:
         for k in k_vals:
             for board in boards:
-                print 'board: ' + board + '; max moves=' + str(m) + '; branching=' + str(k)
+                print 'board: ' + board + '; max moves=' + str(m) + '; shutter=' + str(k)
                 # print board
                 alpha_beta_shutter_k = alpha_beta_shutter.loc[(alpha_beta_shutter['max_moves'] == m) & (alpha_beta_shutter['shutter_size'] == k) & (alpha_beta_shutter['board'] == board)]
                 alpha_beta_shutter_k_shutter = alpha_beta_shutter_k.loc[alpha_beta_shutter_k['heuristic_name'] == 'shutter']
                 alpha_beta_shutter_k_heuristic = alpha_beta_shutter_k.loc[alpha_beta_shutter_k['heuristic_name'] == 'heuristic']
                 print 'correctness shutter: ' + str(bs.bootstrap(alpha_beta_shutter_k_shutter['correct'].values, stat_func=bs_stats.mean, is_pivotal=False))
-                print 'correctness heuristic: ' + str(bs.bootstrap(alpha_beta_shutter_k_heuristic['correct'].values, stat_func=bs_stats.mean, is_pivotal=False))
+                # print 'correctness heuristic: ' + str(bs.bootstrap(alpha_beta_shutter_k_heuristic['correct'].values, stat_func=bs_stats.mean, is_pivotal=False))
                 print 'search size shutter: ' + str(bs.bootstrap(alpha_beta_shutter_k_shutter['numberOfNodes'].values, stat_func=bs_stats.mean, is_pivotal=False))
-                print 'search size heuristic: ' + str(bs.bootstrap(alpha_beta_shutter_k_heuristic['numberOfNodes'].values, stat_func=bs_stats.mean, is_pivotal=False))
+                # print 'search size heuristic: ' + str(bs.bootstrap(alpha_beta_shutter_k_heuristic['numberOfNodes'].values, stat_func=bs_stats.mean, is_pivotal=False))
     print 1/0
     # ------- shutter correlation blindness
     players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')

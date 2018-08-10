@@ -62,7 +62,10 @@ class Game:
     self.neighborhood_size = neighborhood
     self.reduced_opponent = reduced_opponent
     self.shutter = shutter
-
+    self.x_missed_wins = 0.0
+    self.x_wins_opportunity = 0.0
+    self.o_missed_wins = 0.0
+    self.o_wins_opportunity = 0.0
 
   def make_move(self, space, player):
     """Puts <player>'s token on <space>
@@ -369,7 +372,10 @@ class Game:
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       # moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
       # moves = board.get_free_spaces_ranked_heuristic(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
-      moves, nodes_computed = board.get_free_spaces_ranked_heuristic_model(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, shutter_size=self.shutter_size, k=self.k)
+      moves, nodes_computed, missed_win = board.get_free_spaces_ranked_heuristic_model(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, shutter_size=self.shutter_size, k=self.k)
+      if missed_win != -1:
+        self.o_wins_opportunity += 1.0
+        self.o_missed_wins += missed_win
       self.nodes_computed_counter += nodes_computed
       # attempted_moves = []
       # top_moves = moves
@@ -418,8 +424,11 @@ class Game:
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       # TODO 6/8/2018: bring back next line
       # moves = board.get_free_spaces_ranked_heuristic(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
-      moves, nodes_computed = board.get_free_spaces_ranked_heuristic_model(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, shutter_size=self.shutter_size, k=self.k)
+      moves, nodes_computed, missed_win = board.get_free_spaces_ranked_heuristic_model(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, shutter_size=self.shutter_size, k=self.k)
       self.nodes_computed_counter += nodes_computed
+      if missed_win != -1:
+        self.x_wins_opportunity += 1.0
+        self.x_missed_wins += missed_win
       # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
@@ -661,15 +670,15 @@ if __name__ == "__main__":
     # data = get_heatmaps_alpha_beta()
 
     results = []
-    header = ['iteration','board','shutter_size','max_moves','max_heuristic_comp','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','numberOfHeuristicComp','answer','correct','exploredNodes']
+    header = ['iteration','board','shutter_size','max_moves','max_heuristic_comp','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','numberOfHeuristicComp','answer','correct','o_misses','x_misses','exploredNodes']
     game_configs_file = "ab_config_shutter.json"
     configs = get_game_configs(game_configs_file)
     shutter_sizes = [0,1,2]
-    move_limits = [500]
+    move_limits = [100]
     node_limit = 100
     k = 5
     for conf in configs:
-      for i in range(500):
+      for i in range(100):
         if i % 100 == 0:
           print i
         for shutter_size in shutter_sizes:
@@ -684,8 +693,8 @@ if __name__ == "__main__":
 
               else:
                 # if filename.startswith("10by10_easy"):
-                # if not(filename.startswith("10_medium")):
-                #   continue
+                if not(filename.startswith("10_easy")):
+                  continue
                 file_path = "examples/board_10_5.txt"
                 continue
 
@@ -708,6 +717,7 @@ if __name__ == "__main__":
               board_results.append(game.potential)
               board_results.append(game.neighborhood_size)
               board_results.append(game.opponent)
+
 
 
               # print filename
@@ -740,6 +750,14 @@ if __name__ == "__main__":
                               move_matrix[r][j] = move_matrix[r][j]/game.move_counter
 
                 # print move_matrix
+                o_blindness = 0.0
+                if game.o_wins_opportunity > 0:
+                  o_blindness = game.o_missed_wins/game.o_wins_opportunity
+                x_blindness = 0.0
+                if game.x_wins_opportunity > 0:
+                  x_blindness = game.x_missed_wins/game.x_wins_opportunity
+                board_results.append(o_blindness)
+                board_results.append(x_blindness)
                 board_results.append(copy.deepcopy(move_matrix))
                 data_matrices[filename] = move_matrix
                 results.append(copy.deepcopy(board_results))
@@ -753,7 +771,7 @@ if __name__ == "__main__":
     # for i in range(len(results)):
     #   print results[i]
 
-    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_stochastic_080818_test_shutter2.csv'
+    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_stochastic_100818_misses.csv'
     write_results(output_name, results, header)
       #
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path

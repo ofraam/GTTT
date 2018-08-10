@@ -100,6 +100,13 @@ def normalize_matrix(score_matrix, with_negative=False):
                         score_matrix[r][c] = 0
 
 
+def add_noise_to_scores(score_matrix, mu=0.0, sigma=0.5):
+    for r in range(0,len(score_matrix)):
+        for j in range(0,len(score_matrix[r])):
+            if (score_matrix[r][j] != 'X') & (score_matrix[r][j] != 'O'):
+                score_matrix[r][j] += np.random.normal(mu, sigma)
+
+
 def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None, board_obj=None, pruned_squares=None):
     """
     computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
@@ -115,7 +122,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
     """
     board_matrix = copy.deepcopy(board_mat)
     convert_matrix_xo(board_matrix)
-
+    winning_moves_alpha_beta = []
     # compute path scores
     score_matrix = copy.deepcopy(board_matrix)
 
@@ -172,6 +179,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                 elif o_weight == 1.0:
                     square_score = square_score_x  # o blindness - just use for score how good it would be to block x
                 if square_score > WIN_SCORE:
+                    # winning_moves_alpha_beta.append((r,c))
                     square_score = WIN_SCORE
 
                 score_matrix[r][c] = square_score
@@ -207,11 +215,23 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                     else:
                         score_matrix[row][col] = INFINITY_O
 
+    noise = False
+    if noise:
+        add_noise_to_scores(score_matrix)
+
+    for row in range(len(board_matrix)):
+        for col in range(len(board_matrix[row])):
+            if (score_matrix[row][col] != 'X') & (score_matrix[row][col] != 'O'):
+                if score_matrix[row][col] >= WIN_SCORE:
+                    winning_moves_alpha_beta.append((row, col))
+
     if normalized:
         normalize_matrix(score_matrix, False)
+
+
     alpha_beta = True  # TODO: remove later
     if alpha_beta:
-        return score_matrix, len(active_squares)
+        return score_matrix, len(active_squares), winning_moves_alpha_beta
     return score_matrix
 
 

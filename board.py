@@ -277,7 +277,7 @@ class Board:
     prev_move_x_row_col = None
     if prev_move_x != None:
       prev_move_x_row_col = convert_position_to_row_col(prev_move_x,math.sqrt(self.size))
-    probs, nodes_computed = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=True, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col)
+    probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col)
 
     # note to self: now done within the heuristic computation
     # if (shutter) & (prev_move_x != None):
@@ -304,7 +304,18 @@ class Board:
       ranked_list = []
       for sp in sorted_list:
           ranked_list.append(sp[0])
-    return ranked_list[ :k], nodes_computed
+    missed_win = -1
+    top_move = ranked_list[0]
+    top_move_row_col = convert_position_to_row_col(top_move, math.sqrt(self.size))
+    if len(winning_moves) > 0:
+      missed_win = 1.0
+      for win_move in winning_moves:
+        if (win_move[0] == top_move_row_col[0]) & (win_move[1] == top_move_row_col[1]):
+          missed_win = 0.0
+          break
+
+    return ranked_list[ :k], nodes_computed, missed_win
+
 
   def weighted_choice(self,weights):
       rnd = random.random() * sum(weights)
