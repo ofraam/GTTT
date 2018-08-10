@@ -5,6 +5,8 @@ from model import *
 from utils import *
 from replay import *
 from board import *
+from bisect import bisect_right
+
 
 class Board:
   def __init__(self, num_spaces, winning_paths, board = None, pruned_spaces = None):
@@ -254,7 +256,7 @@ class Board:
 
     return sorted_list
 
-  def get_free_spaces_ranked_heuristic_model(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, k=3, prev_move_x=None):
+  def get_free_spaces_ranked_heuristic_model(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, k=3, prev_move_x=None, stochastic_order=True):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
     list_of_occupied = []
@@ -290,11 +292,70 @@ class Board:
       list_of_spaces_with_dist.append((space, probs[row][col]))
     sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
 
-    ranked_list = []
-    for sp in sorted_list:
-        ranked_list.append(sp[0])
+    if stochastic_order:
+      ranked_list = self.reorder_list(sorted_list)
+
+    else:
+      ranked_list = []
+      for sp in sorted_list:
+          ranked_list.append(sp[0])
     return ranked_list[ :k]
 
+  def weighted_choice(self,weights):
+      rnd = random.random() * sum(weights)
+      for i, w in enumerate(weights):
+          rnd -= w
+          if rnd < 0:
+              return i
+
+  def reorder_list(self, move_list):
+    a = [i[0] for i in move_list]
+    w = [i[1]+0.000001 for i in move_list]
+    # for item_weight in w:
+    #   if item_weight == 0:
+    #     item_weight += 0.0001
+    w = list(w) # make a copy of w
+    if len(a) != len(w):
+        print("weighted_shuffle: Lenghts of lists don't match.")
+        return
+
+    r = [0]*len(a) # contains the random shuffle
+    for i in range(len(a)):
+        j = self.weighted_choice(w)
+        if (i is None) | (j is None):
+          print 'problem'
+        r[i]=a[j]
+        w[j] = 0
+    return r
+    # r = np.empty_like(a)
+    # cumWeights = np.cumsum(w)
+    # for i in range(len(a)):
+    #      rnd = random.random() * cumWeights[-1]
+    #      j = bisect_right(cumWeights,rnd)
+    #      #j = np.searchsorted(cumWeights, rnd, side='right')
+    #      r[i]=a[j]
+    #      cumWeights[j:] -= w[j]
+    return r
+    # move_list.sort(key = lambda item: random.expovariate(lambd=0.5) * item[1], reverse=True)
+
+    # reordered_list = []
+    # added_indices = []
+    #
+    # while len(reordered_list) < len(move_list):
+    #   rand = random.random()
+    #   sum_probs = 0.0
+    #   i = 0
+    #   while rand > sum_probs:
+    #     sum_probs += move_list[i][1]
+    #     i += 1
+    #   if i == len(move_list):
+    #     i -= 1
+    #
+    #   # if i not in added_indices:
+    #   added_indices.append(i)
+    #   reordered_list.append(copy.deepcopy(move_list[i]))
+    #   move_list
+    # return reordered_list
 
   def get_free_spaces_ranked_heuristic(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, k=10):
     ''' Return a list of unoccupied spaces. '''

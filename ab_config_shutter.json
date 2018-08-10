@@ -9,7 +9,20 @@
       "potential": "square",
       "neighborhood": 2,
       "name": "shutter",
-      "reduced_opponent":false
+      "reduced_opponent":false,
+      "shutter": true
+    },
+    {
+      "heuristic": "blocking",
+      "interaction": true,
+      "opponent": true,
+      "prune": false,
+      "exp": 2,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "heuristic",
+      "reduced_opponent":false,
+      "shutter": false
     }
   ]
 }

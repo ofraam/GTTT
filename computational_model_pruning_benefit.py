@@ -16,7 +16,7 @@ import csv
 class Game:
   ## MORE LIKE POOP METHODS ##
 
-  def __init__(self, num_spaces, winning_paths, board={}, whos_turn=c.COMPUTER, other_player=c.HUMAN, reduced_opponent=True, noise=c.NOISE_HUMAN, heuristic="paths", exp=1, interaction=False, opponent=False, neighborhood=2, prune = False, potential='square'):
+  def __init__(self, num_spaces, winning_paths, board={}, whos_turn=c.COMPUTER, other_player=c.HUMAN, reduced_opponent=True, noise=c.NOISE_HUMAN, heuristic="paths", exp=1, interaction=False, opponent=False, neighborhood=2, prune = False, potential='square', shutter=False):
     ''' Initalizes a Game object '''
     self.num_spaces = num_spaces
     self.winning_paths = winning_paths
@@ -49,6 +49,7 @@ class Game:
     self.prev_move_x_depth = 0
     self.max_depth = None
     self.max_moves = 35
+    self.shutter_size = 5
     self.heuristic = heuristic
     self.prune = prune
     self.exp = exp
@@ -57,6 +58,7 @@ class Game:
     self.opponent = opponent
     self.neighborhood_size = neighborhood
     self.reduced_opponent = reduced_opponent
+    self.shutter = shutter
 
 
   def make_move(self, space, player):
@@ -96,19 +98,20 @@ class Game:
     space = 100
     # while not winning_player:
     while self.num_turns<1:
-      print self.num_turns
+      # print self.num_turns
     # while not winning_player:
       self.node_count = 0
-      self.display_game()
+      # self.display_game()  # TODO: bring back if want to display
       self.max_depth = max_depth-self.num_turns
       space = self.get_next_move(max_depth)
       if space is None:
         print 'darn'
-      print self.node_count
+        raise Exception('space is None')
+      # print self.node_count
       winning_player = self.make_move(space, self.whos_turn)
       self.change_player()
-    self.display_game()
-    print self.node_count
+    # self.display_game()  # TODO: bring back if want to display
+    # print self.node_count
     return (self.node_count, space)
     # return winning_player
 
@@ -156,8 +159,8 @@ class Game:
       #     self.save_board_to_file(space)
       #   self.change_player()
           # max_depth=25
-      print 'score = '+str(score)
-      print 'space = '+str(space)
+      # print 'score = '+str(score)
+      # print 'space = '+str(space)
       self.last_socre = score
       self.last_depth = max_depth
       # self.save_board_to_file(space, score)
@@ -349,7 +352,7 @@ class Game:
         beta = min(beta, score)
       return min_child
 
-  def minimax_max_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None):
+  def minimax_max_alphabeta_DL(self, alpha, beta, board, depth, prev_space_x = None, stochastic_choic=False):
     '''Minimax algorithm with alpha-beta pruning and depth-limited search. '''
     # or ((depth==self.max_depth-1) & (beta==c.LOSE_SCORE))
     if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves):
@@ -363,13 +366,13 @@ class Game:
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       # moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
       # moves = board.get_free_spaces_ranked_heuristic(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
-      moves = board.get_free_spaces_ranked_heuristic_model(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=True, prev_move_x=prev_space_x)
-
+      moves = board.get_free_spaces_ranked_heuristic_model(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, k=self.shutter_size)
+      # attempted_moves = []
       # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)[:5]:
       for space in moves:
-        # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
+                # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
         #   continue
         # print 'depth = ' + str(depth) + ', space = ' + str(space)
         new_board = board.get_board_copy()
@@ -411,7 +414,7 @@ class Game:
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       # TODO 6/8/2018: bring back next line
       # moves = board.get_free_spaces_ranked_heuristic(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
-      moves = board.get_free_spaces_ranked_heuristic_model(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=True, prev_move_x=prev_space_x)
+      moves = board.get_free_spaces_ranked_heuristic_model(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, k=self.shutter_size)
       # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
@@ -556,7 +559,7 @@ def start_game(file_path, configuration = None):
   if configuration == None:
     game = Game(num_spaces, winning_paths)
   else:
-    game = Game(num_spaces, winning_paths, reduced_opponent=configuration['reduced_opponent'],heuristic=configuration['heuristic'], interaction=configuration['interaction'], neighborhood=configuration['neighborhood'], exp=configuration['exp'], opponent=configuration['opponent'], potential=configuration['potential'], prune=configuration['prune'])
+    game = Game(num_spaces, winning_paths, reduced_opponent=configuration['reduced_opponent'],heuristic=configuration['heuristic'], interaction=configuration['interaction'], neighborhood=configuration['neighborhood'], exp=configuration['exp'], opponent=configuration['opponent'], potential=configuration['potential'], prune=configuration['prune'], shutter=configuration['shutter'])
 
 
   return game
@@ -592,6 +595,7 @@ def get_heatmaps_alpha_beta():
 
 
     game = start_game(file_path)
+
     print filename
     win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
     print 'depth = '+ str(win_depth)
@@ -652,76 +656,93 @@ if __name__ == "__main__":
     # data = get_heatmaps_alpha_beta()
 
     results = []
-    header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
+    header = ['iteration','board','shutter_size','max_moves','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
     game_configs_file = "ab_config_shutter.json"
     configs = get_game_configs(game_configs_file)
+    shutter_sizes = [5]
+    move_limits = [50]
     for conf in configs:
-      data_matrices = {}
-      for filename in os.listdir("predefinedBoards/"):
-        if filename.startswith("6"):
-          file_path = "examples/board_6_4.txt"
-          # continue
-          # if not(filename.startswith("6_hard")):
-          #   continue
+      for i in range(500):
+        if i % 100 == 0:
+          print i
+        for k in shutter_sizes:
+          for move_limit in move_limits:
+            data_matrices = {}
+            for filename in os.listdir("predefinedBoards/"):
+              if filename.startswith("6"):
+                file_path = "examples/board_6_4.txt"
+                continue
+                # if not(filename.startswith("6_hard")):
+                  # continue
 
-        else:
-          # if filename.startswith("10by10_easy"):
-          # if (filename.startswith("10_medium")):
-          #   continue
-          file_path = "examples/board_10_5.txt"
-          # continue
+              else:
+                # if filename.startswith("10by10_easy"):
+                if not(filename.startswith("10_medium")):
+                  continue
+                file_path = "examples/board_10_5.txt"
+                # continue
 
-        game = start_game(file_path, conf)
-        board_results = []
-        board_results.append(filename[:-5])
-        board_results.append(conf['name'])
-        board_results.append(game.heuristic)
-        board_results.append(game.prune)
-        board_results.append(game.interaction)
-        board_results.append(game.exp)
-        board_results.append(game.potential)
-        board_results.append(game.neighborhood_size)
-        board_results.append(game.opponent)
+              game = start_game(file_path, conf)
+              game.shutter_size = k
+              game.max_moves = move_limit
+              board_results = []
+              board_results.append(i)
+              board_results.append(filename[:-5])
+              board_results.append(game.shutter_size)
+              board_results.append(game.max_moves)
+              board_results.append(conf['name'])
+              board_results.append(game.heuristic)
+              board_results.append(game.prune)
+              board_results.append(game.interaction)
+              board_results.append(game.exp)
+              board_results.append(game.potential)
+              board_results.append(game.neighborhood_size)
+              board_results.append(game.opponent)
 
-        print filename
-        win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
-        print 'depth = '+ str(win_depth)
-        nodes, solution = game.play_game(win_depth)
-        board_results.append(nodes)
-        board_results.append(solution)
-        if solution in c.WIN_MOVES:
-          board_results.append(1)
-        else:
-          board_results.append(0)
 
-        # print game.dist_between_spaces_on_path
-        # print game.count_between_spaces_on_path
-        move_matrix = copy.deepcopy(game.move_matrix)
-        for r in range(0,len(move_matrix)):
-            for j in range(0,len(move_matrix[r])):
-                if (move_matrix[r][j]=='X'):
-                    move_matrix[r][j] = -0.00001
-                elif (move_matrix[r][j]=='O'):
-                    move_matrix[r][j] = -0.00002
-        normalized = True
-        if normalized:
-          for r in range(len(move_matrix)):
-              for j in range(len(move_matrix[r])):
-                  if (move_matrix[r][j]!=-0.00001) & (move_matrix[r][j]!=-0.00002):
-                      move_matrix[r][j] = move_matrix[r][j]/game.move_counter
+              # print filename
+              win_depth = fill_board_from_file("predefinedBoards/"+filename,game)
+              # print 'depth = '+ str(win_depth)
+              try:
+                nodes, solution = game.play_game(win_depth)
+                board_results.append(nodes)
+                board_results.append(solution)
+                if solution in c.WIN_MOVES:
+                  board_results.append(1)
+                else:
+                  board_results.append(0)
 
-        print move_matrix
-        board_results.append(copy.deepcopy(move_matrix))
-        data_matrices[filename] = move_matrix
-        results.append(copy.deepcopy(board_results))
+                # print game.dist_between_spaces_on_path
+                # print game.count_between_spaces_on_path
+                move_matrix = copy.deepcopy(game.move_matrix)
+                for r in range(0,len(move_matrix)):
+                    for j in range(0,len(move_matrix[r])):
+                        if (move_matrix[r][j]=='X'):
+                            move_matrix[r][j] = -0.00001
+                        elif (move_matrix[r][j]=='O'):
+                            move_matrix[r][j] = -0.00002
+                normalized = True
+                if normalized:
+                  for r in range(len(move_matrix)):
+                      for j in range(len(move_matrix[r])):
+                          if (move_matrix[r][j]!=-0.00001) & (move_matrix[r][j]!=-0.00002):
+                              move_matrix[r][j] = move_matrix[r][j]/game.move_counter
+
+                # print move_matrix
+                board_results.append(copy.deepcopy(move_matrix))
+                data_matrices[filename] = move_matrix
+                results.append(copy.deepcopy(board_results))
+              except:
+                print 'exception'
+                continue
 
 
       # write_matrices_to_file(data_matrices, 'data_matrices/'+conf['name']+'_potentialBlock100000.json')
 
-    for i in range(len(results)):
-      print results[i]
+    # for i in range(len(results)):
+    #   print results[i]
 
-    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_' + str(game.max_moves) + '_k3_Shutter_070818.csv'
+    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_stochastic_080818_5_50_10medium.csv'
     write_results(output_name, results, header)
       #
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path
