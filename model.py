@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import math
 import replay as rp
 import computational_model as cm
-import config as c
+import config
 import json
 from emd import emd
 import random
@@ -46,10 +46,13 @@ WIN_SCORE = 100
 
 
 def get_positions_shutter(row, col, board_matrix, shutter_size=0):
+    prob = 1.0
+    if not shutter_size.is_integer():
+        prob = shutter_size - math.floor(shutter_size)
     active_squares = get_open_paths_through_square(row, col, board_matrix, player='X')
     if len(active_squares) > 0:
-        for i in range(1, shutter_size+1):
-            active_squares.extend(expand_neighborhood(active_squares, len(board_matrix)))
+        for i in range(1, int(math.ceil(shutter_size)+1)):
+            active_squares.extend(expand_neighborhood(active_squares, len(board_matrix), prob=prob))
     else:
         return []
     active_squares = remove_duplicates(active_squares)
@@ -142,12 +145,26 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
         if prev_x_move is not None:
             active_squares = get_positions_shutter(prev_x_move[0], prev_x_move[1], board_matrix, shutter_size)
 
+    add_to_dict = False
+    prev_computed_scores = None
+    if config.SCORES_DICT is not None:
+        if str(board_matrix) in config.SCORES_DICT.keys():
+            prev_computed_scores = config.SCORES_DICT[str(board_matrix)]
+            config.HITS += 1
+        else:
+            add_to_dict = True
+            config.NO_HIT += 1
+
     for r in range(len(board_matrix)):
         for c in range(len(board_matrix[r])):
             if board_matrix[r][c] == 0:  # only check if free & passed threshold
                 if ([r, c] not in active_squares) & shutter & (len(active_squares) > 0):  # if there are available positions within shutter, and square is not in them, give score 0
                     square_score = 0
                     score_matrix[r][c] = square_score
+                    continue
+
+                if prev_computed_scores is not None:
+                    score_matrix[r][c] = prev_computed_scores[r][c]
                     continue
 
                 x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction)
@@ -214,6 +231,9 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                                 score_matrix[row][col] = -1*WIN_SCORE
                     else:
                         score_matrix[row][col] = INFINITY_O
+
+    if add_to_dict:
+        config.SCORES_DICT[str(board_matrix)] = score_matrix
 
     if noise > 0:
         add_noise_to_scores(score_matrix, mu=0.0, sigma=noise)

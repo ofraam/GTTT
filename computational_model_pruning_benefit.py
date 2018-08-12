@@ -11,7 +11,7 @@ import os
 import copy
 from scipy import stats
 import csv
-
+import pickle as pkl
 
 class Game:
   ## MORE LIKE POOP METHODS ##
@@ -674,14 +674,20 @@ if __name__ == "__main__":
     header = ['iteration','board','shutter_size','k','noise_sig','max_moves','max_heuristic_comp','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','numberOfHeuristicComp','answer','correct','o_misses','x_misses','exploredNodes']
     game_configs_file = "ab_config_shutter.json"
     configs = get_game_configs(game_configs_file)
-    shutter_sizes = [0,1,2]
+    # shutter_sizes = [0,1,2]
+    shutter_sizes = [0.5]
     move_limit = 50000
     # move_limits = [1000, 2000]
-    node_limits = [30, 50, 100]  #
+    node_limits = [30, 50]  #
     noise_vals = [0.5, 1.0, 1.5]
+    # node_limits = [50]  #
+    # noise_vals = [0.5]
     # k = [3, 5, 10]
     k = 5
     write_header = True
+    # with open('scores_pickle_no_shutter_new.pickle', 'rb') as handle:
+    #     c.SCORES_DICT_ALL_BOARDS = pkl.load(handle)
+
     for conf in configs:
       for i in range(500):
         if i % 100 == 0:
@@ -693,17 +699,28 @@ if __name__ == "__main__":
 
               data_matrices = {}
               for filename in os.listdir("predefinedBoards/"):
+
                 if filename.startswith("6"):
                   file_path = "examples/board_6_4.txt"
-                  continue
+                  # if filename.startswith('6_easy'):
+                  #   c.SCORES_DICT = c.SCORES_DICT_ALL_BOARDS['6_easy']
+                  # else:
+                  #   c.SCORES_DICT = c.SCORES_DICT_ALL_BOARDS['6_hard']
+                  # # continue
                   # if not(filename.startswith("6_hard")):
-                  #   continue
+                  continue
 
                 else:
                   # if filename.startswith("10by10_easy"):
-                  # if not(filename.startswith("10_hard")):
-                  #   continue
+                  if not(filename.startswith("10_easy")):
+                    continue
                   file_path = "examples/board_10_5.txt"
+                  # if filename.startswith('10_easy'):
+                  #   c.SCORES_DICT = c.SCORES_DICT_ALL_BOARDS['10_easy']
+                  # elif filename.startswith('10_medium'):
+                  #   c.SCORES_DICT = c.SCORES_DICT_ALL_BOARDS['10_medium']
+                  # else:
+                  #   c.SCORES_DICT = c.SCORES_DICT_ALL_BOARDS['10_hard']
                   # continue
 
                 game = start_game(file_path, conf)
@@ -775,7 +792,7 @@ if __name__ == "__main__":
               # except Exception as e:
               #   print str(e)
               #   continue
-              output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_110818_10boards_moveLimit.csv'
+              output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_110818_10easy_shutter05.csv'
               dataFile = open(output_name, 'ab')
               fieldnames = header
               # fieldnames.extend(heuristics_list)
@@ -787,6 +804,15 @@ if __name__ == "__main__":
               for record in results:
                   dataWriter.writerow(record)
               dataFile.close()
+
+      print c.HITS
+      print c.NO_HIT
+      with open('scores_pickle_no_shutter_new2.pickle', 'wb') as handle:
+          pkl.dump(c.SCORES_DICT_ALL_BOARDS, handle, protocol=pkl.HIGHEST_PROTOCOL)
+
+      # with open('scores_pickle_no_shutter.pickle', 'rb') as handle:
+      #     b = pkl.load(handle)
+      #     print b
       # write_matrices_to_file(data_matrices, 'data_matrices/'+conf['name']+'_potentialBlock100000.json')
 
     # for i in range(len(results)):

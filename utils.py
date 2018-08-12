@@ -186,7 +186,7 @@ def remove_duplicates(square_list):
     return unique_squares
 
 
-def expand_neighborhood(squares, size):
+def expand_neighborhood(squares, size, prob=1.0):
     checked = []
     new_neighborhood = []
     for square in squares:
@@ -194,7 +194,10 @@ def expand_neighborhood(squares, size):
             neighbors = get_neighboring_squares(size, square, 1)
             for neighbor in neighbors:
                 if not check_square_in_list(neighbor,new_neighborhood):
-                    new_neighborhood.append(neighbor)
+                    if random.random() <= prob:
+                        new_neighborhood.append(neighbor)
+                    # else:
+                    #     print 'not adding'
             checked.append(str(square))
             # new_neighborhood.extend(get_neighboring_squares(size, square, 1))
     return remove_duplicates(new_neighborhood)
