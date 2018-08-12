@@ -256,7 +256,7 @@ class Board:
 
     return sorted_list
 
-  def get_free_spaces_ranked_heuristic_model(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, shutter_size=2, k=3, prev_move_x=None, stochastic_order=True):
+  def get_free_spaces_ranked_heuristic_model(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, shutter_size=2, k=3, prev_move_x=None, stochastic_order=True, noise=0):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
     list_of_occupied = []
@@ -277,7 +277,7 @@ class Board:
     prev_move_x_row_col = None
     if prev_move_x != None:
       prev_move_x_row_col = convert_position_to_row_col(prev_move_x,math.sqrt(self.size))
-    probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col)
+    probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
 
     # note to self: now done within the heuristic computation
     # if (shutter) & (prev_move_x != None):

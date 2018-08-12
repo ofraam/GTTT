@@ -100,14 +100,14 @@ def normalize_matrix(score_matrix, with_negative=False):
                         score_matrix[r][c] = 0
 
 
-def add_noise_to_scores(score_matrix, mu=0.0, sigma=0.5):
+def add_noise_to_scores(score_matrix, mu=0.0, sigma=1.0):
     for r in range(0,len(score_matrix)):
         for j in range(0,len(score_matrix[r])):
             if (score_matrix[r][j] != 'X') & (score_matrix[r][j] != 'O'):
                 score_matrix[r][j] += np.random.normal(mu, sigma)
 
 
-def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None, board_obj=None, pruned_squares=None):
+def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None, board_obj=None, pruned_squares=None, noise = 0):
     """
     computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
     :param exp: parameter creates the non-linearity (i.e., 2 --> squared)
@@ -215,9 +215,8 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                     else:
                         score_matrix[row][col] = INFINITY_O
 
-    noise = False
-    if noise:
-        add_noise_to_scores(score_matrix)
+    if noise > 0:
+        add_noise_to_scores(score_matrix, mu=0.0, sigma=noise)
 
     for row in range(len(board_matrix)):
         for col in range(len(board_matrix[row])):
