@@ -277,7 +277,7 @@ class Board:
     prev_move_x_row_col = None
     if prev_move_x != None:
       prev_move_x_row_col = convert_position_to_row_col(prev_move_x,math.sqrt(self.size))
-    probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
+    probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=True, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
 
     # note to self: now done within the heuristic computation
     # if (shutter) & (prev_move_x != None):
