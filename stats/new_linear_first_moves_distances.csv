@@ -1,0 +1,11 @@
+,board,distance,scoring
+0,6_easy_full,0.08703195637927413,linear
+1,6_easy_pruned,0.09392417605681389,linear
+2,10_easy_full,0.06005880397168616,linear
+3,10_easy_pruned,0.057926247906369695,linear
+4,6_hard_full,0.09103077757806732,linear
+5,6_hard_pruned,0.09182174370620866,linear
+6,10_hard_full,0.078985139106465,linear
+7,10_hard_pruned,0.06582988492546346,linear
+8,10_medium_full,0.07775475454955912,linear
+9,10_medium_pruned,0.08724848406744008,linear

@@ -6,6 +6,7 @@ import seaborn as sns
 from utils import *
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import scipy.stats as stats
 import copy
 import csv
@@ -22,6 +23,8 @@ from sklearn.metrics import roc_curve
 from scipy import interp
 from lmfit import minimize as lmmin
 from lmfit import Parameters
+from scipy.interpolate import griddata
+import glob
 
 
 from sklearn import metrics
@@ -29,9 +32,10 @@ import math
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
 from sklearn.model_selection import train_test_split
-
+import matplotlib.ticker as ticker
 # from patsy import
 from replay import *
+
 
 # import Tkinter
 import ast
@@ -51,6 +55,73 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
                 [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
                   ]
+
+
+def rank_biserial_effect_size(x,y):
+    mann_whitney_res = stats.mannwhitneyu(x, y)
+    u = mann_whitney_res[0]
+    effect_size = 1.0-((2.0*u)/(len(x)*len(y)))
+    return effect_size
+
+
+def merge_csv(dir_name,merged_path):
+    with open(merged_path,'w') as wfile:
+        csv_files = glob.glob(dir_name+"*.csv")
+        for csv_file in os.listdir(dir_name):
+            f = open(dir_name+csv_file)
+            if not csv_file.startswith("0"):
+                f.__next__()  # skip the header
+            for line in f:
+                wfile.write(line)
+            f.close()  # not really needed
+
+def upper_bound_ci_correct(df):
+    ci95_hi = df.correct.mean() + df.correct.sem() * 1.96
+    ci95_hi_heuristic = df.numberOfHeuristicComp.mean() + df.numberOfHeuristicComp.sem() * 1.96
+    return ci95_hi, ci95_hi_heuristic
+
+
+
+def cohen_d(x,y):
+    nx = len(x)
+    ny = len(y)
+    dof = nx + ny - 2
+    return (np.mean(x) - np.mean(y)) / np.sqrt(((nx-1)*np.std(x, ddof=1) ** 2 + (ny-1)*np.std(y, ddof=1) ** 2) / dof)
+
+
+def spearmanr_ci(x,y,alpha=0.05):
+    ''' calculate Pearson correlation along with the confidence interval using scipy and numpy
+    Parameters
+    ----------
+    x, y : iterable object such as a list or np.array
+      Input for correlation calculation
+    alpha : float
+      Significance level. 0.05 by default
+    Returns
+    -------
+    r : float
+      Pearson's correlation coefficient
+    pval : float
+      The corresponding p value
+    lo, hi : float
+      The lower and upper bound of confidence intervals
+    '''
+
+    # r, p = stats.pearsonr(x,y)
+    # r_z = np.arctanh(r)
+    # se = 1/np.sqrt(x.size-3)
+    # z = stats.norm.ppf(1-alpha/2)
+    # lo_z, hi_z = r_z-z*se, r_z+z*se
+    # lo, hi = np.tanh((lo_z, hi_z))
+    r, p = stats.spearmanr(x,y)
+    stderr = 1.0 / math.sqrt(x.size - 3)
+    z = stats.norm.ppf(1-alpha/2)
+    print z
+    delta = z * stderr
+    lower = math.tanh(math.atanh(r) - delta)
+    upper = math.tanh(math.atanh(r) + delta)
+    # print "lower %.6f upper %.6f" % (lower, upper)
+    return r, p, lower, upper
 
 def medianCI(data, ci, p):
 	'''
@@ -86,7 +157,7 @@ def boot_matrix(z, B):
     idz = np.random.randint(0, n, size=(B, n))  # indices to pick for all boostrap samples
     return z[idz]
 
-def bootstrap_mean(x, B=10000, alpha=0.05, plot=False):
+def bootstrap_mean(x, B=100000, alpha=0.05, plot=False):
     """Bootstrap standard error and (1-alpha)*100% c.i. for the population mean
 
     Returns bootstrapped standard error and different types of confidence intervals"""
@@ -105,19 +176,20 @@ def bootstrap_mean(x, B=10000, alpha=0.05, plot=False):
     se_mean_boot = sampling_distribution.std()
     quantile_boot = np.percentile(sampling_distribution, q=(100*alpha/2, 100*(1-alpha/2)))
 
-    # RESULTS
-    print("Estimated mean:", orig)
-    print("Classic standard error:", se_mean)
-    print("Classic student c.i.:", orig + np.array([-qt, qt])*se_mean)
-    print("\nBootstrap results:")
-    print("Standard error:", se_mean_boot)
-    print("t-type c.i.:", orig + np.array([-qt, qt])*se_mean_boot)
-    print("Percentile c.i.:", quantile_boot)
-    print("Basic c.i.:", 2*orig - quantile_boot[::-1])
+    # # RESULTS
+    # print("Estimated mean:", orig)
+    # print("Classic standard error:", se_mean)
+    # print("Classic student c.i.:", orig + np.array([-qt, qt])*se_mean)
+    # print("\nBootstrap results:")
+    # print("Standard error:", se_mean_boot)
+    # print("t-type c.i.:", orig + np.array([-qt, qt])*se_mean_boot)
+    # print("Percentile c.i.:", quantile_boot)
+    # print("Basic c.i.:", 2*orig - quantile_boot[::-1])
 
     if plot:
         plt.hist(sampling_distribution, bins="fd")
 
+    return sampling_distribution
 
 
 def bootstrap_t_pvalue(x, y, equal_var=False, B=10000, plot=False):
@@ -132,6 +204,35 @@ def bootstrap_t_pvalue(x, y, equal_var=False, B=10000, plot=False):
     xboot = boot_matrix(x - x.mean(), B=B) # important centering step to get sampling distribution under the null
     yboot = boot_matrix(y - y.mean(), B=B)
     sampling_distribution = stats.ttest_ind(xboot, yboot, axis=1, equal_var=equal_var)[0]
+
+    # Calculate proportion of bootstrap samples with at least as strong evidence against null
+    p = np.mean(sampling_distribution >= orig[0])
+
+    # RESULTS
+    print("p value for null hypothesis of equal population means:")
+    print("Parametric:", orig[1])
+    print("Bootstrap:", 2*min(p, 1-p))
+
+    # Plot bootstrap distribution
+    if plot:
+        plt.figure()
+        plt.hist(sampling_distribution, bins="fd")
+
+    return 2*min(p, 1-p)
+
+
+def bootstrap_t_pvalue_after_sampling(x, y, xboot, yboot, equal_var=False, B=10000, plot=False):
+    """Bootstrap p values for two-sample t test
+
+    Returns boostrap p value, test statistics and parametric p value"""
+
+    # Original t test statistic
+    orig = stats.ttest_ind(x, y, equal_var=equal_var)
+
+    # Generate boostrap distribution of t statistic
+    # xboot = bxs # important centering step to get sampling distribution under the null
+    # yboot = bys
+    sampling_distribution = stats.ttest_ind(xboot, yboot, axis=1, equal_var=equal_var, nan_policy='omit')[0]
 
     # Calculate proportion of bootstrap samples with at least as strong evidence against null
     p = np.mean(sampling_distribution >= orig[0])
@@ -240,6 +341,9 @@ def probs_clicks(dynamics):
         board_data = full
         if board.endswith('pruned'):
             board_data = pruned
+        else:
+            board_matrix = copy.deepcopy(START_POSITION[i+1])
+
 
         first_moves = board_data.loc[board_data['board_name'] == board]
         total_first_moves = first_moves.shape[0]
@@ -257,7 +361,7 @@ def probs_clicks(dynamics):
 
         data_matrics[board] = copy.deepcopy(board_matrix)
 
-    write_matrices_to_file(data_matrics, 'data_matrices/cogsci/first_pruned.json')
+    write_matrices_to_file(data_matrics, 'data_matrices/cogsci/first_pruned280818.json')
 
 
 def merge_undos_to_reset(dynamics):
@@ -316,7 +420,7 @@ def add_aperture_values(dynamics):
         square_row = int(square[0])
         square_col = int(square[1])
         square = [square_row,square_col]
-        aperture = 1
+        aperture = 0
         open_path = True
         if len(active_squares) == 0:
             open_path = False
@@ -1154,7 +1258,7 @@ def compute_blindness_player(player_moves_probs, player=2, include_forced=False)
 
 
 if __name__== "__main__":
-
+    sns.set(style="whitegrid")
     # states_cont = pd.read_csv("stats/states_continued.csv")
     # states_cont_filtered = states_cont.loc[(states_cont['count'] > 4) & (states_cont['path_length'] <7) & (states_cont['path_length'] > 0)]
     # s = states_cont_filtered['count']
@@ -1247,9 +1351,9 @@ if __name__== "__main__":
     # print 1/0
 
     # states = pd.read_csv("stats/states.csv")
-    # dynamics = pd.read_csv("stats/dynamicsFirstMoves1.csv")
+    dynamicsFirstMoves = pd.read_csv("stats/dynamicsFirstMoves1.csv")
     # compare_start_move(dynamics)
-    # probs_clicks(dynamics)
+    # probs_clicks(dynamicsFirstMoves)
     # print 1/0
 
     # exploreExploit = pd.read_csv("stats/exploreExploit0311_avg.csv")
@@ -1263,88 +1367,675 @@ if __name__== "__main__":
     # resetsDelta = pd.read_csv("stats/resetsDeltaData.csv")
     # resetsDelta = pd.read_csv("stats/actionsLogDelta_blocking_abs.csv")
     resetsDelta = pd.read_csv("stats/resetsFiltered2.csv")
-    move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_player.csv')  # only cogsci data
-    move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_player_allData.csv')  # all data
+    move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_player_cogsci_withPaths.csv')  # only cogsci data
+    # move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_player_allData.csv')  # all data
 
     userids_sig = []
     fitted_heuristics_sig = []
 
+
+    #------------ move times analysis
+    moves = dynamics.loc[(dynamics['userid'].isin(cogsci_part_list)) & (dynamics['action'] == 'click') & (dynamics['path_number'] > 1) & (dynamics['prev_action'] != 'undo')]
+    moves = moves = moves.loc[dynamics['move_number_in_path'] < 6]
+    # ax = sns.lmplot('move_number_in_path', 'time_from_action', data=moves)
+    # print stats.spearmanr(moves['move_number_in_path'], moves['time_from_action'])
+    # plt.show()
+    moves_pruned = moves.loc[moves['condition'] == 'pruned']
+    moves_pruned_first = moves_pruned.loc[moves_pruned['move_number_in_path'] == 1]
+    moves_pruned_late = moves_pruned.loc[moves_pruned['move_number_in_path'] > 1]
+    moves_full = moves.loc[moves['condition'] == 'full']
+    moves_full_first = moves_full.loc[moves_full['move_number_in_path'] == 1]
+    moves_full_late = moves_full.loc[moves_full['move_number_in_path'] > 1]
+    print moves_pruned_first['time_from_action'].median()
+    print moves_pruned_late['time_from_action'].median()
+    print moves_full_first['time_from_action'].median()
+    print moves_full_late['time_from_action'].median()
+    print stats.mannwhitneyu(moves_pruned_first['time_from_action'], moves_full_first['time_from_action'])
+    print rank_biserial_effect_size(moves_pruned_first['time_from_action'], moves_full_first['time_from_action'])
+    print stats.mannwhitneyu(moves_pruned_late['time_from_action'], moves_full_late['time_from_action'])
+    print rank_biserial_effect_size(moves_pruned_late['time_from_action'], moves_full_late['time_from_action'])
+
+    ratios = []
+    conditions = []
+    for user in moves['userid'].unique():
+        moves_user = moves.loc[moves['userid'] == user]
+        moves_first = moves_user.loc[moves_user['move_number_in_path'] == 1]
+        moves_late = moves_user.loc[moves_user['move_number_in_path'] > 1]
+        # ratio = moves_first['time_from_action'].mean()/moves_late['time_from_action'].mean()
+        # print '---'
+        # print moves_first['time_from_action'].median()
+        # print moves_late['time_from_action'].median()
+        # print '---'
+
+        ratio = moves_first['time_from_action'].median()/moves_late['time_from_action'].median()
+        print ratio
+        ratios.append(ratio)
+        conditions.append(moves_user['condition'].iloc[0])
+
+    times_df = pd.DataFrame({'ratio': ratios, 'condition': conditions})
+    # print times_df['ratio'].mean()
+    times_pruned = times_df.loc[times_df['condition'] == 'pruned']
+    times_full = times_df.loc[times_df['condition'] == 'full']
+    print times_df['ratio'].median()
+    print times_pruned['ratio'].median()
+    print times_full['ratio'].median()
+    exit()
+    #------------ move times analysis end
+   # participant actions figure-----
+   #  alphaBetaFull['heuristic_name'] = alphaBetaFull['heuristic_name'].map({'density':'Density', 'linear':  'Linear','non-linear':'Non-linear', 'non-linear-interaction': 'Interaction','blocking':'Forcing', 'participants':'Participants'})
+   #  sns.set(font_scale=1.2, style='whitegrid')
+   #
+   #  # plt.figure(figsize=(10, 3))
+   #  # alpha beta and participant actions figure-----
+   #  # ax = sns.factorplot(x="board", y="moves",, hue="heuristic_name", data=alphaBetaFull, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=["1","2","3","4","8","o"], legend_out=False, legend=False)
+   #  # data['board'] = data['board'].map({'6 MC full': 'MC6 full','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
+   #  alphaBetaFull['board'] = alphaBetaFull['board'].map({'6 MC full': 'I full', '6 MC truncated': 'I truncated','10 MC full': 'III full','10 MC truncated':'III truncated','6 HC full': 'II full', '6 HC truncated':'II truncated','10 HC full':'IV full','10 HC truncated':'IV truncated', '10 DC full': 'V full','10 DC truncated':'V truncated'})
+   #  ax = sns.factorplot(x="board", y="moves",  scale= 0.5, data=alphaBetaFull, hue="heuristic_name", n_boot=1000, order=['I truncated', 'I full', 'II truncated', 'III truncated', 'V truncated','II full', 'IV truncated', 'III full',   'IV full', 'V full'],  markers=["<","1","2","3","4","*"],linestyles=["-","-","-","-","-", "--"], legend_out=False, legend=False)
+   #  ax.fig.get_axes()[0].set_yscale('log')
+   #  # ax.set_xticklabels(ax.get_xticklabels(), rotation=60)
+   #  # ax.set_xlabel('Board', fontsize=14)
+   #  # ax.set_ylabel('Number of Moves', fontsize=14)
+   #  # ax.tick_params(labelsize=12)
+   #  # print alphaBetaFull['moves']
+   #  # ax.ax.show()
+   #  plt.ylim(0, 200000)
+   #  # sns.plt.xlim(0, None)
+   #
+   #
+   #  ax.set(xlabel='Board', ylabel='Number of Moves')
+   #  lw = ax.ax.lines[0].get_linewidth()
+   #  plt.setp(ax.ax.lines,linewidth=lw)
+   #  plt.legend(loc='best')
+   #  plt.show()
+   #  exit()
+
+
+
     # ----shutters alpha beta
-    # alpha_beta_shutter = pd.read_csv('stats/ab_shutter_stochastic_080818_6boards.csv')
-    alpha_beta_shutter = pd.read_csv('stats/ab_config_shutter_cogsci_stochastic_100818_noise05_10boards.csv')
 
-    max_vals = alpha_beta_shutter['max_moves'].unique()
-    k_vals = alpha_beta_shutter['shutter_size'].unique()
-    boards = alpha_beta_shutter['board'].unique()
+ # #
+ # #    # # non-linear and blockign heuristics data
+ # #    # heuristic_name = 'interaction'
+ # #    # for k in ['k7']:
+ # #    #     first = True
+ # #    #     for filename in os.listdir('stats/ab_pareto/' + heuristic_name):
+ # #    #         if k in filename:
+ # #    #             if first:
+ # #    #                 print filename
+ # #    #                 alpha_beta_shutter = pd.read_csv('stats/ab_pareto/' + heuristic_name + '/' + filename)
+ # #    #                 first = False
+ # #    #             else:
+ # #    #                 print filename
+ # #    #                 new_df = pd.read_csv('stats/ab_pareto/' + heuristic_name + '/' + filename)
+ # #    #                 alpha_beta_shutter = alpha_beta_shutter.append(copy.deepcopy(new_df))
+ # #    #     alpha_beta_shutter.to_csv('stats/ab_pareto/' + heuristic_name + '_' + k + '_agg.csv')
+ # #    #
+ # #    # exit()
+ # #
+ # # #    # alpha_beta_shutter = pd.read_csv('stats/ab_shutter_stochastic_080818_6boards.csv')
+ # # #    # alpha_beta_shutter = pd.read_csv('stats/ab_config_shutter_cogsci_110818_allBoards_moveLimit.csv')
+ # # #    # # alpha_beta_shutter = pd.read_csv('stats/ab_config_shutter_cogsci_120818_allBoards_limitHeuristic.csv')
+ # # #    # alpha_beta_shutter = pd.read_csv('stats/ab_config_shutter_cogsci_130818_allBoards_limitHeuristicLimitMoves.csv')
+ # #    # alpha_beta_shutter_k3 = pd.read_csv('stats/ab_pareto/ab_tradeoff_allBoards_moveLimit_agg_k3.csv')
+ # #    # alpha_beta_shutter_k5 = pd.read_csv('stats/ab_pareto/ab_tradeoff_allBoards_moveLimit_agg_k5.csv')
+ # #    # alpha_beta_shutter_k10 = pd.read_csv('stats/ab_pareto/ab_tradeoff_allBoards_moveLimit_agg_k10.csv')
+ #    alpha_beta_shutter_k3 = pd.read_csv('stats/ab_pareto/ab_tradeoff_allBoards_moveLimit_agg_k3_noiseAnalysis.csv')
+ #    alpha_beta_shutter_k5 = pd.read_csv('stats/ab_pareto/ab_tradeoff_allBoards_moveLimit_agg_k5_noiseAnalysis.csv')
+ #    alpha_beta_shutter_k10 = pd.read_csv('stats/ab_pareto/ab_tradeoff_allBoards_moveLimit_agg_k10_noiseAnalysis.csv')
+ #    alpha_beta_shutter_k7 = pd.read_csv('stats/ab_pareto/interaction_k7_agg.csv')
+ # #    alpha_beta_shutter_k3 = pd.read_csv('stats/ab_pareto/nonlinear_k3_agg.csv')
+ # #    alpha_beta_shutter_k5 = pd.read_csv('stats/ab_pareto/nonlinear_k5_agg.csv')
+ # #    alpha_beta_shutter_k10 = pd.read_csv('stats/ab_pareto/nonlinear_k10_agg.csv')
+ # # # #    # print alpha_beta_shutter_k3.columns.values
+ # # # #    # print alpha_beta_shutter_k5.columns.values
+ # # # #    # print alpha_beta_shutter_k10.columns.values
+ #    frames = [alpha_beta_shutter_k3, alpha_beta_shutter_k5, alpha_beta_shutter_k7, alpha_beta_shutter_k10]
+ #    # frames = [alpha_beta_shutter_k10, alpha_beta_shutter_k5]
+ #    alpha_beta_shutter = pd.concat(frames, sort=False)
+ # #
+ # #
+ #
+ #    # inverse_computation = alpha_beta_shutter['numberOfHeuristicComp'].apply(lambda x: 1.0/x)
+ #    # alpha_beta_shutter_pareto['inverse_computation'] = inverse_computation
+ #
+ #    aggregations = {
+ #        'correct': ['mean','sem'],
+ #        'numberOfHeuristicComp':['mean','sem']
+ #    }
+ #    # for board in
+ #    # alpha_beta_shutter = alpha_beta_shutter.loc[alpha_beta_shutter['board'].isin(['10_medium_full'])]
+ #    alpha_beta_shutter_pareto = alpha_beta_shutter.groupby(['max_moves','noise_sig','k','shutter_size','board']).agg(aggregations).reset_index()
+ #    # print alpha_beta_shutter_pareto.columns.values
+ #    alpha_beta_shutter_pareto.columns = ['max_moves','noise_sig','k','shutter_size','board','numberOfHeuristicComp', 'numberOfHeuristicComp_sem', 'correct', 'correct_sem']
+ #    # print alpha_beta_shutter_pareto.columns.values
+ #    # alpha_beta_shutter_pareto = alpha_beta_shutter_pareto.loc[(alpha_beta_shutter_pareto['board'] == '6_easy_full') | (alpha_beta_shutter_pareto['board'] == '6_easy_pruned')]
+ # #    alpha_beta_shutter_pareto.map({"('max_moves', '')":'max_moves', "('noise_sig', '') ('k', '')":'noise_sig' ('shutter_size', '')
+ # # ('board', '') ('numberOfHeuristicComp', 'mean')})
+ # # ('numberOfHeuristicComp', 'sem') ('correct', 'mean') ('correct', 'sem')])
+ #    inverse_computation = alpha_beta_shutter_pareto['numberOfHeuristicComp'].apply(lambda x: 1.0/x)
+ #    alpha_beta_shutter_pareto['inverse_computation'] = inverse_computation
+ #
+ #    inverse_computation_all = alpha_beta_shutter['numberOfHeuristicComp'].apply(lambda x: 1.0/x)
+ #    alpha_beta_shutter['inverse_computation'] = inverse_computation_all
+ #
+ #    # pareto board specific figures pnas
+ #    alpha_beta_tradeoff_config = alpha_beta_shutter.loc[(alpha_beta_shutter['max_moves']==30) & (alpha_beta_shutter['noise_sig']==0.5) & (alpha_beta_shutter['k']==5) & (alpha_beta_shutter['board']=='6_easy_full')]
+ #    first = True
+ #    for i in range(1):
+ #
+ #        alpha_beta_tradeoff_config = alpha_beta_shutter.loc[(alpha_beta_shutter['max_moves']==30) & (alpha_beta_shutter['noise_sig']==0.5) & (alpha_beta_shutter['k']==5) & (alpha_beta_shutter['board']=='6_easy_full')]
+ #        alpha_beta_tradeoff_config_sub = alpha_beta_tradeoff_config.sample(frac=1.0)
+ #        alpha_beta_shutter_pareto_config_sub = alpha_beta_tradeoff_config_sub.groupby(['shutter_size']).agg(aggregations).reset_index()
+ #        alpha_beta_shutter_pareto_config_sub.columns = ['shutter_size','numberOfHeuristicComp', 'numberOfHeuristicComp_sem', 'correct', 'correct_sem']
+ #        # print alpha_beta_shutter_pareto_config_sub['numberOfHeuristicComp'].values
+ #        inverse_computation_sub = alpha_beta_shutter_pareto_config_sub['numberOfHeuristicComp'].apply(lambda x: 1.0/x)
+ #        # inverse_computation_sub = alpha_beta_shutter_pareto_config_sub['numberOfHeuristicComp'].apply(lambda x: 1-(x/alpha_beta_shutter_pareto_config_sub['numberOfHeuristicComp'].values.max()))
+ #        alpha_beta_shutter_pareto_config_sub['inverse_computation_sub'] = copy.deepcopy(inverse_computation_sub)
+ #        if first:
+ #            alpha_beta_tradeoff_config_pareto = copy.deepcopy(alpha_beta_shutter_pareto_config_sub)
+ #            first = False
+ #        else:
+ #            alpha_beta_tradeoff_config_pareto = alpha_beta_tradeoff_config_pareto.append(alpha_beta_shutter_pareto_config_sub)
+ #    alpha_beta_no_tradeoff_config = alpha_beta_shutter_pareto.loc[(alpha_beta_shutter_pareto['max_moves']==30) & (alpha_beta_shutter_pareto['noise_sig']==0.5) & (alpha_beta_shutter_pareto['k']==5) & (alpha_beta_shutter_pareto['board']=='6_hard_full')]
+ #
+ #    alpha_beta_no_tradeoff_config_all = alpha_beta_shutter.loc[(alpha_beta_shutter['max_moves']==30) & (alpha_beta_shutter['noise_sig']==0.5) & (alpha_beta_shutter['k']==5) & (alpha_beta_shutter['board']=='6_hard_full')]
+ #    # # alpha_beta_no_tradeoff_config.to_csv('stats/tradeoff_example.csv')
+ #    # # alpha_beta_no_tradeoff_config = pd.read_csv('stats/tradeoff_example.csv')
+ #    # inverse_computation_sub = alpha_beta_no_tradeoff_config['numberOfHeuristicComp'].apply(lambda x: 1-(x/alpha_beta_no_tradeoff_config['numberOfHeuristicComp'].values.max()))
+ #    # # # inverse_computation_sub = alpha_beta_shutter_pareto_config_sub['numberOfHeuristicComp'].apply(lambda x: 1-(x/alpha_beta_shutter_pareto_config_sub['numberOfHeuristicComp'].values.max()))
+ #    alpha_beta_no_tradeoff_config['inverse_computation'] = alpha_beta_no_tradeoff_config['numberOfHeuristicComp'].apply(lambda x: 1-(x/alpha_beta_no_tradeoff_config['numberOfHeuristicComp'].values.max()))
+ #    alpha_beta_no_tradeoff_config_all['inverse_computation'] = alpha_beta_no_tradeoff_config_all['numberOfHeuristicComp'].apply(lambda x: 1.0-(float(x)/alpha_beta_no_tradeoff_config_all['numberOfHeuristicComp'].values.max()))
+ #
+ #
+ #    # for index, row in alpha_beta_no_tradeoff_config_all.iterrows():
+ #
+ #
+ #    aggregations = {
+ #        'correct': ['mean','sem'],
+ #        'inverse_computation':['mean','sem']
+ #    }
+ #    # for board in
+ #    # alpha_beta_shutter = alpha_beta_shutter.loc[alpha_beta_shutter['board'].isin(['10_medium_full'])]
+ #    alpha_beta_shutter_pareto_no_tradeoff = alpha_beta_no_tradeoff_config_all.groupby(['shutter_size']).agg(aggregations).reset_index()
+ #    # alpha_beta_shutter_pareto_no_tradeoff.columns = ['shutter_size','inverseComputationMean', 'inverseComputationSem', 'correct', 'correct_sem']
+ #
+ #    sns.set(font_scale=1.2, style='whitegrid')
+ #    sns.set(style='whitegrid')
+ #
+ #    sns.set(rc={"font.style":"normal",
+ #                "axes.facecolor":(0.9, 0.9, 0.9),
+ #                "figure.facecolor":'white',
+ #                "grid.color":'black',
+ #                "grid.linestyle":':',
+ #                "axes.grid":True,
+ #                'axes.labelsize':30,
+ #                'figure.figsize':(20.0, 10.0),
+ #                'xtick.labelsize':25,
+ #                'ytick.labelsize':20})
+ #    sns.set(style='whitegrid')
+ #    # ax = sns.lmplot(x="inverse_computation", y="correct", hue='shutter_size', data=alpha_beta_no_tradeoff_config,  fit_reg=False, scatter_kws={"s": 70}, size=5, aspect=1, palette='colorblind')
+ #    # ax.set(xticklabels=[0,0.5,1.0])
+ #    # plt.xlim(-0.05,1)
+ #    colors = sns.color_palette("hls", 4)
+ #
+ #    x = alpha_beta_shutter_pareto_no_tradeoff[('inverse_computation','mean')]
+ #    print x
+ #    y = alpha_beta_shutter_pareto_no_tradeoff[('correct','mean')]
+ #    print y
+ #    x_err = alpha_beta_shutter_pareto_no_tradeoff[('inverse_computation','sem')]
+ #    print x_err
+ #    y_err = alpha_beta_shutter_pareto_no_tradeoff[('correct','sem')]
+ #    print y_err
+ #    # plt.show()
+ #    figure, axs = plt.subplots(2,1,figsize=(4.5,5))
+ #
+ #    # plt.figure(figsize=(4,2))
+ #    # plt.errorbar(x, y, yerr=y_err, xerr=x_err,
+ #    #         capthick=2, fmt='none', ecolor='#B2BABB',zorder=1)
+ #    plt.subplot(2,1,1)
+ #    for i in range(4):
+ #        plt.errorbar(x[i], y[i], xerr=x_err[i], yerr=y_err[i], lw=2, capsize=5, capthick=2, color=colors[i],zorder=1)
+ #
+ #    # plt.scatter(x, y, s=20, color=colors)
+ #    # ax = sns.scatterplot(x="inverse_computation", y="correct", hue='shutter_size', data=alpha_beta_no_tradeoff_config)
+ #    # plt.ylim(0,1)
+ #    # plt.xlim(-0.05,1)
+ #    # plt.show()
+ #
+ #    color_dict = {0: colors[0], 0.5: colors[1], 1: colors[2], 2: colors[3]}
+ #    alpha_beta_no_tradeoff_config['color'] = alpha_beta_no_tradeoff_config['shutter_size'].apply(lambda x: color_dict[x])
+ #
+ #
+ #    # plt.show()
+ #    # fig = plt.figure()
+ #
+ #
+ #
+ #    # figure, axs = plt.subplots(2,1,figsize=(3.5,5))
+ #    # fig = plt.subplot(2,1,1)
+ #    #
+ #    # ax = sns.regplot(x="inverse_computation", y="correct", data=alpha_beta_no_tradeoff_config,  fit_reg=False, scatter_kws={"s": 70, 'facecolors':alpha_beta_no_tradeoff_config['color']})
+ #    #
+ #    #
+ #    # legend_elements = [Line2D([0], [0], marker='o', color='w', label='0',
+ #    #                   markerfacecolor=color_dict[0], markersize=10),
+ #    #                Line2D([0], [0], marker='o', color='w', label='0.5',
+ #    #                   markerfacecolor=color_dict[0.5], markersize=10),
+ #    #               Line2D([0], [0], marker='o', color='w', label='1',
+ #    #                   markerfacecolor=color_dict[1], markersize=10),
+ #    #                Line2D([0], [0], marker='o', color='w', label='2',
+ #    #                   markerfacecolor=color_dict[2], markersize=10)]
+ #    # fig.legend(labels=['shutter=0','shutter=0.5','shutter=1','shutter=2'], handles=legend_elements)
+ #    # ax.legend(loc="best")
+ #    # # plt.show()
+ #    # ax.set_xlabel('Computation', fontsize=14)
+ #    # ax.set_ylabel('Correctness', fontsize=14)
+ #    # ax.tick_params(labelsize=12)
+ #    alpha_beta_tradeoff_config = alpha_beta_shutter_pareto.loc[(alpha_beta_shutter_pareto['max_moves']==30) & (alpha_beta_shutter_pareto['noise_sig']==0.5) & (alpha_beta_shutter_pareto['k']==5) & (alpha_beta_shutter_pareto['board']=='6_easy_full')]
+ #
+ #    alpha_beta_tradeoff_config_all = alpha_beta_shutter.loc[(alpha_beta_shutter['max_moves']==30) & (alpha_beta_shutter['noise_sig']==0.5) & (alpha_beta_shutter['k']==5) & (alpha_beta_shutter['board']=='6_easy_full')]
+ #
+ #    # inverse_computation_sub = alpha_beta_tradeoff_config['numberOfHeuristicComp'].apply(lambda x: 1-(x/alpha_beta_no_tradeoff_config['numberOfHeuristicComp'].values.max()))
+ #    # inverse_computation_sub = alpha_beta_shutter_pareto_config_sub['numberOfHeuristicComp'].apply(lambda x: 1-(x/alpha_beta_shutter_pareto_config_sub['numberOfHeuristicComp'].values.max()))
+ #    alpha_beta_tradeoff_config['inverse_computation'] = alpha_beta_tradeoff_config['numberOfHeuristicComp'].apply(lambda x: 1-(x/alpha_beta_tradeoff_config['numberOfHeuristicComp'].values.max()))
+ #    alpha_beta_tradeoff_config_all['inverse_computation'] = alpha_beta_tradeoff_config_all['numberOfHeuristicComp'].apply(lambda x: 1.0-(float(x)/alpha_beta_tradeoff_config_all['numberOfHeuristicComp'].values.max()))
+ #
+ #    alpha_beta_shutter_pareto_tradeoff = alpha_beta_tradeoff_config_all.groupby(['shutter_size']).agg(aggregations).reset_index()
+ #    colors = sns.color_palette("hls", 4)
+ #    color_dict = {0: colors[0], 0.5: colors[1], 1: colors[2], 2: colors[3]}
+ #    alpha_beta_tradeoff_config['color'] = alpha_beta_tradeoff_config['shutter_size'].apply(lambda x: color_dict[x])
+ #
+ #    x = alpha_beta_shutter_pareto_tradeoff[('inverse_computation','mean')]
+ #    print x
+ #    y = alpha_beta_shutter_pareto_tradeoff[('correct','mean')]
+ #    print y
+ #    x_err = alpha_beta_shutter_pareto_tradeoff[('inverse_computation','sem')]
+ #    print x_err
+ #    y_err = alpha_beta_shutter_pareto_tradeoff[('correct','sem')]
+ #    print y_err
+ #    # plt.show()
+ #    # plt.figure(figsize=(4,2))
+ #    # plt.errorbar(x, y, yerr=y_err, xerr=x_err,
+ #    #         capthick=2, fmt='none', ecolor='#B2BABB',zorder=1)
+ #    fig = plt.subplot(2,1,2)
+ #    fig.tick_params(axis='both', which='major', labelsize=10)
+ #    for i in range(4):
+ #        plt.errorbar(x[i], y[i], xerr=x_err[i], yerr=y_err[i], lw=2, capsize=5, capthick=2, color=colors[i],zorder=1)
+ #
+ #    # plt.subplot(1,2,2)
+ #    # plt.figure(figsize=(3,3))
+ #    # ax = sns.lmplot(x="inverse_computation", y="correct", hue='shutter_size', data=alpha_beta_tradeoff_config,  fit_reg=False, scatter_kws={"s": 70}, size=5, aspect=1, palette='colorblind')
+ #
+ #    # fig = plt.figure()
+ #    # fig = plt.subplot(2,1,2)
+ #    # ax = sns.regplot(x="inverse_computation", y="correct", data=alpha_beta_tradeoff_config,  fit_reg=False, scatter_kws={"s": 70, 'facecolors':alpha_beta_tradeoff_config['color']})
+ #    # ax.set_xlabel('Computation', fontsize=14)
+ #    # ax.set_ylabel('Correctness', fontsize=14)
+ #    # ax.tick_params(labelsize=12)
+ #    # legend_elements = [Line2D([0], [0], marker='o', color='w', label='0',
+ #    #                   markerfacecolor=color_dict[0], markersize=10),
+ #    #                Line2D([0], [0], marker='o', color='w', label='0.5',
+ #    #                   markerfacecolor=color_dict[0.5], markersize=10),
+ #    #               Line2D([0], [0], marker='o', color='w', label='1',
+ #    #                   markerfacecolor=color_dict[1], markersize=10),
+ #    #                Line2D([0], [0], marker='o', color='w', label='2',
+ #    #                   markerfacecolor=color_dict[2], markersize=10)]
+ #    # fig.legend(labels=['shutter=0','shutter=0.5','shutter=1','shutter=2'], handles=legend_elements)
+ #    # fig.legend(loc=2)
+ #    # # plt.savefig("stats/pareto/grid_pareto_170818.png", format='png')
+ #    # # plt.ylim(0.25,0.3)
+ #    # # plt.xlim(0,0.015)
+ #    # # plt.xlim(-0.05,1)
+ #    plt.tight_layout(pad=2.5)
+ #    # plt.rcParams.update({'font.size': 20})
+ #    # plt.rc('xtick', labelsize=20)
+ #    # plt.rc('ytick', labelsize=20)
+ #    plt.show()
+ #    exit()
+ # #
+ # #    # exit()
+ #    move_limits = alpha_beta_shutter_pareto['max_moves'].unique()
+ #    # move_limits = [30,50,100]
+ #    noise_vals = alpha_beta_shutter_pareto['noise_sig'].unique()
+ #    # noise_vals = [0.5,1.0,1.5,2.0,2.5]
+ #    k_vals = alpha_beta_shutter_pareto['k'].unique()
+ #    # k_vals = [3,5,10]
+ #    shutter_sizes = alpha_beta_shutter_pareto['shutter_size'].unique()
+ #    boards = alpha_beta_shutter_pareto['board'].unique()
+ #    out = []
+ #    moves = []
+ #    noises = []
+ #    boards_df = []
+ #    shutters = []
+ #    corrects = []
+ #    comp = []
+ #    ks = []
+ #    for m in move_limits:
+ #        for n in noise_vals:
+ #            for k in k_vals:
+ #                for b in boards:
+ #                    alpha_beta_shutter_pareto_conf = alpha_beta_shutter_pareto.loc[(alpha_beta_shutter_pareto['max_moves']==m) & (alpha_beta_shutter_pareto['noise_sig']==n) & (alpha_beta_shutter_pareto['k']==k)& (alpha_beta_shutter_pareto['board']==b)]
+ #                    # if alpha_beta_shutter_pareto_conf.shape[0] == 0:
+ #                    #     continue
+ #                    for i in range(len(shutter_sizes)):
+ #                        dominated = False
+ #                        shutter_data_i = alpha_beta_shutter_pareto_conf.loc[alpha_beta_shutter_pareto_conf['shutter_size'] == shutter_sizes[i]]
+ #                        if shutter_data_i.shape[0] == 0:
+ #                            print 'problem'
+ #                        i_comp_s = shutter_data_i['inverse_computation'].iloc[0]
+ #                        i_comp_s_raw = shutter_data_i['numberOfHeuristicComp'].iloc[0]
+ #                        i_comp_s_upper = shutter_data_i['numberOfHeuristicComp'].iloc[0] + 1.*shutter_data_i['numberOfHeuristicComp_sem'].iloc[0]
+ #                        i_comp_s_lower = shutter_data_i['numberOfHeuristicComp'].iloc[0] - 1.*shutter_data_i['numberOfHeuristicComp_sem'].iloc[0]
+ #                        i_correct_s = shutter_data_i['correct'].iloc[0]
+ #                        i_correct_s_upper = shutter_data_i['correct'].iloc[0] + 1.*shutter_data_i['correct_sem'].iloc[0]
+ #                        i_correct_s_lower = shutter_data_i['correct'].iloc[0] - 1.*shutter_data_i['correct_sem'].iloc[0]
+ #                        for j in range(len(shutter_sizes)):
+ #                            if j!=i:
+ #                                shutter_data_j = alpha_beta_shutter_pareto_conf.loc[alpha_beta_shutter_pareto_conf['shutter_size'] == shutter_sizes[j]]
+ #                                if shutter_data_j.shape[0] == 0:
+ #                                    print 'problem'
+ #                                j_comp_s = shutter_data_j['inverse_computation'].iloc[0]
+ #                                j_comp_s_raw = shutter_data_j['numberOfHeuristicComp'].iloc[0]
+ #                                j_comp_s_upper = shutter_data_j['numberOfHeuristicComp'].iloc[0] + 1.*shutter_data_j['numberOfHeuristicComp_sem'].iloc[0]
+ #                                j_comp_s_lower = shutter_data_j['numberOfHeuristicComp'].iloc[0] - 1.*shutter_data_j['numberOfHeuristicComp_sem'].iloc[0]
+ #                                j_correct_s = shutter_data_j['correct'].iloc[0]
+ #                                j_correct_s_upper = shutter_data_j['correct'].iloc[0] + 1.*shutter_data_j['correct_sem'].iloc[0]
+ #                                j_correct_s_lower = shutter_data_j['correct'].iloc[0] - 1.*shutter_data_j['correct_sem'].iloc[0]
+ #                                if i_comp_s_lower >= j_comp_s_upper:
+ #                                     if not (i_correct_s_lower >= j_correct_s_upper):
+ #                                        dominated = True
+ #                                elif i_correct_s_upper <= j_correct_s_lower:
+ #                                    if not i_comp_s_upper <= j_comp_s_lower:
+ #                                        dominated = True
+ #                                # elif shutter_sizes[i] == 2.0:
+ #                                #     print 'large shutter'
+ #                        if not dominated:
+ #                            # if shutter_sizes[i] == 2.0:
+ #                            #     print 'large shutter'
+ #                            moves.append(m)
+ #                            noises.append(n)
+ #                            ks.append(k)
+ #                            boards_df.append(b)
+ #                            shutters.append(shutter_sizes[i])
+ #                            corrects.append(i_correct_s)
+ #                            comp.append(i_comp_s)
+ #                        # else:
+ #                        #     print 'removing shutter ' + str(shutter_sizes[i])
+ #                            # if
+ #
+ #    data_dict = {'move_limit': moves, 'noise': noises, 'board': boards_df, 'shutter_size': shutters, 'correct': corrects, 'inverse_computation': comp, 'k': ks}
+ #    data_df = pd.DataFrame(data_dict)
+ #
+ #    # alpha_beta_shutter_pareto.to_csv('stats/ab_pareto_no_board.csv')
+ #    # alpha_beta_shutter_pareto = pd.read_csv('stats/ab_pareto_no_board.csv')
+ #
+ #    # data_df.to_csv('stats/filtered_pareto_tradeoffs.csv')
+ #    # data_df = pd.read_csv('stats/filtered_pareto_tradeoffs.csv')
+ # #
+ #    data_df.to_csv('stats/pareto_interaction_all.csv')
+ #    data_df = pd.read_csv('stats/pareto_interaction_all.csv')
+ # # #
+ # # # #    # # plot alpha-beta
+ # # # #    # ax = sns.lmplot(x="inverse_computation", y="correct", hue='shutter_size', col='board', col_wrap=2, data=data_df, fit_reg=False)
+ # # # #    # plt.savefig("stats/pareto/grid_pareto_170818.png", format='png')
+ # # # #    # plt.ylim(0,1)
+ # # # #    # plt.xlim(0,0.03)
+ # # # #    # plt.show()
+ # # # #
+ # # # #    # compute pareto stats to see whether there is tradeoff or not
+ # # # #
+ #    pareto_tradeoffs_df = data_df.groupby(['move_limit','noise','k','board']).shutter_size.nunique().reset_index()
+ #    pareto_tradeoffs_df.columns = ['move_limit','noise','k','board','tradeoff']
+ #    pareto_tradeoffs_df['tradeoff'] = pareto_tradeoffs_df['tradeoff'].apply(lambda x: min(x-1,1))
+ #    pareto_tradeoffs_df.to_csv('stats/pareto_tradeoffs_interaction_all.csv')
+ # # # #
+ # # #
+ #    exit()
+ # #
+ #    alpha_beta_shutter_pareto = pd.read_csv('stats/pareto_tradeoffs_nonlinear100.csv')
+ #    alpha_beta_shutter_pareto = pd.read_csv('stats/pareto_tradeoffs_blocking.csv')
+ #    alpha_beta_shutter_pareto= pd.read_csv('stats/pareto_tradeoffs_noiseAnalysisAll.csv')
+ #    alpha_beta_shutter_pareto= pd.read_csv('stats/pareto_tradeoffs_interaction_all.csv')
+ #    # alpha_beta_shutter_pareto_with_complexity = pd.read_csv('stats/pareto_noises_test2.csv')
+ #    alpha_beta_shutter_pareto_noises = alpha_beta_shutter_pareto.groupby(['board', 'noise']).tradeoff.mean().reset_index()
+ #    alpha_beta_shutter_pareto_noises.to_csv('stats/pareto_noises_interaction_all.csv')
+ #    # alpha_beta_shutter_pareto_noises.to_csv('stats/pareto_noises_test2.csv')
+ #    # alpha_beta_shutter_pareto_noises.to_csv('stats/pareto_noises_test2_blocking.csv')
+ #    exit()
+ #    # alpha_beta_shutter_pareto_noises = pd.merge(alpha_beta_shutter_pareto_noises, alpha_beta_shutter_pareto_with_complexity[['board','complexity']], on = 'board', how = 'left')
+ #    alpha_beta_shutter_pareto_noises.to_csv('stats/pareto_noises_test2.csv')
+ #    exit()
+ #    alpha_beta_shutter_pareto = pd.read_csv('stats/pareto_tradeoffs_noiseAnalysisCI.csv')
+ #    alpha_beta_shutter_pareto_noises = alpha_beta_shutter_pareto.groupby(['board', 'noise']).tradeoff.mean().reset_index()
+    # alpha_beta_shutter_pareto_noises.to_csv('stats/pareto_noises_test_CI.csv')
+    # alpha_beta_shutter_pareto_noises = pd.read_csv('stats/pareto_noises_interaction_all.csv')
+    # alpha_beta_shutter_pareto_noises = pd.read_csv('stats/pareto_noises_test2_blocking.csv')
+    # alpha_beta_shutter_pareto_noises = alpha_beta_shutter_pareto_noises.loc[alpha_beta_shutter_pareto_noises['moves']!=200]
+    # result = alpha_beta_shutter_pareto_noises.pivot(index='noise', columns='complexity', values='tradeoff')
+    # grid_x, grid_y = np.mgrid[0:100000:100j, 0:2.5:100j]
+    # result2 = copy.deepcopy(result)
+    # result_mat = result2.as_matrix()
+    # result_mat2 = copy.deepcopy(result_mat)
+    # # guassian_kernel = []
+    # for r in range(len(result_mat)):
+    #     for c in range(len(result_mat[r])):
+    #         sum_vals = result_mat[r][c]
+    #         counts = 1.0
+    #         if r+1 < len(result_mat)-1:
+    #             sum_vals+=result_mat[r+1][c]
+    #             counts += 1
+    #             if c+1 < len(result_mat)-1:
+    #                 sum_vals+=result_mat[r+1][c]
+    #                 counts += 1
+    #             if c-1 > 0:
+    #                 sum_vals+=result_mat[r+1][c-1]
+    #                 counts += 1
+    #         if r-1 > 0:
+    #             sum_vals+=result_mat[r-1][c]
+    #             counts += 1
+    #             if c+1 < len(result_mat)-1:
+    #                 sum_vals+=result_mat[r-1][c]
+    #                 counts += 1
+    #             if c-1 > 0:
+    #                 sum_vals+=result_mat[r-1][c-1]
+    #                 counts += 1
+    #         if c+1 < len(result_mat)-1:
+    #             print c+1
+    #             sum_vals+=result_mat[r][c+1]
+    #             counts += 1
+    #         if c-1 > 0:
+    #             sum_vals+=result_mat[r][c-1]
+    #             counts += 1
+    #         result_mat2[r][c] = sum_vals/counts
 
-    # alpha_beta_shutter_0 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 0) & (alpha_beta_shutter['board'] == '6_hard_full')]
-    # alpha_beta_shutter_1 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 1) & (alpha_beta_shutter['board'] == '6_hard_full')]
-    # alpha_beta_shutter_2 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 2) & (alpha_beta_shutter['board'] == '6_hard_full')]
-    # print bootstrap_t_pvalue(alpha_beta_shutter_0['correct'].values, alpha_beta_shutter_1['correct'].values)
-    # print bootstrap_t_pvalue(alpha_beta_shutter_0['correct'].values, alpha_beta_shutter_2['correct'].values)
-    # print bootstrap_t_pvalue(alpha_beta_shutter_1['correct'].values, alpha_beta_shutter_2['correct'].values)
-    for m in max_vals:
-        for board in boards:
-            for k in k_vals:
-                print 'board: ' + board + '; max moves=' + str(m) + '; shutter=' + str(k)
-                # print board
-                alpha_beta_shutter_k = alpha_beta_shutter.loc[(alpha_beta_shutter['max_moves'] == m) & (alpha_beta_shutter['shutter_size'] == k) & (alpha_beta_shutter['board'] == board)]
-                alpha_beta_shutter_k_shutter = alpha_beta_shutter_k.loc[alpha_beta_shutter_k['heuristic_name'] == 'shutter']
-                alpha_beta_shutter_k_heuristic = alpha_beta_shutter_k.loc[alpha_beta_shutter_k['heuristic_name'] == 'heuristic']
-                print 'correctness shutter: ' + str(bs.bootstrap(alpha_beta_shutter_k_shutter['correct'].values, stat_func=bs_stats.mean, is_pivotal=False))
-                # print 'correctness heuristic: ' + str(bs.bootstrap(alpha_beta_shutter_k_heuristic['correct'].values, stat_func=bs_stats.mean, is_pivotal=False))
-                print 'search size shutter: ' + str(bs.bootstrap(alpha_beta_shutter_k_shutter['numberOfNodes'].values, stat_func=bs_stats.mean, is_pivotal=False))
-                # print 'search size heuristic: ' + str(bs.bootstrap(alpha_beta_shutter_k_heuristic['numberOfNodes'].values, stat_func=bs_stats.mean, is_pivotal=False))
-    print 1/0
+
+    # for r in range(len(result_mat)):
+    #     for c in range(len(result_mat[r])):
+    #         for guas in guassian_kernel:
+    #             result_mat[r][c] += guas[r][c]
+
+    # grid_z2 = griddata((alpha_beta_shutter_pareto_noises['complexity'].unique(), alpha_beta_shutter_pareto_noises['noise'].unique()), result_mat, (grid_x, grid_y), method='cubic')
+    # plt.subplot(2,1,1)
+    # plt.figure(figsize=(4,4))
+    # ax = sns.heatmap(result, annot=False, fmt="g", cmap='coolwarm', square=True)
+    # ax.set_xlabel('Complexity', fontsize=16)
+    # ax.set_ylabel('Noise', fontsize=16)
+    # ax.tick_params(labelsize=10)
+    # ax.set_xticklabels(ax.get_xticklabels(), rotation=60)
+    # ax.set_yticklabels(ax.get_yticklabels(), rotation=60)
+    # # plt.subplot(2,1,2)
+    # # sns.heatmap(result_mat2, annot=False, fmt="g", cmap='coolwarm')
+    # plt.show()
+    # exit()
+    # # x, y, z = np.random.rand(3, 100)
+    # cmap = sns.cubehelix_palette(as_cmap=True)
+
+    #
+    # f, ax = plt.subplots()
+    # points = ax.scatter(alpha_beta_shutter_pareto_noises['complexity'].values, alpha_beta_shutter_pareto_noises['noise'].values, c=alpha_beta_shutter_pareto_noises['tradeoff'].values, s=100, cmap='coolwarm')
+    # f.colorbar(points)
+    # ax.set_xscale('log')
+    # plt.show()
+    # exit()
+
+    #
+    # max_vals = alpha_beta_shutter['max_moves'].unique()
+    # k_vals = alpha_beta_shutter['shutter_size'].unique()
+    # noise_vals = alpha_beta_shutter['noise_sig'].unique()
+    # boards = alpha_beta_shutter['board'].unique()
+    #
+    #
+    #
+    #
+    # # alpha_beta_shutter_0 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 0) & (alpha_beta_shutter['board'] == '6_hard_full')]
+    # # alpha_beta_shutter_1 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 1) & (alpha_beta_shutter['board'] == '6_hard_full')]
+    # # alpha_beta_shutter_2 = alpha_beta_shutter.loc[(alpha_beta_shutter['shutter_size'] == 2) & (alpha_beta_shutter['board'] == '6_hard_full')]
+    # # print bootstrap_t_pvalue(alpha_beta_shutter_0['correct'].values, alpha_beta_shutter_1['correct'].values)
+    # # print bootstrap_t_pvalue(alpha_beta_shutter_0['correct'].values, alpha_beta_shutter_2['correct'].values)
+    # # print bootstrap_t_pvalue(alpha_beta_shutter_1['correct'].values, alpha_beta_shutter_2['correct'].values)
+    # for m in max_vals:
+    #     for noise in noise_vals:
+    #         alpha_beta_shutter_filtered = alpha_beta_shutter.loc[(alpha_beta_shutter['max_moves'] == m) & (alpha_beta_shutter['noise_sig'] == noise)]
+    #         ax = sns.barplot(x = 'board', y = 'o_misses', hue="shutter_size",   n_boot=1000, data=alpha_beta_shutter_filtered)
+    #         plt.title('alpha_beta shutter - correctness: noise =' + str(noise) + '; max moves = '+str(m))
+    #         plt.show()
+    #     # for board in boards:
+    #     #     for k in k_vals:
+    #     #         print 'board: ' + board + '; max moves=' + str(m) + '; shutter=' + str(k)
+    #     #         # print board
+    #     #         alpha_beta_shutter_k = alpha_beta_shutter.loc[(alpha_beta_shutter['max_moves'] == m) & (alpha_beta_shutter['shutter_size'] == k) & (alpha_beta_shutter['board'] == board)]
+    #     #         alpha_beta_shutter_k_shutter = alpha_beta_shutter_k.loc[alpha_beta_shutter_k['heuristic_name'] == 'shutter']
+    #     #         alpha_beta_shutter_k_heuristic = alpha_beta_shutter_k.loc[alpha_beta_shutter_k['heuristic_name'] == 'heuristic']
+    #     #         print 'correctness shutter: ' + str(bs.bootstrap(alpha_beta_shutter_k_shutter['correct'].values, stat_func=bs_stats.mean, is_pivotal=False))
+    #     #         # print 'correctness heuristic: ' + str(bs.bootstrap(alpha_beta_shutter_k_heuristic['correct'].values, stat_func=bs_stats.mean, is_pivotal=False))
+    #     #         print 'search size shutter: ' + str(bs.bootstrap(alpha_beta_shutter_k_shutter['numberOfNodes'].values, stat_func=bs_stats.mean, is_pivotal=False))
+    #     #         # print 'search size heuristic: ' + str(bs.bootstrap(alpha_beta_shutter_k_heuristic['numberOfNodes'].values, stat_func=bs_stats.mean, is_pivotal=False))
+    # print 1/0
     # ------- shutter correlation blindness
-    players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
-    players = players_heuristics['userid'].unique()
-    players_data = dynamics.loc[(dynamics['userid'].isin(players))]
-    # moves = players_data.loc[(players_data['action'] == 'click')]
-    moves = pd.read_csv('stats/test_moves.csv')
-    search_sizes = moves.groupby(['userid'], as_index=False)['action'].count()
-    correct = moves.groupby(['userid'], as_index=False)['correct'].first()
-    moves = moves.loc[moves['open_path'] == True]
-    # moves.to_csv('stats/test_moves.csv')
-    shutter_means = moves.groupby(['userid'], as_index=False)['shutter'].mean()
-
-    shutter_medians = moves.groupby(['userid'], as_index=False)['shutter'].median()
-    # o_blindness_df = pd.read_csv('stats/blindness_metrics_players.csv')  # various noisy metrics
-    o_blindness_df = pd.read_csv('stats/o_blindness_misses.csv')  # missed wins metric
-    o_blindness_df = o_blindness_df.loc[o_blindness_df['player'] == 2]
-    shutter_blindness_df = pd.merge(o_blindness_df, shutter_means[['userid','shutter']], on = 'userid', how = 'left')
-    shutter_blindness_df = shutter_blindness_df.rename(columns={'shutter': 'shutter_mean'})
-    shutter_blindness_df = pd.merge(shutter_blindness_df, shutter_medians[['userid','shutter']], on = 'userid', how = 'left')
-    shutter_blindness_df = pd.merge(shutter_blindness_df, search_sizes[['userid','action']], on = 'userid', how = 'left')
-    shutter_blindness_df = pd.merge(shutter_blindness_df, correct[['userid','correct']], on = 'userid', how = 'left')
-    shutter_blindness_df = pd.merge(shutter_blindness_df, players_heuristics[['userid','fitted_heuristic']], on = 'userid', how = 'left')
+    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
+    # # players = players_heuristics['userid'].unique()
+    # players = cogsci_participants
+    # players_data = dynamics.loc[(dynamics['userid'].isin(players))]
+    # # moves = players_data.loc[(players_data['action'] == 'click')]
+    # moves = pd.read_csv('stats/test_moves.csv')
+    # search_sizes = moves.groupby(['userid'], as_index=False)['action'].count()
+    # correct = moves.groupby(['userid'], as_index=False)['correct'].first()
+    # moves = moves.loc[moves['open_path'] == True]
+    # # moves.to_csv('stats/test_moves.csv')
+    # shutter_means = moves.groupby(['userid'], as_index=False)['shutter'].mean()
+    #
+    # shutter_medians = moves.groupby(['userid'], as_index=False)['shutter'].median()
+    # # o_blindness_df = pd.read_csv('stats/blindness_metrics_players.csv')  # various noisy metrics
+    # o_blindness_df = pd.read_csv('stats/o_blindness_misses.csv')  # missed wins metric
+    #
+    # o_blindness_df = o_blindness_df.loc[o_blindness_df['player'] == 2]
+    #
+    # o_blindness_df['player'] = o_blindness_df['player'].apply(lambda x: 'X' if x==1 else 'O')
     # shutter_blindness_df = pd.merge(o_blindness_df, shutter_means[['userid','shutter']], on = 'userid', how = 'left')
     # shutter_blindness_df = shutter_blindness_df.rename(columns={'shutter': 'shutter_mean'})
     # shutter_blindness_df = pd.merge(shutter_blindness_df, shutter_medians[['userid','shutter']], on = 'userid', how = 'left')
     # shutter_blindness_df = pd.merge(shutter_blindness_df, search_sizes[['userid','action']], on = 'userid', how = 'left')
-    shutter_blindness_df = shutter_blindness_df.rename(columns={'shutter': 'shutter_median'})
-    shutter_blindness_df = shutter_blindness_df.rename(columns={'action': 'search_size'})
-
-    # shutter_blindness_df = shutter_blindness_df.loc[shutter_blindness_df['fitted_heuristic'] == 'blocking']
-    shutter_blindness_correct = shutter_blindness_df.loc[shutter_blindness_df['correct'] == 1]
-    shutter_blindness_wrong = shutter_blindness_df.loc[shutter_blindness_df['correct'] == 0]
-
-
-    print stats.pearsonr(shutter_blindness_df['shutter_mean'].values, shutter_blindness_df['missed_win'].values)
-    print stats.pearsonr(shutter_blindness_correct['shutter_mean'].values, shutter_blindness_correct['missed_win'].values)
-    print stats.pearsonr(shutter_blindness_wrong['shutter_mean'].values, shutter_blindness_wrong['missed_win'].values)
-    # print stats.pearsonr(shutter_blindness_df['o_prob_ratio_mean'].values, shutter_blindness_df['shutter_mean'].values)
-    # print stats.pearsonr(shutter_blindness_df['o_rank_mean'].values, shutter_blindness_df['shutter_mean'].values)
-    # print stats.pearsonr(shutter_blindness_correct['o_rank_mean'].values, shutter_blindness_correct['missed_win'].values)
-
-    # print stats.pearsonr(shutter_blindness_df['search_size'].values, shutter_blindness_df['o_prob_mean'].values)
-    # print stats.pearsonr(shutter_blindness_correct['search_size'].values, shutter_blindness_correct['o_prob_mean'].values)
-    # print stats.pearsonr(shutter_blindness_wrong['search_size'].values, shutter_blindness_wrong['o_prob_mean'].values)
+    # shutter_blindness_df = pd.merge(shutter_blindness_df, correct[['userid','correct']], on = 'userid', how = 'left')
+    # shutter_blindness_df = pd.merge(shutter_blindness_df, players_heuristics[['userid','fitted_heuristic']], on = 'userid', how = 'left')
+    # # shutter_blindness_df = pd.merge(o_blindness_df, shutter_means[['userid','shutter']], on = 'userid', how = 'left')
+    # # shutter_blindness_df = shutter_blindness_df.rename(columns={'shutter': 'shutter_mean'})
+    # # shutter_blindness_df = pd.merge(shutter_blindness_df, shutter_medians[['userid','shutter']], on = 'userid', how = 'left')
+    # # shutter_blindness_df = pd.merge(shutter_blindness_df, search_sizes[['userid','action']], on = 'userid', how = 'left')
+    # shutter_blindness_df = shutter_blindness_df.rename(columns={'shutter': 'shutter_median'})
+    # shutter_blindness_df = shutter_blindness_df.rename(columns={'action': 'search_size'})
+    #
+    #
+    # # shutter_blindness_df = shutter_blindness_df.loc[shutter_blindness_df['fitted_heuristic'] == 'blocking']
+    # shutter_blindness_correct = shutter_blindness_df.loc[shutter_blindness_df['correct'] == 1]
+    # shutter_blindness_wrong = shutter_blindness_df.loc[shutter_blindness_df['correct'] == 0]
+    # shutter_blindness_df['shutter_mean'] = shutter_blindness_df['shutter_mean'].apply(lambda x: x-1.0)
+    # shutter_blindness_df['mean_shutter_cat'] = pd.qcut(shutter_blindness_df['shutter_mean'], 3, labels=['narrow\n(0-0.2)','medium\n(0.2-0.5)','wide\n(0.5-2)'])
+    # print shutter_blindness_df.shape[0]
+    # cats = shutter_blindness_df['mean_shutter_cat'].unique()
+    # for i in range(len(cats)):
+    #     s = cats[i]
+    #     print s
+    #     blindness_cat = shutter_blindness_df.loc[shutter_blindness_df['mean_shutter_cat'] == s]
+    #     print blindness_cat.shape[0]
+    #     print bs.bootstrap(blindness_cat['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #     for j in range(i,len(cats)):
+    #         s2 = cats[j]
+    #         blindness_cat2 = shutter_blindness_df.loc[shutter_blindness_df['mean_shutter_cat'] == s2]
+    #         if s != s2:
+    #             print s2
+    #             # print bootstrap_t_pvalue(blindness_cat['missed_win'].values, blindness_cat2['missed_win'].values)
+    #             print stats.mannwhitneyu(blindness_cat['missed_win'].values, blindness_cat2['missed_win'].values)
+    #             print rank_biserial_effect_size(blindness_cat['missed_win'].values, blindness_cat2['missed_win'].values)
+    #         print s
+    #
+    #
+    #
+    # # #
+    # # # # print stats.pearsonr(shutter_blindness_df['mean_shutter_cat'].values, shutter_blindness_df['missed_win'].values)
+    # # # # figure 4 - shutter and correctness pnas
+    # shutter_blindness_df['missed_win_percent'] = shutter_blindness_df['missed_win'].apply(lambda x: x*100)
+    # f, axs = plt.subplots(1,3,figsize=(8.6,3), gridspec_kw = {'width_ratios':[2, 1, 2]})
+    # plt.subplot(1,3,3)
+    # ax = sns.barplot(x='mean_shutter_cat',y='missed_win_percent', ci=68, data=shutter_blindness_df)
+    # # ax.set(xlabel='Shutter', ylabel='Missed O Wins')
+    # ax.set_xlabel('Shutter size', fontsize=12)
+    # ax.set_ylabel("Prob. missed 'O' wins [%]", fontsize=12)
+    # ax.tick_params(labelsize=11)
+    # plt.ylim(0,100)
+    # # plt.show()
+    # # ax = sns.regplot(x='shutter_mean', y='missed_win', data=shutter_blindness_df, x_jitter=.1)
+    # # plt.show()
+    # print stats.pearsonr(shutter_blindness_correct['shutter_mean'].values, shutter_blindness_correct['missed_win'].values)
+    # print stats.pearsonr(shutter_blindness_wrong['shutter_mean'].values, shutter_blindness_wrong['missed_win'].values)
     # # print stats.pearsonr(shutter_blindness_df['o_prob_ratio_mean'].values, shutter_blindness_df['shutter_mean'].values)
     # # print stats.pearsonr(shutter_blindness_df['o_rank_mean'].values, shutter_blindness_df['shutter_mean'].values)
-    # print stats.pearsonr(shutter_blindness_correct['o_rank_mean'].values, shutter_blindness_correct['o_prob_mean'].values)
-    print 1/0
+    # # print stats.pearsonr(shutter_blindness_correct['o_rank_mean'].values, shutter_blindness_correct['missed_win'].values)
+    #
+    # # print stats.pearsonr(shutter_blindness_df['search_size'].values, shutter_blindness_df['o_prob_mean'].values)
+    # # print stats.pearsonr(shutter_blindness_correct['search_size'].values, shutter_blindness_correct['o_prob_mean'].values)
+    # # print stats.pearsonr(shutter_blindness_wrong['search_size'].values, shutter_blindness_wrong['o_prob_mean'].values)
+    # # # print stats.pearsonr(shutter_blindness_df['o_prob_ratio_mean'].values, shutter_blindness_df['shutter_mean'].values)
+    # # # print stats.pearsonr(shutter_blindness_df['o_rank_mean'].values, shutter_blindness_df['shutter_mean'].values)
+    # # print stats.pearsonr(shutter_blindness_correct['o_rank_mean'].values, shutter_blindness_correct['o_prob_mean'].values)
+    # # print 1/0
     # ------- shutter correlation blindness end
+
+    # --- shutter search size correlation (pnas)----
+    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
+    # players = players_heuristics['userid'].unique()
+    # # players_data = dynamics.loc[(dynamics['userid'].isin(cogsci_participants))]
+    # players_data = dynamics
+    # moves = players_data.loc[(players_data['action'] == 'click')]
+    # # moves = pd.read_csv('stats/test_moves.csv')
+    # search_sizes = moves.groupby(['userid'], as_index=False)['action'].count()
+    #
+    # # correct = moves.groupby(['userid'], as_index=False)['correct'].first()
+    # moves = moves.loc[moves['open_path'] == True]
+    # # moves.to_csv('stats/test_moves.csv')
+    # shutter_means = moves.groupby(['userid'], as_index=False)['shutter'].mean()
+    # shutter_means_players = shutter_means['userid'].unique()
+    # search_sizes = search_sizes.loc[(search_sizes['userid'].isin(shutter_means_players))]
+    # # shutter_means = shutter_means.loc[shutter_means['shutter'] is not np.nan]
+    #
+    # shutter_medians = moves.groupby(['userid'], as_index=False)['shutter'].median()
+    #
+    # shutter_search_df = pd.merge(search_sizes, shutter_means, on='userid', how='left')
+    # shutter_search_df = shutter_search_df.loc[shutter_search_df['shutter']<=1.5]
+    # shutter_search_df['shutter'] = shutter_search_df['shutter'].apply(lambda x: x+ np.random.normal(0, 0.02))
+    # shutter_search_df['action'] = shutter_search_df['action'].apply(lambda x: x+ np.random.normal(0, 0.02))
+    # # for idx, row in shutter_search_df.iterrows():
+    # #     row['shutter'] += np.random.normal(0, 0.1)
+    # #     row['action'] += np.random.normal(0, 0.1)
+    # # np.random.normal(0, 0.1)
+    # shutter_search_df1 = shutter_search_df.loc[shutter_search_df['shutter']==1.0]
+    # print shutter_search_df1.shape[0]
+    #
+    # # figure 4b --- moved to SI
+    # ax = sns.regplot(x='shutter', y='action', data=shutter_search_df)
+    # plt.show()
+    # print stats.pearsonr(shutter_search_df['action'].values, shutter_search_df['shutter'].values)
+    # print 1/0
+    # --- shutter search size correlation (pnas) end----
 
     # ----------o blindness - non-forced moves quality---------------
     # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
@@ -1408,90 +2099,90 @@ if __name__== "__main__":
 
 
     # ----------o blindness and correctness---------------
-    # compare blocking with blocking-blind, interaction with interaction-blind
-    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_allData_070818.csv')
-    players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
-    players = players_heuristics['userid'].unique()
-    players_data = dynamics.loc[(dynamics['userid'].isin(players))]
-    moves = players_data.loc[(players_data['action'] == 'click')]
-    misses = []
-    players = []
-    users = []
-    boards = []
-    distances = []
-    correct = []
-    open = []
-    heuristics_fitted = []
-    for index, row in moves.iterrows():
-        if row['top_possible_score'] == 100:
-            if row['score_move'] < 100:
-                misses.append(1)
-            else:
-                misses.append(0)
-            players.append(row['player'])
-            users.append(row['userid'])
-            boards.append(row['board_name'])
-            distances.append(row['shutter'])
-            open.append(row['open_path'])
-            correct.append(row['correct'])
-            player_heuristic = players_heuristics.loc[players_heuristics['userid'] == row['userid']]
-            heuristics_fitted.append(player_heuristic['fitted_heuristic'].iloc[0])
-
-    misses_data = {'userid': users,'board': boards, 'player':players, 'missed_win':misses, 'shutter':distances, 'open_path':open, 'correct': correct, 'fitted_heuristic': heuristics_fitted}
-    # misses_data = {'userid': users,'board': boards, 'player':players, 'missed_win':misses, 'correct': correct, 'fitted_heuristic': heuristics_fitted}
-    misses_data = pd.DataFrame(misses_data)
-    # misses_data.to_csv('stats/misses_data_all.csv')
-    print misses_data.shape[0]
-    # compute mean missed wins per player
-    missed_wins_averages = misses_data.groupby(['userid','player'], as_index=False)['missed_win'].mean()
-    missed_wins_averages.to_csv('stats/o_blindness_misses.csv')
-    misses_data = misses_data[['userid','board','shutter','fitted_heuristic','correct']]
-    # misses_data = misses_data[['userid','board','fitted_heuristic','correct']]
-    misses_data = misses_data.drop_duplicates(subset='userid', keep='first', inplace=False)
-    misses_data = pd.merge(missed_wins_averages, misses_data[['userid','board','shutter','fitted_heuristic','correct']], on = 'userid', how = 'left')
-    # misses_data = pd.merge(missed_wins_averages, misses_data[['userid','board','fitted_heuristic','correct']], on = 'userid', how = 'left')
-
-    # misses_data.to_csv('stats/misses_data_averages_all.csv')
-    print misses_data.shape[0]
-    misses_data = misses_data.loc[misses_data['fitted_heuristic'] == 'blocking']
-    # print missed_wins_averages['missed_win']
-    # for board in LOGFILE:
-    #     print '-----------------'
-    #     print board
-    #     misses_data_board = misses_data.loc[misses_data['board'] == board]
-    missed_wins_x_correct = misses_data.loc[(misses_data['player'] == 1)  & (misses_data['correct'] == 1)]
-    missed_wins_x_wrong = misses_data.loc[(misses_data['player'] == 1) & (misses_data['correct'] == 0)]
-    missed_wins_o_correct = misses_data.loc[(misses_data['player'] == 2)  & (misses_data['correct'] == 1)]
-    missed_wins_o_wrong = misses_data.loc[(misses_data['player'] == 2) & (misses_data['correct'] == 0)]
-    missed_wins_x = misses_data.loc[(misses_data['player'] == 1) ]
-    missed_wins_o = misses_data.loc[(misses_data['player'] == 2)]
-
-    print bs.bootstrap(missed_wins_x['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(missed_wins_o['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print '---'
-    print missed_wins_x_correct.shape[0]
-    if missed_wins_x_correct.shape[0] > 0:
-        print bs.bootstrap(missed_wins_x_correct['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print missed_wins_o_correct.shape[0]
-    if missed_wins_o_correct.shape[0] > 0:
-        print bs.bootstrap(missed_wins_o_correct['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print missed_wins_x_wrong.shape[0]
-    if missed_wins_x_wrong.shape[0] > 0:
-        print bs.bootstrap(missed_wins_x_wrong['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print missed_wins_o_wrong.shape[0]
-    if missed_wins_o_wrong.shape[0] > 0:
-        print bs.bootstrap(missed_wins_o_wrong['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-
-    print bootstrap_t_pvalue(missed_wins_o_correct['missed_win'].values, missed_wins_o_wrong['missed_win'].values)
-    print 'mann whitney'
-    print stats.mannwhitneyu(missed_wins_o_correct['missed_win'].values, missed_wins_o_wrong['missed_win'].values)
-    # plt.hist(missed_wins_x['missed_win'])
-    # print np.std(missed_wins_x['missed_win'].values)
-    # plt.show()
-    # plt.hist(missed_wins_o['missed_win'])
-    # print np.std(missed_wins_o['missed_win'].values)
-    # plt.show()
-    print 1/0
+    # # compare blocking with blocking-blind, interaction with interaction-blind
+    # # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_allData_070818.csv')
+    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
+    # players = players_heuristics['userid'].unique()
+    # players_data = dynamics.loc[(dynamics['userid'].isin(players))]
+    # moves = players_data.loc[(players_data['action'] == 'click')]
+    # misses = []
+    # players = []
+    # users = []
+    # boards = []
+    # distances = []
+    # correct = []
+    # open = []
+    # heuristics_fitted = []
+    # for index, row in moves.iterrows():
+    #     if row['top_possible_score'] == 100:
+    #         if row['score_move'] < 100:
+    #             misses.append(1)
+    #         else:
+    #             misses.append(0)
+    #         players.append(row['player'])
+    #         users.append(row['userid'])
+    #         boards.append(row['board_name'])
+    #         distances.append(row['shutter'])
+    #         open.append(row['open_path'])
+    #         correct.append(row['correct'])
+    #         player_heuristic = players_heuristics.loc[players_heuristics['userid'] == row['userid']]
+    #         heuristics_fitted.append(player_heuristic['fitted_heuristic'].iloc[0])
+    #
+    # misses_data = {'userid': users,'board': boards, 'player':players, 'missed_win':misses, 'shutter':distances, 'open_path':open, 'correct': correct, 'fitted_heuristic': heuristics_fitted}
+    # # misses_data = {'userid': users,'board': boards, 'player':players, 'missed_win':misses, 'correct': correct, 'fitted_heuristic': heuristics_fitted}
+    # misses_data = pd.DataFrame(misses_data)
+    # # misses_data.to_csv('stats/misses_data_all.csv')
+    # print misses_data.shape[0]
+    # # compute mean missed wins per player
+    # missed_wins_averages = misses_data.groupby(['userid','player'], as_index=False)['missed_win'].mean()
+    # missed_wins_averages.to_csv('stats/o_blindness_misses.csv')
+    # misses_data = misses_data[['userid','board','shutter','fitted_heuristic','correct']]
+    # # misses_data = misses_data[['userid','board','fitted_heuristic','correct']]
+    # misses_data = misses_data.drop_duplicates(subset='userid', keep='first', inplace=False)
+    # misses_data = pd.merge(missed_wins_averages, misses_data[['userid','board','shutter','fitted_heuristic','correct']], on = 'userid', how = 'left')
+    # # misses_data = pd.merge(missed_wins_averages, misses_data[['userid','board','fitted_heuristic','correct']], on = 'userid', how = 'left')
+    #
+    # # misses_data.to_csv('stats/misses_data_averages_all.csv')
+    # print misses_data.shape[0]
+    # misses_data = misses_data.loc[misses_data['fitted_heuristic'] == 'blocking']
+    # # print missed_wins_averages['missed_win']
+    # # for board in LOGFILE:
+    # #     print '-----------------'
+    # #     print board
+    # #     misses_data_board = misses_data.loc[misses_data['board'] == board]
+    # missed_wins_x_correct = misses_data.loc[(misses_data['player'] == 1)  & (misses_data['correct'] == 1)]
+    # missed_wins_x_wrong = misses_data.loc[(misses_data['player'] == 1) & (misses_data['correct'] == 0)]
+    # missed_wins_o_correct = misses_data.loc[(misses_data['player'] == 2)  & (misses_data['correct'] == 1)]
+    # missed_wins_o_wrong = misses_data.loc[(misses_data['player'] == 2) & (misses_data['correct'] == 0)]
+    # missed_wins_x = misses_data.loc[(misses_data['player'] == 1) ]
+    # missed_wins_o = misses_data.loc[(misses_data['player'] == 2)]
+    #
+    # print bs.bootstrap(missed_wins_x['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(missed_wins_o['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print '---'
+    # print missed_wins_x_correct.shape[0]
+    # if missed_wins_x_correct.shape[0] > 0:
+    #     print bs.bootstrap(missed_wins_x_correct['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print missed_wins_o_correct.shape[0]
+    # if missed_wins_o_correct.shape[0] > 0:
+    #     print bs.bootstrap(missed_wins_o_correct['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print missed_wins_x_wrong.shape[0]
+    # if missed_wins_x_wrong.shape[0] > 0:
+    #     print bs.bootstrap(missed_wins_x_wrong['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print missed_wins_o_wrong.shape[0]
+    # if missed_wins_o_wrong.shape[0] > 0:
+    #     print bs.bootstrap(missed_wins_o_wrong['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #
+    # print bootstrap_t_pvalue(missed_wins_o_correct['missed_win'].values, missed_wins_o_wrong['missed_win'].values)
+    # print 'mann whitney'
+    # print stats.mannwhitneyu(missed_wins_o_correct['missed_win'].values, missed_wins_o_wrong['missed_win'].values)
+    # # plt.hist(missed_wins_x['missed_win'])
+    # # print np.std(missed_wins_x['missed_win'].values)
+    # # plt.show()
+    # # plt.hist(missed_wins_o['missed_win'])
+    # # print np.std(missed_wins_o['missed_win'].values)
+    # # plt.show()
+    # print 1/0
     # # ----------o blindness and correctness end---------------
     #
     # # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_withBlind_030818.csv')
@@ -1578,312 +2269,936 @@ if __name__== "__main__":
     #
     # print 1/0
     # ------- shutter correlation correctness
-    players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered_withBlind_030818.csv')
-    players_heuristics_filtered = players_heuristics.loc[players_heuristics['fitted_heuristic'] == 'blocking_blind']
-    players = players_heuristics_filtered['userid'].unique()
-    moves_on_path = dynamics.loc[(dynamics['open_path'] == True) & (dynamics['userid'].isin(players))]
+    # players_heuristics = pd.read_csv('stats/fitted_heuristics_filtered030818.csv')
+    # # players_heuristics_filtered = players_heuristics.loc[players_heuristics['fitted_heuristic'] == 'blocking_blind']
+    # players_heuristics_filtered = players_heuristics
+    # # players = players_heuristics_filtered['userid'].unique()
+    # players = cogsci_participants['userid'].unique()
+    # moves_on_path = dynamics.loc[(dynamics['open_path'] == True) & (dynamics['userid'].isin(players))]
+    # moves_on_path = moves_on_path.loc[moves_on_path['action'] == 'click']
     # players = moves_on_path['userid'].unique()
-    mean_shutter_players = []
-    median_shutter_players = []
-    correctness = []
-    userids = []
-    heuristic_log_likelihoods = []
-    for player in players:
-        player_data = moves_on_path.loc[(moves_on_path['userid'] == player)]
-        player_heuristic_data = players_heuristics_filtered.loc[players_heuristics_filtered['userid'] == player]
-        userids.append(player)
-        mean_shutter_players.append(player_data['shutter'].mean())
-        median_shutter_players.append(player_data['shutter'].median())
-        heuristic_log_likelihoods.append(player_heuristic_data['log_likelihood'].unique()[0])
-        correctness.append(player_data['correct'].unique()[0])
-
-    shutter_correctness_dict = {'userid': userids, 'mean_shutter': mean_shutter_players, 'median_shutter': median_shutter_players, 'correct': correctness, 'log_likelihood':heuristic_log_likelihoods}
-    shutter_correctness_df = pd.DataFrame(shutter_correctness_dict)
-    correct_players = shutter_correctness_df.loc[shutter_correctness_df['correct'] == 1]
-    wrong_players = shutter_correctness_df.loc[shutter_correctness_df['correct'] == 0]
-    print correct_players['mean_shutter'].mean()
-    print correct_players.shape[0]
-    print wrong_players['mean_shutter'].mean()
-    print wrong_players.shape[0]
-    print bootstrap_t_pvalue(correct_players['mean_shutter'].values, wrong_players['mean_shutter'].values)
-    print bs.bootstrap(correct_players['mean_shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(wrong_players['mean_shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-
-    print bs.bootstrap(correct_players['log_likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(wrong_players['log_likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
-
-    print 1/0
+    # # players = moves_on_path['userid'].unique()
+    # print 'num=' + str(len(players))
+    # mean_shutter_players = []
+    # median_shutter_players = []
+    # correctness = []
+    # userids = []
+    # # heuristic_log_likelihoods = []
+    # # heuristics_fitted = []
+    # for player in players:
+    #     # print player
+    #     player_data = moves_on_path.loc[(moves_on_path['userid'] == player)]
+    #     player_heuristic_data = players_heuristics_filtered.loc[players_heuristics_filtered['userid'] == player]
+    #     userids.append(player)
+    #     mean_shutter_players.append(player_data['shutter'].mean())
+    #     median_shutter_players.append(player_data['shutter'].median())
+    #     # player_corr = moves_on_path.loc[(moves_on_path['userid'] == player)]
+    #     # heuristic_log_likelihoods.append(player_heuristic_data['log_likelihood'].unique()[0])
+    #     # heuristics_fitted.append(player_heuristic_data['fitted_heuristic'].unique()[0])
+    #     correctness.append(player_data['correct'].unique()[0])
+    #
+    # shutter_correctness_dict = {'userid': userids, 'mean_shutter': mean_shutter_players, 'median_shutter': median_shutter_players, 'correct': correctness}
+    # # shutter_correctness_dict = {'userid': userids, 'mean_shutter': mean_shutter_players, 'median_shutter': median_shutter_players, 'correct': correctness,'fitted_heuristic': heuristics_fitted, 'log_likelihood':heuristic_log_likelihoods}
+    #
+    # shutter_correctness_df = pd.DataFrame(shutter_correctness_dict)
+    # correct_players = shutter_correctness_df.loc[shutter_correctness_df['correct'] == 1]
+    # wrong_players = shutter_correctness_df.loc[shutter_correctness_df['correct'] == 0]
+    #
+    # shutter_correctness_df['mean_shutter'] = shutter_correctness_df['mean_shutter'].apply(lambda x: x-1.0)
+    # # #
+    # # # # ---code for figure 4a--
+    # # bins = pd.IntervalIndex.from_tuples([(0, 0.2), (0.2, 0.5), (0.5, 1.9)])
+    # # pd.Inter
+    # shutter_correctness_df['mean_shutter_cat'] = pd.cut(shutter_correctness_df['mean_shutter'], bins=[0,0.2,0.5,2], right=True, include_lowest=True, labels=['narrow\n(0-0.2)','medium\n(0.2-0.5)','wide\n(0.5-2)'])
+    # # shutter_correctness_df['mean_shutter_cat'] = pd.qcut(shutter_correctness_df['mean_shutter'], 3)
+    # print shutter_correctness_df.shape[0]
+    # cats = shutter_correctness_df['mean_shutter_cat'].unique()
+    # print cats
+    # # cats = cats[:3]
+    # for i in range(len(cats)):
+    #     # print i
+    #     # print 's =' + str(s)
+    #     print '-------------------'
+    #     s = cats[i]
+    #     print s
+    #     blindness_cat = shutter_correctness_df.loc[shutter_correctness_df['mean_shutter_cat'] == s]
+    #     print blindness_cat.shape[0]
+    #     print bs.bootstrap(blindness_cat['correct'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #     for j in range(i+1,len(cats)):
+    #         s2 = cats[j]
+    #         print s2
+    #         blindness_cat2 = shutter_correctness_df.loc[shutter_correctness_df['mean_shutter_cat'] == s2]
+    #         # print blindness_cat2.shape[0]
+    #
+    #         print stats.mannwhitneyu(blindness_cat['correct'].values, blindness_cat2['correct'].values)
+    #         print rank_biserial_effect_size(blindness_cat['correct'].values, blindness_cat2['correct'].values)
+    #             # print stats.chi2_contingency()
+    #         # print s
+    #
+    # # shutter_correctness_blindness_df = pd.merge(shutter_blindness_df, shutter_correctness_df, on='userid', how='left')
+    # # shutter_correctness_df['correct'] = shutter_correctness_df['correct'].map({1: 'correct', 0: 'wrong'})
+    # shutter_correctness_df['correct_percent'] = shutter_correctness_df['correct'].apply(lambda x: x*100)
+    # plt.subplot(1,3,1)
+    # ax = sns.barplot(x = 'mean_shutter_cat', y = 'correct_percent', n_boot=1000, data=shutter_correctness_df, ci=68)
+    # # ax.set(xlabel='Shutter', ylabel='Correct Participants')
+    # ax.set_xlabel('Shutter size', fontsize=12)
+    # ax.set_ylabel('Prob. winning move [%]', fontsize=12)
+    # ax.tick_params(labelsize=11)
+    # # plt.ylim(0,100)
+    # # # ax = sns.barplot(x = 'fitted_heuristic', y = 'heuristic_correct', hue="correct",   n_boot=1000, data = heuristics_sensitivity_filtered,  estimator=weighted_mean, orient="v",order=['density','linear','non-linear', 'interaction_blind', 'interaction','blocking_blind','blocking'])
+    # # ax = sns.barplot(x = 'correct', y = 'mean_shutter', n_boot=1000, data=shutter_correctness_df, ci=68)
+    # # change_width(ax, .35)
+    # # for bar in ax.patches:
+    # #     x = bar.get_x()
+    # #     # x = bar[0]._x
+    # #     width = bar.get_width()
+    # #     # width = bar[0]._linewidth
+    # #     newwidth = width/2.
+    # #     centre = x+width/2.
+    # #     # bar[0]._x = centre-newwidth/2.
+    # #     # bar[0]._linewidth = newwidth
+    # #     bar.set_x(centre-newwidth/2.)
+    # #     bar.set_width(newwidth)
+    # # plt.tight_layout(pad=2.5)
+    # # plt.show()
+    # # exit()
+    # # #
+    # # # # #
+    # # # # print correct_players['mean_shutter'].mean()
+    # # # # print correct_players.shape[0]
+    # # # # print wrong_players['mean_shutter'].mean()
+    # # # # print wrong_players.shape[0]
+    # # # # print bootstrap_t_pvalue(correct_players['mean_shutter'].values, wrong_players['mean_shutter'].values)
+    # # # # print bs.bootstrap(correct_players['mean_shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # # # print bs.bootstrap(wrong_players['mean_shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # # #
+    # # # # print bs.bootstrap(correct_players['log_likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # # # print bs.bootstrap(wrong_players['log_likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # #
+    # # print 1/0
     # ------- shutter correlation correctness end
 
-    # --------heuristic fit population confidence intervals --------
-    print 'start'
+    # ---- linear new distance people
+    # boards = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
+    # base_dir = 'data_matrices/cogsci/'
+    # people_all = read_matrices_from_file(base_dir+'avg_people_first_moves_all.json')
+    # linear_moves = read_matrices_from_file(base_dir+'linear_new.json')
+    # boards_list = []
+    # scoring_list = []
+    # distances_list = []
+    # for board in boards:
+    #     boards_list.append(board)
+    #     scoring_list.append('linear')
+    #     participants_dist = people_all[board]
+    #     linear_matrix = linear_moves[board]
+    #     distances_list.append(emd(participants_dist, linear_matrix))
+    #
+    # dist_data = {'scoring': scoring_list, 'board': boards_list, 'distance': distances_list}
+    # dist_data_df = pd.DataFrame(dist_data)
+    # dist_data_df.to_csv('stats/new_linear_first_moves_distances.csv')
+    #
+    # exit()
 
-    # move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_winScoresChanged.csv')
-    players = move_probabilities_heuristics['userid'].unique()
-    heuristics = ['density', 'linear', 'non-linear', 'interaction', 'blocking', 'interaction_blind', 'blocking_blind']
 
-    players_to_include = []
+    # ----- mcts distance people
+    # boards = ['6_easy_full','6_easy_pruned', '10_easy_full', '10_easy_pruned','6_hard_full','6_hard_pruned', '10_hard_full', '10_hard_pruned',  '10_medium_full', '10_medium_pruned']
+    # base_dir = 'data_matrices/cogsci/'
+    # people_all = read_matrices_from_file(base_dir+'avg_people_first_moves_all.json')
+    # paths_mcts = pd.read_csv('stats/mcts_paths_all_boards_100nodes_None_1545756029563.csv')
+    # # first_moves_mcts = paths_mcts.loc[paths_mcts['length'] == 1]
+    # first_moves_mcts = paths_mcts.loc[paths_mcts['path'].map(len) == 1]
+    # sum_dists = 0.0
+    # for board in boards:
+    #     participants_dist = people_all[board]
+    #     first_moves_mcts_board = first_moves_mcts.loc[paths_mcts['board'] == board]
+    #     total_moves_mcts = first_moves_mcts_board['count'].sum()
+    #     mcts_matrix = copy.deepcopy(participants_dist)
+    #     for index, row in first_moves_mcts_board.iterrows():
+    #         a = np.array(ast.literal_eval(row['path']))
+    #         r = a[0][0]
+    #         c = a[0][1]
+    #         mcts_matrix[r][c] = float(row['count'])/total_moves_mcts
+    #
+    #     for row in range(len(participants_dist)):
+    #         for col in range(len(participants_dist)):
+    #             if (participants_dist[row][col] == -0.00001) | (participants_dist[row][col] == -0.00002):
+    #                 participants_dist[row][col] = 0
+    #                 mcts_matrix[row][col] = 0
+    #             # else:
+    #             #     mcts_matrix =
+    #     print participants_dist
+    #     print mcts_matrix
+    #     print emd(participants_dist, mcts_matrix)
+    #     sum_dists += emd(participants_dist, mcts_matrix)
+    # print 'avg'
+    # print sum_dists/len(boards)
+    # exit()
 
-    # filter out players with bad fit
-    log_likelihood_threshold = -3
-    for player in players:
-        # player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player) & (move_probabilities_heuristics['move_number'] % 2 == 0)]
-        player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player)]
-        max_log_likeilhood = -10000
+    # ------ mcts path entropies
+    # # mcts6 = pd.read_csv('stats/testCorrect.csv')
+    # # print bs.bootstrap(mcts6['correct'].values,stat_func=bs_stats.mean, is_pivotal=False)
+    # # exit()
+    #
+    # # paths_mcts = pd.read_csv('stats/mcts170918_paths_k3_stochastic_1000nodes_test3.csv')
+    # # paths_mcts = pd.read_csv('stats/mcts210918_paths_k3_stochastic__100nodes_All_500runs.csv')
+    # paths_mcts = pd.read_csv('stats/mcts210918_paths_k3_stochastic_1000nodes_testPaths.csv')
+    # paths_mcts = paths_mcts.loc[paths_mcts['board'] == 'simulation']
+    # # boards_raw = ['6_easy', '10_easy','6_hard', '10_hard', 'medium']
+    # board_states = paths_mcts['board_state'].unique()
+    # entropies_pruned = []
+    # entropies_full = []
+    # states_data = []
+    # boards = []
+    # solved = []
+    # conditions = []
+    # # heuristics = []
+    # entropies = []
+    # for s in board_states:
+    #     moves_s = paths_mcts.loc[(paths_mcts['board_state'] == s)]
+    #     if (len(moves_s['path'].unique()) > 1):
+    #         check = True
+    #         for p in moves_s['path'].unique():
+    #             m_p = moves_s.loc[moves_s['path'] == p]
+    #             if m_p.shape[0] < 5:
+    #                 check = False
+    #                 break
+    #             # moves_pruned = m_p.loc[m_p['condition'] == 'pruned']
+    #             # moves_full = m_p.loc[m_p['condition'] == 'full']
+    #             # if (moves_full.shape[0] == 0) | (moves_pruned.shape[0] == 0):
+    #             #     check = False
+    #             #     break;
+    #         if check:
+    #             # vals = moves_s['position'].unique()
+    #             #
+    #             # g = sns.FacetGrid(moves_s, col="condition", legend_out=False)
+    #             # g.map(sns.countplot, "position", order= vals, color="steelblue", lw=0)
+    #             # print moves_s['board_name'].unique()
+    #             # # plt.title("tt")
+    #             # plt.show()
+    #
+    #             pk = []
+    #             moves_pruned = moves_s.loc[moves_s['type'].isin(['6_easy_pruned','10_easy_pruned','10_hard_pruned','6_hard_pruned','10_medium_pruned'])]
+    #             moves_full = moves_s.loc[moves_s['type'].isin(['6_easy_full','10_easy_full','10_hard_full','6_hard_full','10_medium_full'])]
+    #
+    #             if (moves_full.shape[0] == 0) | (moves_pruned.shape[0] == 0):
+    #                 continue
+    #             mp = moves_pruned['position'].unique()
+    #             # if len(mp) > 1:
+    #                 # print 'here'
+    #             total = moves_pruned.shape[0] + 0.0
+    #             for m in mp:
+    #                 count = moves_pruned[moves_pruned['position'] == m].shape[0]
+    #                 pk.append(float(count)/float(total))
+    #             ent = stats.entropy(pk)
+    #             entropies_pruned.append(ent)
+    #             states_data.append(s)
+    #             if moves_pruned.shape[0] == 0:
+    #                 continue
+    #             boards.append(moves_pruned['board'].unique()[0])
+    #             # solvers = moves_pruned[moves_pruned['solved'] != 'validatedCorrect'].shape[0]
+    #             # solved.append(float(solvers)/total)
+    #             conditions.append('pruned')
+    #             # heuristics.append()
+    #             entropies.append(float(ent))
+    #             pk = []
+    #
+    #
+    #             mf = moves_full['position'].unique()
+    #             total = moves_full.shape[0] + 0.0
+    #             for m in mf:
+    #                 count = moves_full[moves_full['position'] == m].shape[0]
+    #                 pk.append(float(count)/float(total))
+    #             ent = stats.entropy(pk)
+    #             entropies_full.append(ent)
+    #             states_data.append(s)
+    #             # solvers = moves_full[moves_full['solved'] == 'validatedCorrect'].shape[0]
+    #             # solved.append(float(solvers)/total)
+    #
+    #             boards.append(moves_full['board'].unique()[0])
+    #             conditions.append('full')
+    #             entropies.append(float(ent))
+    # entropies_data = {'board': boards, 'state': states_data, 'entropy':entropies, 'condition':conditions}
+    # entropies_data = pd.DataFrame(entropies_data)
+    # # entropies_data['condition'] = entropies_data['condition'].map({'full': 'full', 'pruned': 'truncated'})
+    # print entropies_data['entropy']
+    # entropies_full = entropies_data.loc[entropies_data['condition']=='full']
+    # entropies_pruned = entropies_data.loc[entropies_data['condition']=='pruned']
+    # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci=68, data=entropies_data)
+    # print bootstrap_t_pvalue(entropies_full['entropy'].values, entropies_pruned['entropy'].values)
+    # print bs.bootstrap(entropies_full['entropy'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(entropies_pruned['entropy'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # plt.title('all')
+    # plt.show()
+    # exit()
+    # entropies_data.to_csv('stats/entropies_data_082118.csv')
+    # ------ mcts path probabilities
+    # path_counts_df = pd.read_csv('stats/mcts170918_paths_k5_stochastic_1000_6.csv')
+    # path_total_counts = path_counts_df.groupby(['board','length']).sum().reset_index()
+    # path_counts_df['mcts_prob'] = np.nan
+    #
+    # for index, row in path_counts_df.iterrows():
+    #     path_total_counts_path = path_total_counts.loc[(path_total_counts['board'] == row['board']) & (path_total_counts['length'] == row['length'])]
+    #     total_path = path_total_counts_path.iloc[0]['count']
+    #     # print 'done'
+    #     path_counts_df.loc[index,'mcts_prob'] = float(row['count'])/total_path
+    #     # row[path_total_counts] = float(row['count'])/total_path
+    # path_counts_df.to_csv('stats/path_probs_mcts_k5_stochastic_1000_6.csv')
+    # path_counts_mcts_df = pd.read_csv('stats/path_probs_mcts_k5_stochastic_1000_6.csv')
+    # path_counts_participants_df = pd.read_csv('stats/path_probs_participants.csv')
+    #
+    # path_counts_participants_df['mcts_prob'] = np.nan
+    # for index, row in path_counts_participants_df.iterrows():
+    #     path_mcts = path_counts_mcts_df.loc[(path_counts_mcts_df['board'] == row['board_name']) & (path_counts_mcts_df['path'] == row['path'])]
+    #     if path_mcts.shape[0] == 0:
+    #         path_counts_participants_df.loc[index,'mcts_prob'] = 0
+    #     else:
+    #         path_counts_participants_df.loc[index,'mcts_prob'] = path_mcts['mcts_prob'].values[0]
+    #
+    # path_counts_participants_df.to_csv('stats/path_probs_participants_mcts_k5_stochastic_1000_6.csv')
+    #
+    # path_probs_participants_mcts = pd.read_csv('stats/path_probs_participants_mcts_k5_stochastic_1000_6.csv')
+    # path_probs_participants_mcts = path_probs_participants_mcts.loc[(path_probs_participants_mcts['participants_prob'] >= 0.05) & (path_probs_participants_mcts['move_number_in_path'] < 8) & (path_probs_participants_mcts['board_name'].isin(['6_easy_full','6_easy_pruned','6_hard_full','6_hard_pruned']))]
+    # correlations = []
+    # move_numbers = []
+    # path_lenghts = path_probs_participants_mcts['move_number_in_path'].unique()
+    # for i in range(50):
+    #     for l in path_lenghts:
+    #         # path_probs_participants_mcts_l = path_probs_participants_mcts.loc[path_probs_participants_mcts['move_number_in_path']==l]
+    #
+    #         df_sample = path_probs_participants_mcts.sample(frac=0.7)
+    #         # df_sample_h = path_probs_participants_mcts_l.sample(frac=0.7)
+    #         df_sample_h = df_sample.loc[(df_sample['move_number_in_path'] == l)]
+    #         move_numbers.append(l)
+    #         print df_sample_h
+    #         correlations.append(stats.pearsonr(df_sample_h['participants_prob'].values, df_sample_h['mcts_prob'].values)[0])
+    #         print stats.pearsonr(df_sample_h['participants_prob'].values, df_sample_h['mcts_prob'].values)[0]
+    # correlations_df = pd.DataFrame({'path_length': move_numbers, 'correlation': correlations})
+    # correlations_df.to_csv('stats/heuristics_participants_paths_mcts_correlations_pearsonr_k5_stochastic_1000_6.csv')
+    # correlations_df = pd.read_csv('stats/heuristics_participants_paths_mcts_correlations_pearsonr_k5_stochastic_1000_6.csv')
+    # ax = sns.barplot(x='path_length',y='correlation', ci=68, data=correlations_df)
+    # plt.show()
+    # exit()
 
-        for heuristic in heuristics:
-            heuristic_likelhioods = player_data.loc[player_data['heuristic'] == heuristic]
-            mean_likeilhood = heuristic_likelhioods['log_move'].mean()
-            if mean_likeilhood > max_log_likeilhood:
-                max_log_likeilhood = mean_likeilhood
-        if (max_log_likeilhood > log_likelihood_threshold) & (player_data['move_number'].max() > 4):
-            players_to_include.append(player)
-
-    # for each player, sample from moves, fit heuristic. store proportion of population for each heuristic
-    move_probabilities_heuristics_filtered = move_probabilities_heuristics.loc[move_probabilities_heuristics['userid'].isin(players_to_include)]
-    players = move_probabilities_heuristics_filtered['userid'].unique()
-    num_players = len(players)
-    num_samples = 100
-    sample_size = 0.7
-    # heuristics = ['density','non-linear','blocking']
+    # ------- figure 3C,3D pnas: path probabilities population vs. heuristic prediction
+    # # players = move_probabilities_heuristics['userid'].unique()
     # heuristics = ['density', 'linear', 'non-linear', 'interaction', 'blocking']
-    population_distributions = {}
-    for heuristic in heuristics:
-        population_distributions[heuristic] = []
-    players_list = []
-    fitted_heuristic_list = []
-    fitted_heuristic_likelihood = []
-    for i in range(num_samples):
+    # # # moves_df = dynamics.loc[(dynamics['action'] == 'click')]
+    # # # moves_df = moves_df[['board_name','userid','path_after', 'move_number_in_path']]
+    # # # # path_counts_df = moves_df.groupby(['board_name','path_after','move_number_in_path']).count()
+    # # # # path_counts_df.to_csv('stats/test_path_counts.csv')
+    # # path_counts_df = pd.read_csv('stats/test_path_counts.csv')
+    # # # # path_total_counts = path_counts_df.groupby(['board_name','move_number_in_path']).sum()
+    # # # # path_total_counts.to_csv('stats/test_path_totals.csv')
+    # # path_total_counts = pd.read_csv('stats/test_path_totals.csv')
+    # # # move_probabilities_heuristics = move_probabilities_heuristics[['board_name', 'heuristic',  'move_number_in_path', 'path', 'prob_path']]
+    # # # heuristics_path_probs_df = move_probabilities_heuristics.groupby(['board_name', 'heuristic', 'path', 'move_number_in_path']).first()
+    # # # heuristics_path_probs_df.to_csv('stats/path_probs_heuristics.csv')
+    # # # exit()
+    # # # heuristics_path_probs_df = pd.read_csv('stats/path_probs_heuristics.csv')
+    # # #
+    # # # path_counts_df['participants_prob'] = np.nan
+    # # #
+    # # # for index, row in path_counts_df.iterrows():
+    # # #     path_total_counts_path = path_total_counts.loc[(path_total_counts['board_name'] == row['board_name']) & (path_total_counts['move_number_in_path'] == row['move_number_in_path'])]
+    # # #     total_path = path_total_counts_path.iloc[0]['count']
+    # # #     # print 'done'
+    # # #     path_counts_df.loc[index,'participants_prob'] = float(row['count'])/total_path
+    # # #     # row[path_total_counts] = float(row['count'])/total_path
+    # # #
+    # # # path_counts_df.to_csv('stats/path_probs_participants.csv')
+    # # # path_counts_df = pd.read_csv('stats/path_probs_participants.csv')
+    # # # path_probs_participants_heuristic_df = pd.merge(path_counts_df, heuristics_path_probs_df, on=['board_name','move_number_in_path','path'], how='left')
+    # # # path_probs_participants_heuristic_df.to_csv('stats/probs_paths_participants_heuristic.csv')
+    # # # exit()
+    # # path_probs_participants_heuristic_df = pd.read_csv('stats/probs_paths_participants_heuristic.csv')
+    # # # path_probs_participants_heuristic_df = path_probs_participants_heuristic_df.loc[(path_probs_participants_heuristic_df['participants_prob'] >= 0.05) & (path_probs_participants_heuristic_df['move_number_in_path'] < 8)]
+    # # path_probs_participants_heuristic_df = path_probs_participants_heuristic_df.loc[(path_probs_participants_heuristic_df['move_number_in_path'] < 8)]
+    # # heuristic_vals = []
+    # # correlations = []
+    # # move_numbers = []
+    # # path_lenghts = path_probs_participants_heuristic_df['move_number_in_path'].unique()
+    # #
+    # #
+    # #
+    # # heuristic_vals = []
+    # # correlations = []
+    # # move_numbers = []
+    # # for i in range(100):
+    # #     for l in path_lenghts:
+    # #         # df_l = path_probs_participants_heuristic_df.loc[path_probs_participants_heuristic_df['move_number_in_path']==l]
+    # #         # df_sample = df_l.sample(frac=0.7)
+    # #         df_sample = path_probs_participants_heuristic_df.sample(frac=0.7)
+    # #         for heuristic in heuristics:
+    # #             df_sample_h = df_sample.loc[(df_sample['heuristic'] == heuristic) & (df_sample['move_number_in_path'] == l)]
+    # #             heuristic_vals.append(heuristic)
+    # #             move_numbers.append(l)
+    # #             correlations.append(stats.spearmanr(df_sample_h['participants_prob'].values, df_sample_h['prob_path'].values)[0])
+    # # correlations_df = pd.DataFrame({'heuristic': heuristic_vals, 'path_length': move_numbers, 'correlation': correlations})
+    # # correlations_df.to_csv('stats/heuristics_participants_paths_correlations_spearman_new_linearNoPaths3.csv')
+    # # # exit()
+    # # for i in range(1,8):
+    # #     print 'path length = ' + str(i)
+    # #     path_probs_participants_heuristic_df_i = path_probs_participants_heuristic_df.loc[path_probs_participants_heuristic_df['move_number_in_path'] == i]
+    # #     for heuristic in heuristics:
+    # #         print heuristic
+    # #         path_probs_participants_heuristic_df_h = path_probs_participants_heuristic_df_i.loc[path_probs_participants_heuristic_df_i['heuristic'] == heuristic]
+    # #         # print path_probs_participants_heuristic_df_h['count'].values.sum()
+    # #         print stats.spearmanr(path_probs_participants_heuristic_df_h['participants_prob'].values, path_probs_participants_heuristic_df_h['prob_path'].values)
+    # #         # print stats.pearsonr(path_probs_participants_heuristic_df_h['participants_prob'].values, path_probs_participants_heuristic_df_h['prob_path'].values)
+    # # # exit()
+    # # #
+    # #
+    # # # path_probs_participants_heuristic_df = path_probs_participants_heuristic_df.loc[(path_probs_participants_heuristic_df['move_number_in_path'] > 4) & (path_probs_participants_heuristic_df['move_number_in_path'] < 8)]
+    # # # path_probs_participants_heuristic_df = path_probs_participants_heuristic_df.loc[(path_probs_participants_heuristic_df['move_number_in_path'] < 4)]
+    # # # path_probs_participants_heuristic_df = path_probs_participants_heuristic_df.loc[(path_probs_participants_heuristic_df['heuristic'].isin(['blocking'])) & (path_probs_participants_heuristic_df['participants_prob'] >= 0.05) & (path_probs_participants_heuristic_df['move_number_in_path'] < 4)]
+    # # # path_probs_participants_heuristic_df = path_probs_participants_heuristic_df.loc[(path_probs_participants_heuristic_df['move_number_in_path'] < 4) & (path_probs_participants_heuristic_df['participants_prob'] >= 0.05)]
+    # # path_probs_participants_heuristic_df = path_probs_participants_heuristic_df.loc[(path_probs_participants_heuristic_df['participants_prob'] >= 0.05) & (path_probs_participants_heuristic_df['move_number_in_path'] < 10)]
+    # #
+    # # # heuristic_vals = []
+    # # # correlations = []
+    # # # move_numbers = []
+    # # # path_lenghts = path_probs_participants_heuristic_df['move_number_in_path'].unique()
+    # # # for i in range(50):
+    # # #     for l in path_lenghts:
+    # # #         df_sample = path_probs_participants_heuristic_df.sample(frac=0.7)
+    # # #         for heuristic in heuristics:
+    # # #             df_sample_h = df_sample.loc[(df_sample['heuristic'] == heuristic) & (df_sample['move_number_in_path'] == l)]
+    # # #             heuristic_vals.append(heuristic)
+    # # #             move_numbers.append(l)
+    # # #             correlations.append(stats.spearmanr(df_sample_h['participants_prob'].values, df_sample_h['prob_path'].values)[0])
+    # # # correlations_df = pd.DataFrame({'heuristic': heuristic_vals, 'path_length': move_numbers, 'correlation': correlations})
+    # # # correlations_df.to_csv('stats/heuristics_participants_paths_correlations_spearman005.csv')
+    # # # exit()
+    # correlations_df = pd.read_csv('stats/heuristics_participants_paths_correlations.csv')
+    # # correlations_df = pd.read_csv('stats/heuristics_participants_paths_correlations_spearman005.csv')
+    # density = correlations_df.loc[correlations_df['heuristic'] == 'density']
+    # linear = correlations_df.loc[correlations_df['heuristic'] == 'linear']
+    # nonlinear = correlations_df.loc[correlations_df['heuristic'] == 'non-linear']
+    # interaction = correlations_df.loc[correlations_df['heuristic'] == 'interaction']
+    # blocking = correlations_df.loc[correlations_df['heuristic'] == 'blocking']
+    # print np.mean(blocking.correlation.values)
+    # print np.mean(interaction.correlation.values)
+    # print stats.mannwhitneyu(blocking.correlation.values, interaction.correlation.values)
+    # print stats.mannwhitneyu(blocking.correlation.values, nonlinear.correlation.values)
+    # print stats.mannwhitneyu(blocking.correlation.values, linear.correlation.values)
+    # print stats.mannwhitneyu(blocking.correlation.values, density.correlation.values)
+    # print 'interaction'
+    # print stats.mannwhitneyu(interaction.correlation.values, nonlinear.correlation.values)
+    # print stats.mannwhitneyu(interaction.correlation.values, linear.correlation.values)
+    # print stats.mannwhitneyu(interaction.correlation.values, density.correlation.values)
+    # print 'nonlinear'
+    # print stats.mannwhitneyu(nonlinear.correlation.values, linear.correlation.values)
+    # print stats.mannwhitneyu(nonlinear.correlation.values, density.correlation.values)
+    # print 'linear'
+    # print stats.mannwhitneyu(linear.correlation.values, density.correlation.values)
+    # # exit()
+    # # # # ax = sns.lmplot(x='participants_prob', y='prob_path', data=path_probs_participants_heuristic_df, fit_reg=False, col='heuristic', col_order=['density','linear','non-linear','interaction','blocking'])
+    # # # # ax = sns.lmplot(x='participants_prob', y='prob_path', data=path_probs_participants_heuristic_df, fit_reg=False, hue='heuristic')
+    # # # sns.set(font_scale=1.5, style="whitegrid")
+    # # # path_probs_participants_heuristic_df = path_probs_participants_heuristic_df.loc[path_probs_participants_heuristic_df['heuristic'] == 'blocking']
+    # # # ax = sns.lmplot(x='participants_prob', y='prob_path', data=path_probs_participants_heuristic_df, fit_reg=True, scatter_kws={"s": 35})
+    # # # ax = ax.set_axis_labels('Observed Likelihood', 'Predicted Likelihood')
+    # # # # ax.set_xlabel('Observed Likelihood', fontsize=16)
+    # # # # ax.tick_params(labelsize=14)
+    # # # # ax.set(xlabel='Observed Path Likelihood', ylabel='Predicted Path Likelihood')
+    # # # # ax.set(yscale="log")
+    # # # # ax.set(xscale="log")
+    # # # # plt.xlim(0,0.05)
+    # # # plt.show()
+    # # # exit()
+    # # #
+    #
+    # correlations_df['heuristic'] = correlations_df['heuristic'].map({'density':'Density', 'linear':  'Linear','non-linear':'Non-linear', 'interaction': 'Interaction','blocking':'Forcing'})
+    #
+    # heuristics = ['Density', 'Linear', 'Non-linear', 'Interaction', 'Forcing']
+    # print '-------'
+    # for heuristic in heuristics:
+    #     correlations_heuristic = correlations_df.loc[correlations_df['heuristic'] == heuristic]
+    #     print heuristic
+    #     print 'spearman r'
+    #     # print correlations_heuristic['path_length'].values
+    #     # print correlations_heuristic['correlation'].values
+    #     # spearmanr_ci()
+    #     print spearmanr_ci(correlations_heuristic['path_length'].values, correlations_heuristic['correlation'].values)
+    # print '-------'
+    # # ax = sns.lmplot(x='path_length',y='correlation', fit_reg=True, data=correlations_df)
+    # # plt.show()
+    # ax = sns.pointplot('path_length', 'correlation', hue='heuristic', ci='sd', data=correlations_df, legend_out=False, legend=False)
+    # # ax = sns.barplot(x='path_length',y='correlation', ci='sd', data=correlations_df, hue='heuristic')
+    # plt.gca().legend().set_title('')
+    #
+    #
+    # ax.set_ylabel('Correlation', fontsize=16)
+    # ax.set_xlabel('Path length', fontsize=16)
+    # ax.tick_params(labelsize=14)
+    # # plt.subplots(2,1,figsize=(4,7))
+    # # plt.subplot(2,1,2)
+    # # # correlations_df = correlations_df.loc[correlations_df['path_length'] < 8]
+    # #
+    # # ax = sns.barplot(x='heuristic',y='correlation', ci=68, data=correlations_df)
+    # # # ax.set(xlabel='', ylabel='Correlation - Observed & Predicted Path Likelihood', fontsize=16)
+    # # ax.set_ylabel('Correlation', fontsize=16)
+    # # ax.set_xlabel('', fontsize=16)
+    # # ax.tick_params(labelsize=14)
+    # # ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
+    # plt.legend(loc='best')
+    # plt.show()
+    # exit()
+    # ------- end path probabilities population vs. heuristic prediction
 
-        heuristics_player_counts = {}
-        for heuristic in heuristics:
-            heuristics_player_counts[heuristic] = 0.0
-        train_test_same_counter = 0.0
-        player_counter = 0.0
-        for player in players:
-            player_data = move_probabilities_heuristics_filtered.loc[(move_probabilities_heuristics_filtered['userid'] == player)]
-            num_moves_player = player_data['move_number'].max()
-            moves = np.arange(1,num_moves_player+1)
-            train_moves, test_moves = train_test_split(moves, test_size=0.3)  # random split
-            sampled_moves = player_data.loc[player_data['move_number'].isin(train_moves)]
-            max_log_likeilhood = -10000
-            fitted_heuristic = None
-            for heuristic in heuristics:
-                # heuristic_likelhioods = player_data.loc[player_data['heuristic'] == heuristic]
-                heuristic_likelhioods = sampled_moves.loc[sampled_moves['heuristic'] == heuristic]
-                mean_likeilhood = heuristic_likelhioods['log_move'].mean()
-                if mean_likeilhood > max_log_likeilhood:
-                    max_log_likeilhood = mean_likeilhood
-                    fitted_heuristic = heuristic
-            heuristics_player_counts[fitted_heuristic] += 1.0
-            players_list.append(player)
-            fitted_heuristic_list.append(fitted_heuristic)
-            fitted_heuristic_likelihood.append(max_log_likeilhood)
-        sum_distribution_check = 0.0
-        for heuristic in heuristics:
-            prop_heuristic = heuristics_player_counts[heuristic]/num_players
-            sum_distribution_check += prop_heuristic
-            population_distributions[heuristic].append(prop_heuristic)
-        # print sum_distribution_check
 
-    population_distributions_df = pd.DataFrame(population_distributions)
-    heuristic_fitted_df = pd.DataFrame({'userid': players_list, 'fitted_heuristic': fitted_heuristic_list, 'log_likelihood': fitted_heuristic_likelihood})
-    heuristic_fitted_df.to_csv('stats/fitted_heuristics_filtered_allData_070818.csv')
-    for heuristic in heuristics:
-        print heuristic
-        print bs.bootstrap(population_distributions_df[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
-        print population_distributions_df[heuristic].median()
-        print medianCI(population_distributions_df[heuristic], 0.95, 0.5)
-
-    print 1/0
+    # --------heuristic fit population confidence intervals --------
+    # print 'start'
+    # #
+    # # # # move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_winScoresChanged.csv')
+    # # players = move_probabilities_heuristics['userid'].unique()
+    # heuristics = ['density', 'linear', 'non-linear', 'interaction', 'blocking']
+    # # #
+    # # players_to_include = []
+    # #
+    # # # filter out players with bad fit
+    # # log_likelihood_threshold = -3
+    # # for player in players:
+    # #     # player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player) & (move_probabilities_heuristics['move_number'] % 2 == 0)]
+    # #     player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player)]
+    # #     max_log_likeilhood = -10000
+    # #
+    # #     for heuristic in heuristics:
+    # #         heuristic_likelhioods = player_data.loc[player_data['heuristic'] == heuristic]
+    # #         mean_likeilhood = heuristic_likelhioods['log_move'].mean()
+    # #         if mean_likeilhood > max_log_likeilhood:
+    # #             max_log_likeilhood = mean_likeilhood
+    # #     if (max_log_likeilhood > log_likelihood_threshold) & (player_data['move_number'].max() > 4):
+    # #         players_to_include.append(player)
+    # #
+    # # # for each player, sample from moves, fit heuristic. store proportion of population for each heuristic
+    # # move_probabilities_heuristics_filtered = move_probabilities_heuristics.loc[move_probabilities_heuristics['userid'].isin(players_to_include)]
+    # # players = move_probabilities_heuristics_filtered['userid'].unique()
+    # # num_players = len(players)
+    # # num_samples = 100
+    # # sample_size = 0.7
+    # # # heuristics = ['density','non-linear','blocking']
+    # # # heuristics = ['density', 'linear', 'non-linear', 'interaction', 'blocking']
+    # # population_distributions = {}
+    # # # population_ll = {}
+    # # heuristic_list = []
+    # # prop_list = []
+    # # population_ll = []
+    # # for heuristic in heuristics:
+    # #     population_distributions[heuristic] = []
+    # #     # population_ll[heuristic] = []
+    # # players_list = []
+    # # fitted_heuristic_list = []
+    # # fitted_heuristic_likelihood = []
+    # # for i in range(num_samples):
+    # #
+    # #     heuristics_player_counts = {}
+    # #     heuristics_player_ll = {}
+    # #     for heuristic in heuristics:
+    # #         heuristics_player_counts[heuristic] = 0.0
+    # #         heuristics_player_ll[heuristic] = []
+    # #     train_test_same_counter = 0.0
+    # #     player_counter = 0.0
+    # #     for player in players:
+    # #         player_data = move_probabilities_heuristics_filtered.loc[(move_probabilities_heuristics_filtered['userid'] == player)]
+    # #         num_moves_player = player_data['move_number'].max()
+    # #         moves = np.arange(1,num_moves_player+1)
+    # #         train_moves, test_moves = train_test_split(moves, test_size=0.3)  # random split
+    # #         sampled_moves = player_data.loc[player_data['move_number'].isin(train_moves)]
+    # #         max_log_likeilhood = -10000
+    # #         fitted_heuristic = None
+    # #         for heuristic in heuristics:
+    # #             # heuristic_likelhioods = player_data.loc[player_data['heuristic'] == heuristic]
+    # #             heuristic_likelhioods = sampled_moves.loc[sampled_moves['heuristic'] == heuristic]
+    # #             mean_likeilhood = heuristic_likelhioods['log_move'].mean()
+    # #             if mean_likeilhood > max_log_likeilhood:
+    # #                 max_log_likeilhood = mean_likeilhood
+    # #                 fitted_heuristic = heuristic
+    # #         heuristics_player_counts[fitted_heuristic] += 1.0
+    # #         players_list.append(player)
+    # #         fitted_heuristic_list.append(fitted_heuristic)
+    # #         fitted_heuristic_likelihood.append(max_log_likeilhood)
+    # #         heuristics_player_ll[fitted_heuristic].append(max_log_likeilhood)
+    # #     sum_distribution_check = 0.0
+    # #     for heuristic in heuristics:
+    # #         prop_heuristic = heuristics_player_counts[heuristic]/num_players
+    # #         mean_likeilhood_heuristic = np.mean(heuristics_player_ll[heuristic])
+    # #         sum_distribution_check += prop_heuristic
+    # #         population_distributions[heuristic].append(prop_heuristic)
+    # #         population_ll.append(mean_likeilhood_heuristic)
+    # #         heuristic_list.append(heuristic)
+    # #         prop_list.append(prop_heuristic*100)
+    # #     # print sum_distribution_check
+    # #
+    # # population_distributions_df = pd.DataFrame(population_distributions)
+    # # population_distributions_df.to_csv('stats/population_distributions060119_forTable.csv')
+    # # population_distributions_df2 = pd.DataFrame({'heuristic': heuristic_list, 'percent': prop_list, 'log-likelihood': population_ll})
+    # # population_distributions_df2.to_csv('stats/population_distributions060119.csv')
+    # # heuristic_fitted_df = pd.DataFrame({'userid': players_list, 'fitted_heuristic': fitted_heuristic_list, 'log_likelihood': fitted_heuristic_likelihood})
+    # # heuristic_fitted_df.to_csv('stats/fitted_heuristics_filtered_cogsci_060119.csv')
+    # #
+    # # exit()
+    #
+    # # population_distributions_df2 = pd.read_csv('stats/population_distributions210818.csv')
+    # # heuristic_fitted_df = pd.read_csv('stats/fitted_heuristics_filtered_cogsci_210818.csv')
+    # population_distributions_df = pd.read_csv('stats/population_distributions060119_forTable.csv')
+    # population_distributions_df2 = pd.read_csv('stats/population_distributions060119.csv')
+    # heuristic_fitted_df = pd.read_csv('stats/fitted_heuristics_filtered_cogsci_060119.csv')
+    # # generate table 2 in pnas
+    # for heuristic in heuristics:
+    #     print heuristic
+    #     # print stats.t.interval(0.95, len(population_distributions_df[heuristic].values)-1, loc=np.mean(population_distributions_df[heuristic].values), scale=stats.sem(population_distributions_df[heuristic].values))
+    #     #
+    #     print bs.bootstrap(population_distributions_df[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #
+    #     heuristic_pop_ci = np.nanpercentile( np.asarray(population_distributions_df[heuristic].values), q=(100*0.05/2, 100*(1-0.05/2)))
+    #     print heuristic_pop_ci
+    #     # pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
+    #     #
+    #
+    #     # heuristic_fitted_df_filtered = heuristic_fitted_df.loc[heuristic_fitted_df['fitted_heuristic'] == heuristic]
+    #     heuristic_fitted_df_filtered = population_distributions_df2.loc[population_distributions_df2['heuristic'] == heuristic]
+    #     print bs.bootstrap(heuristic_fitted_df_filtered['log-likelihood'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #     heuristic_pop_ci = np.nanpercentile( np.asarray(heuristic_fitted_df_filtered['log-likelihood'].values), q=(100*0.05/2, 100*(1-0.05/2)))
+    #     print heuristic_pop_ci
+    #     # print population_distributions_df[heuristic].median()
+    #     # print medianCI(population_distributions_df[heuristic], 0.95, 0.5)
+    #     # print bs.bootstrap(population_distributions_df[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # exit()
+    # # # generate figure for table 2 pnas
+    # # plt.subplot(1, 2, 1)
+    # # ax = sns.barplot(x='heuristic', y='percent', n_boot=1000, ci=68, data=population_distributions_df2, order=['density','linear','non-linear','interaction','blocking'])
+    # # # ax = sns.regplot(x="moves", y="solutionAndValidationCorrectPercent", x_estimator=np.mean, data=alphaBetaBehvaior, color="r", fit_reg=False,  ci=68)
+    # # # ax.set(xscale="log")
+    # # ax.set(ylim=(0, 100))
+    # # # ax.set(xlabel='Board Complexity', ylabel='Percent Correct')
+    # # # # ax2 = ax.twinx()
+    # # plt.subplot(1, 2, 2)
+    # # ax = sns.barplot(x='fitted_heuristic', y='log_likelihood', n_boot=1000, ci=68, data=heuristic_fitted_df, order=['density','linear','non-linear','interaction','blocking'])
+    # # # ax = sns.regplot(x="moves", y="moves", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="silver", fit_reg=False)
+    # # # # ax3 = ax.twinx()
+    # # # sns.regplot(x="moves", y="actionsSolution", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="b", fit_reg=False, ax=ax)
+    # # # ax.set(xscale="log")
+    # # # ax.set(yscale="log")
+    # # # ax.set(xlabel='Board Complexity', ylabel='Search Size')
+    # # plt.tight_layout()
+    # # plt.show()
+    #
+    # population_distributions_df2['heuristic'] = population_distributions_df2['heuristic'].map({'density':'Density', 'linear':  'Linear','non-linear':'Non-linear', 'interaction': 'Interaction','blocking':'Forcing'})
+    # heuristic_fitted_df['fitted_heuristic'] = heuristic_fitted_df['fitted_heuristic'].map({'density':'Density', 'linear':  'Linear','non-linear':'Non-linear', 'interaction': 'Interaction','blocking':'Forcing'})
+    # sns.set(style='white')
+    #
+    # plt.subplot(2, 1, 1)
+    # ax = sns.barplot(y='percent', x='heuristic',  ci='sd', data=population_distributions_df2,  order=['Density','Linear','Non-linear','Interaction','Forcing'])
+    # ax.set_ylabel('Percent participants', fontsize=14)
+    # ax.set_xlabel('Scoring strategy', fontsize=14)
+    # ax.tick_params(labelsize=12)
+    # # ax.yaxis.set_label_position("right")
+    # # ax.yaxis.set_ticks_position('right')
+    # # ax = sns.regplot(x="moves", y="solutionAndValidationCorrectPercent", x_estimator=np.mean, data=alphaBetaBehvaior, color="r", fit_reg=False,  ci=68)
+    # # ax.set(xscale="log")
+    # # ax.set(ylim=(0, 100))
+    # # ax.set(xlim=(0,100))
+    # # ax.set(xlabel='Board Complexity', ylabel='Percent Correct')
+    # # # ax2 = ax.twinx()
+    # plt.subplot(2, 1, 2)
+    # ax = sns.barplot(y='log_likelihood', x='fitted_heuristic',  ci='sd', data=heuristic_fitted_df, order=['Density','Linear','Non-linear','Interaction','Forcing'])
+    #
+    # ax.set_ylabel('Log Likelihood', fontsize=14)
+    # ax.set_xlabel('Scoring strategy', fontsize=14)
+    # ax.tick_params(labelsize=12)
+    # ax.set(ylim=(-6, -1))
+    # # heuristic_fitted_df.plot("fitted_heuristic", "log_likelihood", kind="barh", color=sns.color_palette("deep", 3))
+    # # ax = sns.regplot(x="moves", y="moves", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="silver", fit_reg=False)
+    # # # ax3 = ax.twinx()
+    # # sns.regplot(x="moves", y="actionsSolution", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="b", fit_reg=False, ax=ax)
+    # # ax.set(xscale="log")
+    # # ax.set(yscale="log")
+    # # ax.set(xlabel='Board Complexity', ylabel='Search Size')
+    # plt.tight_layout(pad=2)
+    # # plt.savefig('figures_pnas/heuristic_fit_population.jpg')
+    # plt.show()
+    #
+    # print 1/0
 
 
     # --------heuristic fit significance split --------
-    print 'start'
-    move_probabilities_heuristics = pd.read_csv('stats/move_probs_heuristics020818.csv')
-    # move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_winScoresChanged.csv')
-    players = move_probabilities_heuristics['userid'].unique()
-    heuristics = ['density','non-linear','blocking']
-    # heuristics = ['density','linear','non-linear','interaction']
-    train_test_same_counter = 0.0
-    player_counter = 0.0
-    for player in players:
-        # player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player) & (move_probabilities_heuristics['move_number'] % 2 == 0)]
-        player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player)]
-        # num_x_moves_player = player_data.loc[player_data['heuristic'] == 'density'].shape[0]
-        num_moves_player = player_data['move_number'].max()
-        # # moves = np.arange(1,num_x_moves_player+1)
-        moves = player_data['path_number'].unique()
-        if num_moves_player < 5:
-            continue
-        train_moves, test_moves = train_test_split(moves, test_size=0.3)  # random split
-        print train_moves
-        print test_moves
-
-        # ordered splity
-        # num_train = int(0.7*len(moves))
-        # train_moves = moves[:num_train]
-        # test_moves = moves[num_train:len(moves)]
-
-
-        train = player_data.loc[player_data['path_number'].isin(train_moves)]
-        test = player_data.loc[player_data['path_number'].isin(test_moves)]
-
-
-        fitted_heuristic_train = None
-        max_log_likeilhood_train = -10000
-        fitted_heuristic_test = None
-        max_log_likeilhood_test = -10000
-        for heuristic in heuristics:
-            heuristic_likelhioods_train = train.loc[train['heuristic'] == heuristic]
-            mean_likeilhood = heuristic_likelhioods_train['log_move'].mean()
-            if mean_likeilhood > max_log_likeilhood_train:
-                max_log_likeilhood_train = mean_likeilhood
-                fitted_heuristic_train = heuristic
-
-            heuristic_likelhioods_test = test.loc[test['heuristic'] == heuristic]
-            mean_likeilhood = heuristic_likelhioods_test['log_move'].mean()
-            if mean_likeilhood > max_log_likeilhood_test:
-                max_log_likeilhood_test = mean_likeilhood
-                fitted_heuristic_test = heuristic
-
-            # print fitted_heuristic_test
-        # print '--------'
-        # print fitted_heuristic_train +';'+fitted_heuristic_test
-
-        if fitted_heuristic_train is None:
-            print 'here'
-        if fitted_heuristic_test is None:
-            print 'here'
-        if fitted_heuristic_train == fitted_heuristic_test:
-            train_test_same_counter += 1.0
-            userids_sig.append(player)
-            fitted_heuristics_sig.append(fitted_heuristic_train)
-            # print fitted_heuristic_train
-        else:
-            # print fitted_heuristic_train +';'+fitted_heuristic_test
-            # print num_moves_player
-            # print player
-            print player_data['board_name'].unique()
-        player_counter += 1
-    print train_test_same_counter
-    print player_counter
-    print train_test_same_counter/player_counter
-    sig_heuristic = {'userids':userids_sig, 'fitted_heuristic':fitted_heuristics_sig}
-    sig_heuristic_df = pd.DataFrame(sig_heuristic)
-    for heuristic in heuristics:
-        print heuristic
-        df_fitted_heuristic = sig_heuristic_df.loc[sig_heuristic_df['fitted_heuristic'] == heuristic]
-        print float(df_fitted_heuristic.shape[0])/sig_heuristic_df.shape[0]
-    print 1/0
-
-
-    # --------heuristic fit analysis-------------
-    aggregations = {
-        'userid': 'count'
-        # 'userid': 'sum'
-    }
-
-    # heuristics_fit_paramters = heuristics_sensitivity.groupby(['win_score','blocking_score','fitted_heuristic']).agg(aggregations)
-    # heuristics_fit_paramters.to_csv("stats/heuristic_fit_agg250718.csv")
-    # print 1/0
-    # sensitivity analysis
-    heuristics_fit_paramters = pd.read_csv("stats/heuristic_fit_agg250718.csv")
-    heuristics = ['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind']
-    # win_scores = [25,50,100,200,400,800,1600,3200,6400,12800]
-    # blocking_vals = [0.05, 0.1, 0.2, 0.4, 0.8]
-    win_scores = [25, 250, 500, 750, 1000,1250, 1500, 1750, 2000, 2250, 2500]
-    blocking_vals = [2,20,40,60,80,100,120,140,160,180,200]
-    prob_changes = []
-    paramaeter_changes = []
-    heuristics_for_data = []
-    heuristics_fit = pd.read_csv("stats/cogsci_heuristics250718_1.csv")
-    heuristics_fit_correct = heuristics_fit.loc[heuristics_fit['correct'] == 1]
-    heuristics_fit_wrong = heuristics_fit.loc[heuristics_fit['correct'] == 0]
-
-    # print 'all'
+    # print 'start'
+    # move_probabilities_heuristics = pd.read_csv('stats/move_probs_heuristics020818.csv')
+    # # move_probabilities_heuristics = pd.read_csv('stats/heuristics_byMove_winScoresChanged.csv')
+    # players = move_probabilities_heuristics['userid'].unique()
+    # heuristics = ['density','non-linear','blocking']
+    # # heuristics = ['density','linear','non-linear','interaction']
+    # train_test_same_counter = 0.0
+    # player_counter = 0.0
+    # for player in players:
+    #     # player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player) & (move_probabilities_heuristics['move_number'] % 2 == 0)]
+    #     player_data = move_probabilities_heuristics.loc[(move_probabilities_heuristics['userid'] == player)]
+    #     # num_x_moves_player = player_data.loc[player_data['heuristic'] == 'density'].shape[0]
+    #     num_moves_player = player_data['move_number'].max()
+    #     # # moves = np.arange(1,num_x_moves_player+1)
+    #     moves = player_data['path_number'].unique()
+    #     if num_moves_player < 5:
+    #         continue
+    #     train_moves, test_moves = train_test_split(moves, test_size=0.3)  # random split
+    #     print train_moves
+    #     print test_moves
+    #
+    #     # ordered splity
+    #     # num_train = int(0.7*len(moves))
+    #     # train_moves = moves[:num_train]
+    #     # test_moves = moves[num_train:len(moves)]
+    #
+    #
+    #     train = player_data.loc[player_data['path_number'].isin(train_moves)]
+    #     test = player_data.loc[player_data['path_number'].isin(test_moves)]
+    #
+    #
+    #     fitted_heuristic_train = None
+    #     max_log_likeilhood_train = -10000
+    #     fitted_heuristic_test = None
+    #     max_log_likeilhood_test = -10000
+    #     for heuristic in heuristics:
+    #         heuristic_likelhioods_train = train.loc[train['heuristic'] == heuristic]
+    #         mean_likeilhood = heuristic_likelhioods_train['log_move'].mean()
+    #         if mean_likeilhood > max_log_likeilhood_train:
+    #             max_log_likeilhood_train = mean_likeilhood
+    #             fitted_heuristic_train = heuristic
+    #
+    #         heuristic_likelhioods_test = test.loc[test['heuristic'] == heuristic]
+    #         mean_likeilhood = heuristic_likelhioods_test['log_move'].mean()
+    #         if mean_likeilhood > max_log_likeilhood_test:
+    #             max_log_likeilhood_test = mean_likeilhood
+    #             fitted_heuristic_test = heuristic
+    #
+    #         # print fitted_heuristic_test
+    #     # print '--------'
+    #     # print fitted_heuristic_train +';'+fitted_heuristic_test
+    #
+    #     if fitted_heuristic_train is None:
+    #         print 'here'
+    #     if fitted_heuristic_test is None:
+    #         print 'here'
+    #     if fitted_heuristic_train == fitted_heuristic_test:
+    #         train_test_same_counter += 1.0
+    #         userids_sig.append(player)
+    #         fitted_heuristics_sig.append(fitted_heuristic_train)
+    #         # print fitted_heuristic_train
+    #     else:
+    #         # print fitted_heuristic_train +';'+fitted_heuristic_test
+    #         # print num_moves_player
+    #         # print player
+    #         print player_data['board_name'].unique()
+    #     player_counter += 1
+    # print train_test_same_counter
+    # print player_counter
+    # print train_test_same_counter/player_counter
+    # sig_heuristic = {'userids':userids_sig, 'fitted_heuristic':fitted_heuristics_sig}
+    # sig_heuristic_df = pd.DataFrame(sig_heuristic)
     # for heuristic in heuristics:
     #     print heuristic
-    #     print bs.bootstrap(heuristics_fit[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #     df_fitted_heuristic = sig_heuristic_df.loc[sig_heuristic_df['fitted_heuristic'] == heuristic]
+    #     print float(df_fitted_heuristic.shape[0])/sig_heuristic_df.shape[0]
+    # print 1/0
 
-    #correct
-    print 'correct'
-    for heuristic in heuristics:
-        print heuristic
-        print bs.bootstrap(heuristics_fit_correct[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
-    #wrong
-    print 'wrong'
-    for heuristic in heuristics:
-        print heuristic
-        print bs.bootstrap(heuristics_fit_wrong[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
 
-    print 1/0
-    probs = []
-    for heuristic in heuristics:
-        probs = []
-        print heuristic
-        for i in range(len(win_scores)):
-            print win_scores[i]
-            # proprtions_heuristic = heuristics_fit_paramters.loc[(heuristics_fit_paramters['fitted_heuristic'] == heuristic) & (heuristics_fit_paramters['win_score'] == win_scores[i])]
-            proprtions_heuristic = heuristics_fit_paramters.loc[(heuristics_fit_paramters['fitted_heuristic'] == heuristic) & (heuristics_fit_paramters['win_score'] == win_scores[i]) & (heuristics_fit_paramters['blocking_score'] == 20)]
-            avg_proportion_heuristic = proprtions_heuristic.proportion_participants.mean()
-            print avg_proportion_heuristic
-            probs.append(avg_proportion_heuristic)
-            # heuristics_for_data.append(heuristic)
-            # paramaeter_changes.append(win_scores[i])
-            if (i > 0) & (avg_proportion_heuristic > 0.1):
-            # if (i > 0) :
-                # print i
-                prob_changes.append(abs(math.log((avg_proportion_heuristic/probs[i-1]),2)))
-                # prob_changes.append(abs(avg_proportion_heuristic/probs[i-1]))
-                # prob_changes.append((abs(avg_proportion_heuristic-probs[i-1])))
-                print probs[i-1]
-                print math.log(avg_proportion_heuristic/probs[i-1])
-                paramaeter_changes.append((win_scores[i]))
-                heuristics_for_data.append(heuristic)
-
-    changes_data = {'parameter_change': paramaeter_changes, 'proportion_change':prob_changes, 'heuristic':heuristics_for_data}
-    changes_df = pd.DataFrame(changes_data)
-    ax = sns.pointplot(x="parameter_change", y="proportion_change", hue='heuristic',data=changes_data, legend_out=False, legend=False)
-    # ax.set(yscale="log")
-    # ax.set(xscale="log")
-    plt.ylim([0,1])
-    plt.legend(loc='best')
-    plt.show()
-            # print heuristic
-            # heuristics_fit_paramters_filter = heuristics_fit_paramters.loc[heuristics_fit_paramters['fitted_heuristic'] == heuristic]
-            # print bs.bootstrap(heuristics_fit_paramters_filter['proportion_participants'].values, stat_func=bs_stats.mean, is_pivotal=False)
-
-    # participant heuristic fit figure-----
-    # heuristics_sensitivity_filtered = heuristics_sensitivity.loc[(heuristics_sensitivity['win_score'] == 100) & (heuristics_sensitivity['blocking_score'] == 10)]
+    # --------heuristic sensitivity analysis-------------
+    # heuristics = ['Density','Linear','Non-linear','Interaction','Forcing']
     #
-    # heuristics_sensitivity_filtered["heuristic_correct"] = zip(heuristics_sensitivity_filtered.user_count, heuristics_sensitivity_filtered.num_participants)
+    # # win_scores = [25, 250, 500, 750, 1000,1250, 1500, 1750, 2000, 2250, 2500]
+    # win_scores = [250, 500, 750, 1000,1250, 1500, 1750, 2000, 2250, 2500]
+    # # blocking_vals = [2,20,40,60,80,100,120,140,160,180,200]
+    # blocking_vals = [20,40,60,80,100,120,140,160,180,200]
+    # # log_changes = []
     #
+    # # heuristics_sensitivity_scores =  heuristics_sensitivity.groupby(['userid','win_score']).mean().reset_index()
+    # # heuristics_sensitivity_scores.to_csv('stats/heuristics_sensitivity_scores.csv')
+    # heuristics_sensitivity_scores = pd.read_csv('stats/heuristics_sensitivity_scores.csv')
     #
-    # def weighted_mean(x, **kws):
-    #     user_count, correct = map(np.asarray, zip(*x))
+    # # exit()
+    # changes = []
+    # folds = []
+    # heuristics_names = []
+    # heuristics_sensitivity_score_25 = heuristics_sensitivity_scores.loc[heuristics_sensitivity_scores['win_score'] == 25]
+    # for win_score in win_scores:
+    #     heuristics_sensitivity_score = heuristics_sensitivity_scores.loc[heuristics_sensitivity_scores['win_score'] == win_score]
+    #     fold = win_score/25.0
+    #     sum_changes = 0.0
+    #     for user in heuristics_sensitivity_score['userid'].unique():
+    #         user_scores_25 = heuristics_sensitivity_score_25.loc[heuristics_sensitivity_score_25['userid'] == user]
+    #         user_scores = heuristics_sensitivity_score.loc[heuristics_sensitivity_score['userid'] == user]
+    #         for h in heuristics:
+    #             # change = abs(np.log(user_scores[h].values[0]/user_scores_25[h].values[0]))
+    #             change = abs((user_scores[h].values[0]/user_scores_25[h].values[0]))
+    #             if change < 1:
+    #                 change = 1.0/change
+    #             change = change - 1
+    #             changes.append(change)
+    #             folds.append(fold)
+    #             heuristics_names.append(h)
     #
-    #     return user_count.sum() / float(correct[0])
+    # changes_dict = {'fold': folds, 'changes':changes, 'heuristic': heuristics_names}
+    # changes_df = pd.DataFrame(changes_dict)
     #
-    # # lambda x: True if x % 2 == 0 else False
-    # ax = sns.barplot(x = 'fitted_heuristic', y = 'heuristic_correct', hue="correct",   n_boot=1000, data = heuristics_sensitivity_filtered,  estimator=weighted_mean, orient="v",order=['density','linear','non-linear', 'interaction_blind', 'interaction','blocking_blind','blocking'])
-    # # ax = sns.barplot(x = 'fitted_heuristic', y = 'blocking', hue="correct",   n_boot=1000, data = heuristics_sensitivity_filtered)
+    # for h in heuristics:
+    #     print h
+    #     max_fold_df = changes_df.loc[(changes_df['fold'] == 100) & (changes_df['heuristic'] == h) ]
+    #     print bs.bootstrap(max_fold_df['changes'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # exit()
+    # plt.subplot(1,2,1)
+    # ax = sns.pointplot('fold', 'changes', hue='heuristic', data=changes_df, legend_out=False, legend=False)
+    # plt.gca().legend().set_title('')
+    # plt.legend(loc='best')
+    # ax.set_ylabel('Mean percent change in log-likelihood', fontsize=16)
+    # ax.set_xlabel('Fold change in winning score', fontsize=16)
+    # ax.tick_params(labelsize=14)
+    # # plt.show()
     #
-    # # ax = sns.factorplot(x="board", y="solutionAndValidationCorrectPercent", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=['o','^'], legend_out=False, legend=False)
-    # # data['board'] = data['board'].map({'6 MC': 'MC6','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
-    # # ax = sns.barplot(x="board", y="solutionAndValidationCorrectPercent",  hue="condition", data=data, n_boot=1000, order=['MC6', 'MC10', 'HC6', 'HC10', 'DC10'])
+    # # heuristics_sensitivity_blocking = heuristics_sensitivity.groupby(['userid','blocking_score']).mean().reset_index()
+    # # heuristics_sensitivity_blocking.to_csv('stats/heuristics_sensitivity_blocking_scores.csv')
+    # heuristics_sensitivity_blocking= pd.read_csv('stats/heuristics_sensitivity_blocking_scores.csv')
+    # changes = []
+    # folds = []
+    # heuristics_names = []
+    # heuristics_blocking_2 = heuristics_sensitivity_blocking.loc[heuristics_sensitivity_blocking['blocking_score'] == 2]
+    # for blocking_score in blocking_vals:
+    #     heuristics_sensitivity_score = heuristics_sensitivity_blocking.loc[heuristics_sensitivity_scores['blocking_score'] == blocking_score]
+    #     fold = blocking_score/2.0
+    #     sum_changes = 0.0
+    #     for user in heuristics_sensitivity_score['userid'].unique():
+    #         user_scores_2 = heuristics_blocking_2.loc[heuristics_blocking_2['userid'] == user]
+    #         user_scores = heuristics_sensitivity_score.loc[heuristics_sensitivity_score['userid'] == user]
+    #         for h in heuristics:
+    #             # change = abs(np.log(user_scores[h].values[0]/user_scores_25[h].values[0]))
+    #             change = abs((user_scores[h].values[0]/user_scores_2[h].values[0]))
+    #             if change < 1:
+    #                 change = 1.0/change
+    #             change = change - 1
+    #             changes.append(change)
+    #             folds.append(fold)
+    #             heuristics_names.append(h)
+    # plt.subplot(1,2,2)
+    # changes_dict_blocking = {'fold': folds, 'changes':changes, 'heuristic': heuristics_names}
+    # changes_blocking_df = pd.DataFrame(changes_dict_blocking)
+    # ax = sns.pointplot('fold', 'changes', data=changes_df)
+    # ax.set_ylabel('Mean percent change in log-likelihood', fontsize=16)
+    # ax.set_xlabel('Fold change in blocking score', fontsize=16)
+    # ax.tick_params(labelsize=14)
+    # plt.tight_layout()
+    # plt.show()
     # #
-    # # ax.set(xlabel='Board', ylabel='Percent Correct')
-    # # lw = ax.ax.lines[0].get_linewidth()
-    # # plt.setp(ax.ax.lines,linewidth=lw)
-    # plt.ylim([0, 1])
+    # #
+    # #
+    # # for h in heuristics:
+    # #     print h
+    # #     print bs.bootstrap(heuristics_sensitivity[h].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # exit()
+    # --------heuristic fit analysis-------------
+    # aggregations = {
+    #     'userid': 'count'
+    #     # 'userid': 'sum'
+    # }
+    #
+    # # heuristics_fit_paramters = heuristics_sensitivity.groupby(['win_score','blocking_score','fitted_heuristic']).agg(aggregations)
+    # # heuristics_fit_paramters.to_csv("stats/heuristic_fit_agg250718.csv")
+    # # print 1/0
+    # # sensitivity analysis
+    # heuristics_fit_paramters = pd.read_csv("stats/heuristic_fit_agg250718.csv")
+    # heuristics = ['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind']
+    # # win_scores = [25,50,100,200,400,800,1600,3200,6400,12800]
+    # # blocking_vals = [0.05, 0.1, 0.2, 0.4, 0.8]
+    # win_scores = [25, 250, 500, 750, 1000,1250, 1500, 1750, 2000, 2250, 2500]
+    # blocking_vals = [2,20,40,60,80,100,120,140,160,180,200]
+    # prob_changes = []
+    # paramaeter_changes = []
+    # heuristics_for_data = []
+    # heuristics_fit = pd.read_csv("stats/cogsci_heuristics250718_1.csv")
+    # heuristics_fit_correct = heuristics_fit.loc[heuristics_fit['correct'] == 1]
+    # heuristics_fit_wrong = heuristics_fit.loc[heuristics_fit['correct'] == 0]
+    #
+    # # print 'all'
+    # # for heuristic in heuristics:
+    # #     print heuristic
+    # #     print bs.bootstrap(heuristics_fit[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #
+    # #correct
+    # print 'correct'
+    # for heuristic in heuristics:
+    #     print heuristic
+    #     print bs.bootstrap(heuristics_fit_correct[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # #wrong
+    # print 'wrong'
+    # for heuristic in heuristics:
+    #     print heuristic
+    #     print bs.bootstrap(heuristics_fit_wrong[heuristic].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #
+    # print 1/0
+    # probs = []
+    # for heuristic in heuristics:
+    #     probs = []
+    #     print heuristic
+    #     for i in range(len(win_scores)):
+    #         print win_scores[i]
+    #         # proprtions_heuristic = heuristics_fit_paramters.loc[(heuristics_fit_paramters['fitted_heuristic'] == heuristic) & (heuristics_fit_paramters['win_score'] == win_scores[i])]
+    #         proprtions_heuristic = heuristics_fit_paramters.loc[(heuristics_fit_paramters['fitted_heuristic'] == heuristic) & (heuristics_fit_paramters['win_score'] == win_scores[i]) & (heuristics_fit_paramters['blocking_score'] == 20)]
+    #         avg_proportion_heuristic = proprtions_heuristic.proportion_participants.mean()
+    #         print avg_proportion_heuristic
+    #         probs.append(avg_proportion_heuristic)
+    #         # heuristics_for_data.append(heuristic)
+    #         # paramaeter_changes.append(win_scores[i])
+    #         if (i > 0) & (avg_proportion_heuristic > 0.1):
+    #         # if (i > 0) :
+    #             # print i
+    #             prob_changes.append(abs(math.log((avg_proportion_heuristic/probs[i-1]),2)))
+    #             # prob_changes.append(abs(avg_proportion_heuristic/probs[i-1]))
+    #             # prob_changes.append((abs(avg_proportion_heuristic-probs[i-1])))
+    #             print probs[i-1]
+    #             print math.log(avg_proportion_heuristic/probs[i-1])
+    #             paramaeter_changes.append((win_scores[i]))
+    #             heuristics_for_data.append(heuristic)
+    #
+    # changes_data = {'parameter_change': paramaeter_changes, 'proportion_change':prob_changes, 'heuristic':heuristics_for_data}
+    # changes_df = pd.DataFrame(changes_data)
+    # ax = sns.pointplot(x="parameter_change", y="proportion_change", hue='heuristic',data=changes_data, legend_out=False, legend=False)
+    # # ax.set(yscale="log")
+    # # ax.set(xscale="log")
+    # plt.ylim([0,1])
     # plt.legend(loc='best')
     # plt.show()
-    # participant success rate figure end-----
-
-
-    # print heuristics_fit_paramters
-    print 1/0
+    #         # print heuristic
+    #         # heuristics_fit_paramters_filter = heuristics_fit_paramters.loc[heuristics_fit_paramters['fitted_heuristic'] == heuristic]
+    #         # print bs.bootstrap(heuristics_fit_paramters_filter['proportion_participants'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    #
+    # # participant heuristic fit figure-----
+    # # heuristics_sensitivity_filtered = heuristics_sensitivity.loc[(heuristics_sensitivity['win_score'] == 100) & (heuristics_sensitivity['blocking_score'] == 10)]
+    # #
+    # # heuristics_sensitivity_filtered["heuristic_correct"] = zip(heuristics_sensitivity_filtered.user_count, heuristics_sensitivity_filtered.num_participants)
+    # #
+    # #
+    # # def weighted_mean(x, **kws):
+    # #     user_count, correct = map(np.asarray, zip(*x))
+    # #
+    # #     return user_count.sum() / float(correct[0])
+    # #
+    # # # lambda x: True if x % 2 == 0 else False
+    # # ax = sns.barplot(x = 'fitted_heuristic', y = 'heuristic_correct', hue="correct",   n_boot=1000, data = heuristics_sensitivity_filtered,  estimator=weighted_mean, orient="v",order=['density','linear','non-linear', 'interaction_blind', 'interaction','blocking_blind','blocking'])
+    # # # ax = sns.barplot(x = 'fitted_heuristic', y = 'blocking', hue="correct",   n_boot=1000, data = heuristics_sensitivity_filtered)
+    # #
+    # # # ax = sns.factorplot(x="board", y="solutionAndValidationCorrectPercent", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=['o','^'], legend_out=False, legend=False)
+    # # # data['board'] = data['board'].map({'6 MC': 'MC6','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
+    # # # ax = sns.barplot(x="board", y="solutionAndValidationCorrectPercent",  hue="condition", data=data, n_boot=1000, order=['MC6', 'MC10', 'HC6', 'HC10', 'DC10'])
+    # # #
+    # # # ax.set(xlabel='Board', ylabel='Percent Correct')
+    # # # lw = ax.ax.lines[0].get_linewidth()
+    # # # plt.setp(ax.ax.lines,linewidth=lw)
+    # # plt.ylim([0, 1])
+    # # plt.legend(loc='best')
+    # # plt.show()
+    # # participant success rate figure end-----
+    #
+    #
+    # # print heuristics_fit_paramters
+    # print 1/0
     # --------end heuristic fit analysis------
 
 
@@ -2148,9 +3463,9 @@ if __name__== "__main__":
     # blockingWrong = blocking.loc[blocking['participants'] == 'wrong']
     #
     # print bs.bootstrap(data['timeMinutes'].values, stat_func=bs_stats.mean, is_pivotal=False)
-
-
-    # print bootstrap_t_pvalue(wrong['actionsSolution'].values, correct['actionsSolution'].values)
+    #
+    #
+    # # print bootstrap_t_pvalue(wrong['actionsSolution'].values, correct['actionsSolution'].values)
     # print bs.bootstrap(density['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(linear['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(nonLinear['value'].values, stat_func=bs_stats.mean, is_pivotal=False)
@@ -2181,7 +3496,7 @@ if __name__== "__main__":
     # print bootstrap_t_pvalue(nonLinearCorrect['value'].values, nonLinearWrong['value'].values)
     # print bootstrap_t_pvalue(nonLinearInteractionCorrect['value'].values, nonLinearInteractionWrong['value'].values)
     # print bootstrap_t_pvalue(blockingCorrect['value'].values, blockingWrong['value'].values)
-    # print 'hello'
+    # exit()
     # sns.set_style("darkgrid")
     # ax = sns.factorplot(x="size_type", y="actionsSolution",col="condition", hue="solutionAndValidationCorrect", data=data, n_boot=1000, order=['6_easy', '10_easy', '6_hard', '10_hard', '10_medium'])
     # ax = sns.factorplot(x="board", y="solutionAndValidationCorrect", hue="condition", data=data, n_boot=1000, order=['6_easy', '10_easy', '6_hard', '10_hard', '10_medium'], markers=['o','^'], linestyles=["-", "--"], legend=False)
@@ -2391,151 +3706,552 @@ if __name__== "__main__":
 
 
     # ----------o blindness - missing winning moves ---------------
-    moves = dynamics.loc[(dynamics['action'] == 'click')]
-    misses = []
-    players = []
-    boards = []
-    distances = []
-    open = []
-
-    for index, row in moves.iterrows():
-        if row['top_possible_score'] == 100:
-            if row['score_move'] < 100:
-                misses.append(1)
-            else:
-                misses.append(0)
-            players.append(row['player'])
-            boards.append(row['board_name'])
-            distances.append(row['shutter'])
-            open.append(row['open_path'])
-
-    misses_data = {'board': boards, 'player':players, 'missed_win':misses, 'shutter':distances, 'open_path':open}
-    misses_data = pd.DataFrame(misses_data)
-
-
-    missed_wins_x = misses_data.loc[(misses_data['player'] == 1) & (misses_data['open_path'] == True)]
-    missed_wins_o = misses_data.loc[(misses_data['player'] == 2) & (misses_data['open_path'] == True)]
+    # moves = dynamics.loc[(dynamics['action'] == 'click')]
+    # misses = []
+    # players = []
+    # boards = []
+    # distances = []
+    # open = []
+    #
+    # for index, row in moves.iterrows():
+    #     if row['top_possible_score'] == 100:
+    #         if row['score_move'] < 100:
+    #             misses.append(1)
+    #         else:
+    #             misses.append(0)
+    #         players.append(row['player'])
+    #         boards.append(row['board_name'])
+    #         distances.append(row['shutter'])
+    #         open.append(row['open_path'])
+    #
+    # misses_data = {'board': boards, 'player':players, 'missed_win':misses, 'shutter':distances, 'open_path':open}
+    # misses_data = pd.DataFrame(misses_data)
+    #
+    #
+    # # missed_wins_x = misses_data.loc[(misses_data['player'] == 1) & (misses_data['open_path'] == True)]
+    # # missed_wins_o = misses_data.loc[(misses_data['player'] == 2) & (misses_data['open_path'] == True)]
     # missed_wins_x = misses_data.loc[(misses_data['player'] == 1) ]
     # missed_wins_o = misses_data.loc[(misses_data['player'] == 2)]
-    print bootstrap_t_pvalue(missed_wins_x['missed_win'].values, missed_wins_o['missed_win'].values)
-    print bs.bootstrap(missed_wins_x['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(missed_wins_o['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
-
-
-
-    print bootstrap_t_pvalue(missed_wins_x['shutter'].values, missed_wins_o['shutter'].values)
-    print bs.bootstrap(missed_wins_x['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(missed_wins_o['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print bs.bootstrap(entropies_pruned, stat_func=bs_stats.mean, is_pivotal=False)
-
-    print '----'
-    unmissed_wins_x = missed_wins_x.loc[missed_wins_x['missed_win'] == 0]
-    unmissed_wins_o = missed_wins_o.loc[missed_wins_o['missed_win'] == 0]
-    print unmissed_wins_x.shape[0]
-    print unmissed_wins_o.shape[0]
-    print bs.bootstrap(unmissed_wins_x['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(unmissed_wins_o['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    unmissed_wins_x = missed_wins_x.loc[missed_wins_x['missed_win'] == 1]
-    unmissed_wins_o = missed_wins_o.loc[missed_wins_o['missed_win'] == 1]
-    print unmissed_wins_x.shape[0]
-    print unmissed_wins_o.shape[0]
-    print bs.bootstrap(unmissed_wins_x['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    print bs.bootstrap(unmissed_wins_o['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # misses_data.to_csv('stats/misses_data230718.csv')
-    print 1/0
+    # print bootstrap_t_pvalue(missed_wins_x['missed_win'].values, missed_wins_o['missed_win'].values)
+    # print bs.bootstrap(missed_wins_x['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(missed_wins_o['missed_win'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print stats.mannwhitneyu(missed_wins_x['missed_win'].values,missed_wins_o['missed_win'].values)
+    # print rank_biserial_effect_size(missed_wins_x['missed_win'].values,missed_wins_o['missed_win'].values)
+    #
+    #
+    # print bootstrap_t_pvalue(missed_wins_x['shutter'].values, missed_wins_o['shutter'].values)
+    # print bs.bootstrap(missed_wins_x['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(missed_wins_o['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # print bs.bootstrap(entropies_pruned, stat_func=bs_stats.mean, is_pivotal=False)
+    #
+    # # figure x misses vs o misses pnas
+    # # plt.subplots(2,1,figsize=(3,6))
+    # plt.subplot(1,3,2)
+    #
+    # misses_data['player'] = misses_data['player'].map({1: 'X', 2:'O'})
+    # misses_data['missed_win'] = misses_data['missed_win'].apply(lambda x: x*100)
+    # ax = sns.barplot(x='player', y='missed_win', n_boot=1000, ci=68, data=misses_data)
+    # ax.set_xlabel('Player', fontsize=12)
+    # ax.set_ylabel('Missed Wins Percent', fontsize=12)
+    # ax.tick_params(labelsize=11)
+    # plt.ylim(0,100)
+    # plt.tight_layout(pad=2.5)
+    # plt.show()
+    #
+    # print '----'
+    # # unmissed_wins_x = missed_wins_x.loc[missed_wins_x['missed_win'] == 0]
+    # # unmissed_wins_o = missed_wins_o.loc[missed_wins_o['missed_win'] == 0]
+    # # print unmissed_wins_x.shape[0]
+    # # print unmissed_wins_o.shape[0]
+    # # print bs.bootstrap(unmissed_wins_x['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # print bs.bootstrap(unmissed_wins_o['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # unmissed_wins_x = missed_wins_x.loc[missed_wins_x['missed_win'] == 1]
+    # # unmissed_wins_o = missed_wins_o.loc[missed_wins_o['missed_win'] == 1]
+    # # print unmissed_wins_x.shape[0]
+    # # print unmissed_wins_o.shape[0]
+    # # print bs.bootstrap(unmissed_wins_x['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # print bs.bootstrap(unmissed_wins_o['shutter'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # # misses_data.to_csv('stats/misses_data230718.csv')
+    # print 1/0
     # ----------end o blindness - missing winning moves ---------------
 
-    # ------ move entropy full vs truncated boards ------
-    # # entropies = pd.read_csv("stats/entropies_data.csv")
-    # # # g = sns.FacetGrid(entropies, col="sizeType", legend_out=False)
-    # # ax = sns.barplot(x="condition",y="entropy", data = entropies)
-    # # # print moves_s['board_name'].unique()
-    # # # plt.title("tt")
-    # # plt.show()
-    # # states = states.loc[(states['action'] == 'click') & (states['sizeType'] == '10medium')]
-    # states = dynamics.loc[(dynamics['action'] == 'click')]
-    # board_states = states['board_state'].unique()
-    # entropies_pruned = []
-    # entropies_full = []
-    # states_data = []
-    # boards = []
-    # solved = []
-    # conditions = []
-    # # heuristics = []
-    # entropies = []
-    # for s in board_states:
-    #     moves_s = states.loc[(states['board_state'] == s)]
-    #     if (len(moves_s['path'].unique()) > 1):
-    #         check = True
-    #         for p in moves_s['path'].unique():
-    #             m_p = moves_s.loc[moves_s['path'] == p]
-    #             if m_p.shape[0] < 5:
-    #                 check = False
-    #                 break
-    #         if check:
-    #             # vals = moves_s['position'].unique()
-    #             #
-    #             # g = sns.FacetGrid(moves_s, col="condition", legend_out=False)
-    #             # g.map(sns.countplot, "position", order= vals, color="steelblue", lw=0)
-    #             # print moves_s['board_name'].unique()
-    #             # # plt.title("tt")
-    #             # plt.show()
+    # ------ new figure 4 pnas: move entropy full vs truncated boards ------
+    # print 'non-solvers'
+    # states = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['solved'] == 'validatedCorrect')]
+    # # states = dynamics.loc[(dynamics['action'] == 'click')]
+    # # states = states.loc[(states['action'] == 'click') & (states['board_name'].isin(['10_medium_full', '10_medium_pruned']))]
+    # print states.shape[0]
     #
-    #             pk = []
-    #             moves_pruned = moves_s.loc[moves_s['condition'] == 'pruned']
-    #             mp = moves_pruned['position'].unique()
-    #             total = moves_pruned.shape[0] + 0.0
-    #             for m in mp:
-    #                 count = moves_pruned[moves_pruned['position'] == m].shape[0]
-    #                 pk.append(float(count)/float(total))
-    #             ent = stats.entropy(pk)
-    #             entropies_pruned.append(ent)
-    #             states_data.append(s)
-    #             boards.append(moves_pruned['board_name'].unique()[0])
-    #             solvers = moves_pruned[moves_pruned['solved'] == 'validatedCorrect'].shape[0]
-    #             solved.append(float(solvers)/total)
-    #             conditions.append('pruned')
-    #             # heuristics.append()
-    #             entropies.append(float(ent))
-    #             pk = []
+    # states_pruned = states.loc[states['board_name'].isin(['6_easy_pruned','10_easy_pruned','10_hard_pruned','6_hard_pruned','10_medium_pruned'])]
+    # states_pruned_len0 = states_pruned.loc[((states['move_number_in_path'] == 1))]
     #
-    #             moves_full = moves_s.loc[moves_s['condition'] == 'full']
-    #             mf = moves_full['position'].unique()
-    #             total = moves_full.shape[0] + 0.0
-    #             for m in mf:
-    #                 count = moves_full[moves_full['position'] == m].shape[0]
-    #                 pk.append(float(count)/float(total))
-    #             ent = stats.entropy(pk)
-    #             entropies_full.append(ent)
-    #             states_data.append(s)
-    #             solvers = moves_full[moves_full['solved'] == 'validatedCorrect'].shape[0]
-    #             solved.append(float(solvers)/total)
-    #             boards.append(moves_full['board_name'].unique()[0])
-    #             conditions.append('full')
-    #             entropies.append(float(ent))
-    # entropies_data = {'board': boards, 'state': states_data, 'entropy':entropies, 'solvers':solved, 'condition':conditions}
+    # # states = states.loc[states['move_number_in_path'] < 4]  # checking just first two moves
+    # print states.shape[0]
+    # board_states = states_pruned['board_state'].unique()
+    # print len(board_states)
+    # counter_full = 0.0
+    # counter_pruned = 0.0
+    # mean_entropy_full = []
+    # mean_entropy_pruned = []
+    # mean_entropies = []
+    # mean_conditions = []
+    # for i in range(1000):
+    #     entropies_pruned = []
+    #     entropies_full = []
+    #     states_data = []
+    #     boards = []
+    #     solved = []
+    #     conditions = []
+    #     # heuristics = []
+    #     entropies = []
+    #     for s in board_states:
+    #         moves_s_all = states.loc[(states['board_state'] == s)]
+    #
+    #
+    #         moves_s = moves_s_all.sample(frac=1, replace=True)
+    #         if (len(moves_s['path'].unique()) > 1):
+    #             check = True
+    #             for p in moves_s['path'].unique():
+    #                 m_p = moves_s.loc[moves_s['path'] == p]
+    #                 if m_p.shape[0] < 5:
+    #                     check = False
+    #                     break
+    #             if check:
+    #                 pk = []
+    #                 moves_pruned = moves_s.loc[moves_s['condition'] == 'pruned']
+    #                 if moves_pruned.shape[0]== 0:
+    #                     continue
+    #                 # moves_pruned = moves_pruned.sample(frac=0.25)
+    #                 counter_pruned += moves_pruned.shape[0]
+    #                 mp = moves_pruned['position'].unique()
+    #                 total = moves_pruned.shape[0] + 0.0
+    #                 for m in mp:
+    #                     count = moves_pruned[moves_pruned['position'] == m].shape[0]
+    #                     pk.append(float(count)/float(total))
+    #                 ent = stats.entropy(pk)
+    #                 entropies_pruned.append(ent)
+    #                 states_data.append(s)
+    #                 boards.append(moves_pruned['board_name'].unique()[0])
+    #                 solvers = moves_pruned[moves_pruned['solved'] != 'validatedCorrect'].shape[0]
+    #                 if total > 0:
+    #                     solved.append(float(solvers)/total)
+    #                 else:
+    #                     solved.append(0.0)
+    #                 conditions.append('pruned')
+    #                 entropies.append(float(ent))
+    #
+    #                 pk = []
+    #                 moves_full = moves_s.loc[moves_s['condition'] == 'full']
+    #                 if moves_full.shape[0]== 0:
+    #                     continue
+    #                 counter_full += moves_full.shape[0]
+    #                 mf = moves_full['position'].unique()
+    #                 total = moves_full.shape[0] + 0.0
+    #                 for m in mf:
+    #                     count = moves_full[moves_full['position'] == m].shape[0]
+    #                     pk.append(float(count)/float(total))
+    #                 ent = stats.entropy(pk)
+    #                 entropies_full.append(ent)
+    #                 states_data.append(s)
+    #                 solvers = moves_full[moves_full['solved'] == 'validatedCorrect'].shape[0]
+    #                 if total > 0:
+    #                     solved.append(float(solvers)/total)
+    #                 else:
+    #                     solved.append(0.0)
+    #                 boards.append(moves_full['board_name'].unique()[0])
+    #                 conditions.append('full')
+    #                 entropies.append(float(ent))
+    #     mean_entropies.append(np.mean(entropies_full))
+    #     mean_conditions.append('Full')
+    #     mean_entropies.append(np.mean(entropies_pruned))
+    #     mean_conditions.append('Truncated')
+    #     mean_entropy_full.append(np.mean(entropies_full))
+    #     mean_entropy_pruned.append(np.mean(entropies_pruned))
+    #
+    # entropies_data = {'condition': mean_conditions, 'entropy': mean_entropies}
     # entropies_data = pd.DataFrame(entropies_data)
-    #
-    #
+    # print 'lengths:'
+    # print len(mean_entropy_full)
+    # print len(mean_entropy_pruned)
+    # entropies_data.to_csv('stats/entropies_all_states_070119_non-solvers_1000.csv')
+
+    entropies_data = pd.read_csv('stats/entropies_all_states_070119_solvers_1000.csv')
+    mean_entropy_full = entropies_data.loc[entropies_data['condition'] == 'Full']
+    mean_entropy_full = mean_entropy_full['entropy'].values
+    mean_entropy_pruned = entropies_data.loc[entropies_data['condition'] == 'Truncated']
+    mean_entropy_pruned = mean_entropy_pruned['entropy'].values
+    full_ci = np.nanpercentile( np.asarray(mean_entropy_full), q=(100*0.05/2, 100*(1-0.05/2)))
+    pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
+
+    print '--stats--'
+    # bootstrap_t_pvalue(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all))
+    # bootstrap_t_pvalue_after_sampling(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all), np.asmatrix(x_boot), np.asmatrix(y_boot))
+    print np.mean(mean_entropy_full)
+    print full_ci
+    print np.mean(mean_entropy_pruned)
+    print pruned_ci
+    print stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned)
+    print rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned)
+    print '--first--'
+
+    # plt.figure(figsize=(5,5))
+    plt.subplot(1,2,1)
+    # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
+    ax = sns.barplot(x='condition', y='entropy',ci='custom', data=entropies_data)
+    ax.set_xlabel('Condition', fontsize=14)
+    # ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+    ax.set_ylabel('Entropy (solvers)', fontsize=14)
+
+    ax.tick_params(labelsize=14)
+
+    entropies_data = pd.read_csv('stats/entropies_all_states_070119_non-solvers_1000.csv')
+    mean_entropy_full = entropies_data.loc[entropies_data['condition'] == 'Full']
+    mean_entropy_full = mean_entropy_full['entropy'].values
+    mean_entropy_pruned = entropies_data.loc[entropies_data['condition'] == 'Truncated']
+    mean_entropy_pruned = mean_entropy_pruned['entropy'].values
+    full_ci = np.nanpercentile( np.asarray(mean_entropy_full), q=(100*0.05/2, 100*(1-0.05/2)))
+    pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
+
+    print '--stats--'
+    # bootstrap_t_pvalue(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all))
+    # bootstrap_t_pvalue_after_sampling(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all), np.asmatrix(x_boot), np.asmatrix(y_boot))
+    print np.mean(mean_entropy_full)
+    print full_ci
+    print np.mean(mean_entropy_pruned)
+    print pruned_ci
+    print stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned)
+    print rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned)
+    print '--first--'
+
+    # plt.figure(figsize=(5,5))
+    plt.subplot(1,2,2)
+    # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
+    ax = sns.barplot(x='condition', y='entropy',ci='custom', data=entropies_data)
+    ax.set_xlabel('Condition', fontsize=14)
+    # ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+    ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+
+    ax.tick_params(labelsize=14)
+    # plt.title("non-solvers first moves")
+    plt.tight_layout(pad=1.5)
+    plt.show()
+
+    exit()
+
+    # ------ end new figure 4 pnas: move entropy full vs truncated boards ------
+
+    # ------ figure 4 pnas: move entropy full vs truncated boards ------
+    # entropies = pd.read_csv("stats/entropies_data.csv")
+    # # g = sns.FacetGrid(entropies, col="sizeType", legend_out=False)
+    # ax = sns.barplot(x="condition",y="entropy", data = entropies)
+    # # print moves_s['board_name'].unique()
     # # plt.title("tt")
-    # # plt.show()
-    # entropies_data.to_csv('stats/entropies_data_230718.csv')
+    # plt.show()
+
+    states = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['solved'] != 'validatedCorrect')]
+    # states = dynamics.loc[(dynamics['action'] == 'click')]
+    # states = states.loc[(states['action'] == 'click') & (states['board_name'].isin(['10_medium_full', '10_medium_pruned']))]
+    print states.shape[0]
+
+    states_pruned = states.loc[states['board_name'].isin(['6_easy_pruned','10_easy_pruned','10_hard_pruned','6_hard_pruned','10_medium_pruned'])]
+    states_pruned_len0 = states.loc[((states['move_number_in_path'] == 1))]
+
+    # states = states.loc[states['move_number_in_path'] < 4]  # checking just first two moves
+    print states.shape[0]
+    board_states = states_pruned['board_state'].unique()
+    print 'this'
+    print len(board_states)
+    entropies_pruned = []
+    entropies_full = []
+    states_data = []
+    boards = []
+    solved = []
+    conditions = []
+    # heuristics = []
+    entropies = []
+    counter_pruned = 0
+    counter_full = 0
+    mean_entropy_pruned = []
+    mean_entropy_full = []
+    x_boot = []
+    y_boot = []
+
+    entropies_full_all = []
+    entropies_pruned_all = []
+    for s in board_states:
+        moves_s_all = states.loc[(states['board_state'] == s)]
+
+        # compute on all sample
+
+        moves_s = moves_s_all
+        if (len(moves_s['path'].unique()) > 1):
+            check = True
+            for p in moves_s['path'].unique():
+                m_p = moves_s.loc[moves_s['path'] == p]
+                if m_p.shape[0] < 5:
+                    check = False
+                    break
+            if check:
+                # counter += 1
+                # vals = moves_s['position'].unique()
+                #
+                # g = sns.FacetGrid(moves_s, col="condition", legend_out=False)
+                # g.map(sns.countplot, "position", order= vals, color="steelblue", lw=0)
+                # print moves_s['board_name'].unique()
+                # # plt.title("tt")
+                # plt.show()
+
+                pk = []
+                moves_pruned = moves_s.loc[moves_s['condition'] == 'pruned']
+                # moves_pruned = moves_pruned.sample(frac=0.25)
+                counter_pruned += moves_pruned.shape[0]
+                mp = moves_pruned['position'].unique()
+                total = moves_pruned.shape[0] + 0.0
+                for m in mp:
+                    count = moves_pruned[moves_pruned['position'] == m].shape[0]
+                    pk.append(float(count)/float(total))
+                ent = stats.entropy(pk)
+                entropies_pruned.append(ent)
+                states_data.append(s)
+                boards.append(moves_pruned['board_name'].unique()[0])
+                solvers = moves_pruned[moves_pruned['solved'] != 'validatedCorrect'].shape[0]
+                solved.append(float(solvers)/total)
+                conditions.append('pruned')
+                # heuristics.append()
+                entropies.append(float(ent))
+                pk = []
+
+                moves_full = moves_s.loc[moves_s['condition'] == 'full']
+                counter_full += moves_full.shape[0]
+                mf = moves_full['position'].unique()
+                total = moves_full.shape[0] + 0.0
+                for m in mf:
+                    count = moves_full[moves_full['position'] == m].shape[0]
+                    pk.append(float(count)/float(total))
+                ent = stats.entropy(pk)
+                entropies_full.append(ent)
+                states_data.append(s)
+                solvers = moves_full[moves_full['solved'] == 'validatedCorrect'].shape[0]
+                solved.append(float(solvers)/total)
+                boards.append(moves_full['board_name'].unique()[0])
+                conditions.append('full')
+                entropies.append(float(ent))
+    entropies_data = {'board': boards, 'state': states_data, 'entropy':entropies, 'solvers':solved, 'condition':conditions}
+    entropies_data = pd.DataFrame(entropies_data)
+    mean_full_all = np.mean(entropies_full)
+    mean_pruned_all = np.mean(entropies_pruned)
+    entropies_full_all = copy.deepcopy(entropies_full)
+    entropies_pruned_all = copy.deepcopy(entropies_pruned)
+    print '--stats on full sample'
+    print 'full moves'
+    print counter_full
+    print 'truncated moves'
+    print counter_pruned
+    # exit()
+    # print entropies_full
+    # print entropies_pruned
+    print stats.mannwhitneyu(entropies_full, entropies_pruned)
+    print rank_biserial_effect_size(entropies_full, entropies_pruned)
+    print '--stats on full sample end'
+    entropies_data['condition'] = entropies_data['condition'].map({'full': 'Full', 'pruned': 'Truncated'})
+    plt.figure(figsize=(5,5))
+    # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
+    ax = sns.barplot(x='condition', y='entropy',ci=68, data=entropies_data, order=['Full', 'Truncated'])
+    ax.set_xlabel('Condition', fontsize=14)
+    # ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+    ax.set_ylabel('Entropy', fontsize=14)
+
+    ax.tick_params(labelsize=12)
+    # plt.title("non-solvers first moves")
+    # plt.tight_layout()
+    plt.show()
+    # exit()
+
+    entropies_pruned = []
+    entropies_full = []
+    states_data = []
+    boards = []
+    solved = []
+    conditions = []
+    # heuristics = []
+    entropies = []
+    counter_pruned = 0
+    counter_full = 0
+    mean_entropy_pruned = []
+    mean_entropy_full = []
+    x_boot = []
+    y_boot = []
+
+    entropies_full_all = []
+    entropies_pruned_all = []
+    for i in range(1000):
+        for s in board_states:
+            moves_s_all = states.loc[(states['board_state'] == s)]
+
+            x_boot_sample = []
+            y_boot_sample = []
+            entropies_pruned = []
+            entropies_full = []
+            moves_s = moves_s_all.sample(frac=1, replace=True)
+            if (len(moves_s['path'].unique()) > 1):
+                check = True
+                for p in moves_s['path'].unique():
+                    m_p = moves_s.loc[moves_s['path'] == p]
+                    if m_p.shape[0] < 5:
+                        check = False
+                        break
+                if check:
+                    # counter += 1
+                    # vals = moves_s['position'].unique()
+                    #
+                    # g = sns.FacetGrid(moves_s, col="condition", legend_out=False)
+                    # g.map(sns.countplot, "position", order= vals, color="steelblue", lw=0)
+                    # print moves_s['board_name'].unique()
+                    # # plt.title("tt")
+                    # plt.show()
+
+                    pk = []
+                    moves_pruned = moves_s.loc[moves_s['condition'] == 'pruned']
+                    if moves_pruned.shape[0]== 0:
+                        continue
+                    # moves_pruned = moves_pruned.sample(frac=0.25)
+                    counter_pruned += moves_pruned.shape[0]
+                    mp = moves_pruned['position'].unique()
+                    total = moves_pruned.shape[0] + 0.0
+                    for m in mp:
+                        count = moves_pruned[moves_pruned['position'] == m].shape[0]
+                        pk.append(float(count)/float(total))
+                    ent = stats.entropy(pk)
+                    y_boot_sample.append(ent - mean_pruned_all)
+                    entropies_pruned.append(ent)
+                    states_data.append(s)
+                    boards.append(moves_pruned['board_name'].unique()[0])
+                    solvers = moves_pruned[moves_pruned['solved'] != 'validatedCorrect'].shape[0]
+                    if total > 0:
+                        solved.append(float(solvers)/total)
+                    else:
+                        solved.append(0.0)
+                    conditions.append('pruned')
+                    # heuristics.append()
+                    entropies.append(float(ent))
+                    pk = []
+
+                    moves_full = moves_s.loc[moves_s['condition'] == 'full']
+                    if moves_full.shape[0]== 0:
+                        continue
+                    counter_full += moves_full.shape[0]
+                    mf = moves_full['position'].unique()
+                    total = moves_full.shape[0] + 0.0
+                    for m in mf:
+                        count = moves_full[moves_full['position'] == m].shape[0]
+                        pk.append(float(count)/float(total))
+                    ent = stats.entropy(pk)
+                    entropies_full.append(ent)
+                    states_data.append(s)
+                    solvers = moves_full[moves_full['solved'] == 'validatedCorrect'].shape[0]
+                    if total > 0:
+                        solved.append(float(solvers)/total)
+                    else:
+                        solved.append(0.0)
+                    boards.append(moves_full['board_name'].unique()[0])
+                    conditions.append('full')
+                    entropies.append(float(ent))
+                    x_boot_sample.append(ent - mean_full_all)
+                if len(entropies_full) > 0 and len(entropies_pruned) > 0:
+                    mean_entropy_full.append(np.mean(entropies_full))
+                    mean_entropy_pruned.append(np.mean(entropies_pruned))
+                    x_boot.append(x_boot_sample)
+                    y_boot.append(y_boot_sample)
+
+    entropies_data = {'board': boards, 'state': states_data, 'entropy':entropies, 'solvers':solved, 'condition':conditions}
+    entropies_data = pd.DataFrame(entropies_data)
+    entropies_data['condition'] = entropies_data['condition'].map({'full': 'full', 'pruned': 'truncated'})
+    entropies_data.to_csv('stats/entropies_data_all_paths_non-solvers070119.csv')
+    df_means_full = pd.DataFrame({'entropy': mean_entropy_full})
+    df_means_full['condition'] = 'Full'
+    df_means_pruned = pd.DataFrame({'entropy': mean_entropy_pruned})
+    df_means_pruned['condition'] = 'Truncated'
+    df_means_all = df_means_full.append(df_means_pruned)
+    df_means_all.to_csv('stats/df_means_all_paths_non-solvers070119.csv')
+    # entropies_data.to_csv('stats/entropies_data_082118.csv')
+    # plt.subplot(2,1,1)
+
+
+    # df_means_all = pd.read_csv('stats/df_means_all_paths070119.csv')
+    # entropies_data = pd.read_csv('stats/entropies_data_all_paths070119.csv')
+    plt.figure(figsize=(5,5))
+    # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
+    ax = sns.barplot(x='condition', y='entropy',ci=68, data=entropies_data)
+    ax.set_xlabel('Condition', fontsize=14)
+    # ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+    ax.set_ylabel('Entropy', fontsize=14)
+
+    ax.tick_params(labelsize=12)
+    # plt.title("non-solvers first moves")
+    # plt.tight_layout()
+    plt.show()
+    #
+    # plt.figure(figsize=(5,5))
+    # # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
+    # ax = sns.barplot(x='condition', y='entropy', n_boot=1000, ci=68, data=entropies_data)
+    # ax.set_xlabel('Condition', fontsize=14)
+    # # ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+    # ax.set_ylabel('Entropy', fontsize=14)
+    #
+    # ax.tick_params(labelsize=12)
+    # # plt.title("non-solvers first moves")
+    # # plt.tight_layout()
+    # plt.show()
+
+    plt.figure(figsize=(5,5))
+    # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
+    ax = sns.barplot(x='condition', y='entropy',ci='sd', data=df_means_all)
+    ax.set_xlabel('Condition', fontsize=14)
+    # ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+    ax.set_ylabel('Entropy', fontsize=14)
+
+    ax.tick_params(labelsize=12)
+    # plt.title("non-solvers first moves")
+    # plt.tight_layout()
+    plt.show()
+
+
     # print entropies_data
-    # print np.mean(entropies_full)
-    # print np.mean(entropies_pruned)
-    #
-    # print np.std(entropies_full)
-    # print np.std(entropies_pruned)
-    #
-    # # entropies_full = np.asarray(entropies_full)
+    print np.mean(entropies_full)
+    print np.mean(entropies_pruned)
+    print np.mean(entropies_pruned)
+
+    print np.std(entropies_full)
+    print np.std(entropies_pruned)
+
+    entropies_full = np.asarray(entropies_full)
     # entropies_full = entropies_data.loc[entropies_data['condition']=='full']
-    # entropies_pruned = entropies_data.loc[entropies_data['condition']=='pruned']
-    # # entropies_pruned = np.asarray(entropies_pruned)
+    # entropies_pruned = entropies_data.loc[entropies_data['condition']=='truncated']
+    entropies_pruned = np.asarray(entropies_pruned)
     # print bootstrap_t_pvalue(entropies_pruned['entropy'].values, entropies_full['entropy'].values)
-    # # print bs.bootstrap(entropies_full, stat_func=bs_stats.mean, is_pivotal=False)
-    # # print bs.bootstrap(entropies_pruned, stat_func=bs_stats.mean, is_pivotal=False)
-    # # print bootstrap_t_pvalue(entropies_full, entropies_pruned)
-    # print 1/0
+
+    full_ci = np.nanpercentile( np.asarray(mean_entropy_full), q=(100*0.05/2, 100*(1-0.05/2)))
+    pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
+
+    print '--first non-solvers--'
+    # bootstrap_t_pvalue(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all))
+    # bootstrap_t_pvalue_after_sampling(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all), np.asmatrix(x_boot), np.asmatrix(y_boot))
+    print np.mean(mean_entropy_full)
+    print full_ci
+    print np.mean(mean_entropy_pruned)
+    print pruned_ci
+    print stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned)
+    print rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned)
+    print '--first--'
+    # # # print bs.bootstrap(entropies_full, stat_func=bs_stats.mean, is_pivotal=False)
+    # # # print bs.bootstrap(entropies_pruned, stat_func=bs_stats.mean, is_pivotal=False)
+    # # # print stats.mannwhitneyu(entropies_full, entropies_pruned)
+    # # # print bootstrap_t_pvalue(entropies_full, entropies_pruned)
+    # # # print 'counter'
+    # # # print counter_pruned
+    # # # print counter_full
+    # # # exit()
+    # # print 1/0
     #--------- reset and undo distributions-----------
 
     # ax = sns.distplot(timeResets['time_before_sec'])
@@ -2598,119 +4314,233 @@ if __name__== "__main__":
     #     plt.show()
 
     # dynamics_filtered = dynamics.loc[(dynamics['move_number_in_path'] < 11) & (dynamics['move_number_in_path'] > 1) & (dynamics['player'] == 2)]
-    userids = dynamics['userid'].unique()
-
-    for user in userids:
-        # print user
-        f, (ax1, ax2) = plt.subplots(2, figsize = (20,10))
-        clicks_filtered = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click')]
-        clicks_filtered_p1 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==1)]
-        clicks_filtered_p2 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==2)]
-
-        # ax = sns.FacetGrid(dynamics_filtered, row="userid")
-        # ax = ax.map_dataframe(sns.tsplot, time='time_rel_sec', value='time_between', unit='userid', data=clicks_filtered, interpolate=False)
-        if (len(clicks_filtered_p1) < 2) | (len(clicks_filtered_p2) < 2):
-            continue
-        sns.tsplot(time='time_rel_sec', value='time_from_action', unit='userid', data=clicks_filtered, interpolate=False, ax=ax1)
-        sns.tsplot(time='time_rel_sec', value='score_heuristic_x', unit='userid', data=clicks_filtered, interpolate=False, color='blue', ax=ax2)
-        # sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p1, interpolate=False, color='orange',  ax=ax2)
-
-        # sns.tsplot(time='time_rel_sec', value='score_move', unit='userid', data=clicks_filtered_p2, interpolate=False, color='black', ax=ax2)
-        # sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p2, interpolate=False, color='orange',  ax=ax2)
-
-        solved = clicks_filtered['solved'].iloc[0]
-        board_name = clicks_filtered['board_name'].iloc[0]
-        resets = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='reset')]
-
-        for index, event in resets.iterrows():
-            time_reset = int(event['time_rel_sec'])
-            # print time_reset
-            ax1.axvline(time_reset, color="red", linestyle="--");
-            ax2.axvline(time_reset, color="red", linestyle="--");
-            # ax3.axvline(time_reset, color="red", linestyle="--");
-
-            solved = event['solved']
-            board_name = event['board_name']
-
-        undos = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='undo')]
-
-        for index, event in undos.iterrows():
-            time_undo = int(event['time_rel_sec'])
-            # print time_undo
-            ax1.axvline(time_undo, color="purple", linestyle="--");
-            ax2.axvline(time_undo, color="purple", linestyle="--");
-            # ax3.axvline(time_undo, color="purple", linestyle="--");
-
-
-
-        ax2.set(yscale="symlog")
-        ax2.set_ylim(-110,110)
-
-        # ax3.set(yscale="symlog")
-        # ax3.set_ylim(-100000,100000)
-        # plt.show()
-
-        ax2.set_ylabel('score_heuristic_x')
-        # ax3.set_ylabel('o score vs. best')
-
-        title = user + '_' + solved + '_' + board_name
-        ax1.set_title(title)
-        plt.show()
-        # plt.savefig("dynamics/time_series3/timeSeries_"+ title +".png", format='png')
-
-        plt.clf()
-        plt.close()
-
-    # participant actions figure-----
-    # ax = sns.factorplot(x="board", y="actionsSolution", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 medium', '10 medium', '6 hard', '10 hard', '10 CV'],  markers=['o','^'], legend_out=False, legend=False)
+    # userids = dynamics['userid'].unique()
     #
-    # ax.set(xlabel='Board', ylabel='Number of Moves')
-    # lw = ax.ax.lines[0].get_linewidth()
-    # plt.setp(ax.ax.lines,linewidth=lw)
-    # plt.legend(loc='best')
+    # for user in userids:
+    #     # print user
+    #     f, (ax1, ax2) = plt.subplots(2, figsize = (20,10))
+    #     clicks_filtered = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click')]
+    #     clicks_filtered_p1 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==1)]
+    #     clicks_filtered_p2 = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='click') & (dynamics['player']==2)]
+    #
+    #     # ax = sns.FacetGrid(dynamics_filtered, row="userid")
+    #     # ax = ax.map_dataframe(sns.tsplot, time='time_rel_sec', value='time_between', unit='userid', data=clicks_filtered, interpolate=False)
+    #     if (len(clicks_filtered_p1) < 2) | (len(clicks_filtered_p2) < 2):
+    #         continue
+    #     sns.tsplot(time='time_rel_sec', value='time_from_action', unit='userid', data=clicks_filtered, interpolate=False, ax=ax1)
+    #     sns.tsplot(time='time_rel_sec', value='score_heuristic_x', unit='userid', data=clicks_filtered, interpolate=False, color='blue', ax=ax2)
+    #     # sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p1, interpolate=False, color='orange',  ax=ax2)
+    #
+    #     # sns.tsplot(time='time_rel_sec', value='score_move', unit='userid', data=clicks_filtered_p2, interpolate=False, color='black', ax=ax2)
+    #     # sns.tsplot(time='time_rel_sec', value='top_possible_score', unit='userid', data=clicks_filtered_p2, interpolate=False, color='orange',  ax=ax2)
+    #
+    #     solved = clicks_filtered['solved'].iloc[0]
+    #     board_name = clicks_filtered['board_name'].iloc[0]
+    #     resets = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='reset')]
+    #
+    #     for index, event in resets.iterrows():
+    #         time_reset = int(event['time_rel_sec'])
+    #         # print time_reset
+    #         ax1.axvline(time_reset, color="red", linestyle="--");
+    #         ax2.axvline(time_reset, color="red", linestyle="--");
+    #         # ax3.axvline(time_reset, color="red", linestyle="--");
+    #
+    #         solved = event['solved']
+    #         board_name = event['board_name']
+    #
+    #     undos = dynamics.loc[(dynamics['userid']==user) & (dynamics['action']=='undo')]
+    #
+    #     for index, event in undos.iterrows():
+    #         time_undo = int(event['time_rel_sec'])
+    #         # print time_undo
+    #         ax1.axvline(time_undo, color="purple", linestyle="--");
+    #         ax2.axvline(time_undo, color="purple", linestyle="--");
+    #         # ax3.axvline(time_undo, color="purple", linestyle="--");
+    #
+    #
+    #
+    #     ax2.set(yscale="symlog")
+    #     ax2.set_ylim(-110,110)
+    #
+    #     # ax3.set(yscale="symlog")
+    #     # ax3.set_ylim(-100000,100000)
+    #     # plt.show()
+    #
+    #     ax2.set_ylabel('score_heuristic_x')
+    #     # ax3.set_ylabel('o score vs. best')
+    #
+    #     title = user + '_' + solved + '_' + board_name
+    #     ax1.set_title(title)
+    #     plt.show()
+    #     # plt.savefig("dynamics/time_series3/timeSeries_"+ title +".png", format='png')
+    #
+    #     plt.clf()
+    #     plt.close()
 
     # participant actions figure-----
+    # # ax = sns.factorplot(x="board", y="actionsSolution", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 medium', '10 medium', '6 hard', '10 hard', '10 CV'],  markers=['o','^'], legend_out=False, legend=False)
+    # print 'here'
+    # name_mapping = {'6 MC': 'I', '6 HC': 'II', '10 MC': 'III', '10 HC': 'IV', '10 DC': 'V'}
+    # print spearmanr_ci(data['timeMinutes'], data['actionsSolution'])
+    # print 'median'
+    # print data['timeMinutes'].median()
+    # print data['timeMinutes'].min()
+    # print data['timeMinutes'].max()
+    # sns.set(font_scale=1.5, style="whitegrid")
+    # ax = sns.lmplot(x='timeMinutes', y='actionsSolution', data=data, fit_reg=True)
+    # ax = ax.set_axis_labels('Solution Time (min.)', 'Search Size')
+    # ax.set(ylim=(0, None))
+    # ax.set(xlim=(0, None))
+    #
+    # # ax.set_ylabel('Search Size', fontsize=14)
+    # # ax.set_xlabel('Solution Time (min.)', fontsize=14)
+    #
+    # plt.show()
+    #
+    # plt.subplot(1,2,1)
+    # data['board_name'] = data['board'].apply(lambda x: name_mapping[x])
+    # ax = sns.barplot(x="board_name", y="timeMinutes", hue="condition", data=data, ci=68, n_boot=1000, order=['I','II','III','IV','V'])
+    # # ax.set(xlabel='Board', ylabel='Solution Time')
+    # ax.set_xlabel('Board', fontsize=14)
+    # ax.set_ylabel('Solution Time (min.)', fontsize=14)
+    # # lw = ax.ax.lines[0].get_linewidth()
+    # # plt.setp(ax.ax.lines,linewidth=lw)
+    # plt.legend(loc='best')
+    # plt.subplot(1,2,2)
+    # ax = sns.barplot(x="board_name", y="actionsSolution", hue="condition", data=data, ci=68, n_boot=1000, order=['I','II','III','IV','V'])
+    # # ax.set(xlabel='Board', ylabel='Solution Time')
+    # ax.set_xlabel('Board', fontsize=14)
+    # ax.set_ylabel('Search Size', fontsize=14)
+    # # lw = ax.ax.lines[0].get_linewidth()
+    # # plt.setp(ax.ax.lines,linewidth=lw)
+    # plt.legend(loc='best')
+    # plt.tight_layout(pad=2)
+    # plt.show()
+
+
+    # ----- participants demographics
+    # cogsci_log = pd.read_csv('logs/fullLogCogSci.csv')
+    # cogsci_log = cogsci_log.loc[cogsci_log['userid'].isin(cogsci_part_list)]
+    #
+    # males = cogsci_log.loc[(cogsci_log['key'] == 'gender') & (cogsci_log['value'] == 'male')]
+    # males = males['userid'].unique()
+    # print males.shape[0]
+    # females = cogsci_log.loc[(cogsci_log['key'] == 'gender') & (cogsci_log['value'] == 'female')]
+    # females = females['userid'].unique()
+    # print females.shape[0]
+    # age = cogsci_log.loc[cogsci_log['key'] == 'age']
+    # age = age.drop_duplicates(subset='userid', keep='first', inplace=False)
+    # age['value'] = age['value'].apply(lambda x: int(x))
+    # print np.mean(age['value'].values)
+    # print np.std(age['value'].values)
+    # exit()
+    # ----- participants demographic end
+
+
+    # ----figure 2 pnas: complexity correctness & search size---------
     # alphaBetaFull['heuristic_name'] = alphaBetaFull['heuristic_name'].map({'density':'density', 'linear':  'linear','non-linear':'non-linear', 'non-linear-interaction': 'interaction','blocking':'blocking', 'participants':'participants'})
-    # # alpha beta and participant actions figure-----
-    # # ax = sns.factorplot(x="board", y="moves",, hue="heuristic_name", data=alphaBetaFull, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=["1","2","3","4","8","o"], legend_out=False, legend=False)
-    # # data['board'] = data['board'].map({'6 MC full': 'MC6 full','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
-    # alphaBetaFull['board'] = alphaBetaFull['board'].map({'6 MC full': 'MC6 full', '6 MC truncated': 'MC6 truncated','10 MC full': 'MC10 full','10 MC truncated':'MC10 truncated','6 HC full': 'HC6 full', '6 HC truncated':'HC6 truncated','10 HC full':'HC10 full','10 HC truncated':'HC10 truncated', '10 DC full': 'DC10 full','10 DC truncated':'DC10 truncated'})
-    # ax = sns.factorplot(x="board", y="moves",  scale= 0.5, data=alphaBetaFull, hue="heuristic_name", n_boot=1000, order=['MC6 full', 'MC6 truncated','MC10 full','MC10 truncated','HC6 full', 'HC6 truncated','HC10 full','HC10 truncated', 'DC10 full','DC10 truncated'],  markers=["<","1","2","3","4","*"],linestyles=["-","-","-","-","-", "--"], legend_out=False, legend=False)
-    # ax.fig.get_axes()[0].set_yscale('log')
-    # # print alphaBetaFull['moves']
-    # # ax.ax.show()
-    # plt.ylim(0, 200000)
-    # sns.plt.xlim(0, None)
-
-
-    # ax.set(xlabel='Board', ylabel='Number of Moves')
-    # lw = ax.ax.lines[0].get_linewidth()
-    # plt.setp(ax.ax.lines,linewidth=lw)
-    # plt.legend(loc='best')
-    # plt.show()
-    #heatmap distance----
-    # distances['scoring'] = distances['scoring'].map({'mcts':'mcts','density':'density', 'linear':  'linear','non-linear':'non-linear', 'non-linear-interaction': 'non-linear'+'\n'+'interaction','blocking':'blocking'})
-    # ax = sns.barplot(x="scoring", y="distance", data=distances, order=['mcts','density', 'linear', 'non-linear','non-linear'+'\n'+'interaction','blocking'])
-    # # ax = sns.factorplot(x="board", y="moves",  data=alphaBetaFull, hue="heuristic_name", n_boot=1000, order=['6 MC full', '6 MC truncated','10 MC full','10 MC truncated','6 HC full', '6 HC truncated','10 HC full','10 HC truncated', '10 DC full','10 DC truncated'],  markers=["<","1","2","3","4","*"],linestyles=["-","-","-","-","-", "--"], legend_out=False, legend=False)
-    # # ax.fig.get_axes()[0].set_yscale('log')
-    # # # print alphaBetaFull['moves']
-    # # # ax.ax.show()
-    # # plt.ylim(0, 200000)
-    # # sns.plt.xlim(0, None)
+    # # alphaBetaFull['board'] = alphaBetaFull['board'].map({'6 MC full': 'MC6 full', '6 MC truncated': 'MC6 truncated','10 MC full': 'MC10 full','10 MC truncated':'MC10 truncated','6 HC full': 'HC6 full', '6 HC truncated':'HC6 truncated','10 HC full':'HC10 full','10 HC truncated':'HC10 truncated', '10 DC full': 'DC10 full','10 DC truncated':'DC10 truncated'})
+    # alphaBetaInteraction = alphaBetaFull.loc[alphaBetaFull['heuristic_name'] == 'interaction']
+    # # data['board'] = data['board'].map({'6 MC': 'MC6','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
+    #
+    # alphaBetaBehvaior = pd.merge(alphaBetaInteraction, data, on=['size','type','condition'], how='left')
+    # max_moves = float(alphaBetaBehvaior['moves'].max())
+    # moves_norm = []
+    # for index, row in alphaBetaBehvaior.iterrows():
+    #     moves_norm.append(float(row['actionsSolution'])/float(row['moves']))
+    # alphaBetaBehvaior['actions_normalized'] = moves_norm
+    # # alphaBetaBehvaior['moves_blocking'] = moves_norm
+    # # alphaBetaBehvaior['actionsSolution'] = alphaBetaBehvaior['actionsSolution'].apply(lambda x: np.round(float(x)/alphaBetaBehvaior['moves'],5))
+    # # alphaBetaBehvaior.to_csv('stats/alpha_beta_participants_normalized.csv')
+    #
+    # # ax = sns.regplot(x="moves", y="moves", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="r", fit_reg=False)
+    # # ax.set(yscale="log")
+    # # ax.set(xscale="log")
+    # # plt.show()
+    # plt.subplots(1,2, figsize=(8.6,4))
+    # plt.subplot(1, 2, 2)
+    # ax = sns.regplot(x="moves", y="solutionAndValidationCorrectPercent", x_estimator=np.mean, data=alphaBetaBehvaior, color="r", fit_reg=False,  ci=68)
+    # ax.set(xscale="log")
+    # ax.set(ylim=(0, 100))
+    # ax.set(xlim=(10, 200000))
+    # ax.set_xlabel('Board Complexity', fontsize=14)
+    # ax.set_ylabel('Percent Correct', fontsize=14)
+    # ax.tick_params(labelsize=12)
+    # # ax.set(xlabel='Board Complexity', ylabel='Percent Correct')
+    # # ax2 = ax.twinx()
+    # fig = plt.subplot(1, 2, 1)
+    # # alphaBetaBehvaior2 = pd.read_csv('stats/alpha_beta_participants_ab.csv')
+    # # pal = {'participant':"silver", 'alpha-beta':"blue"}
+    # # g = sns.FacetGrid(alphaBetaBehvaior2, hue='moves_type', palette=pal, size=5);
+    # # g.map(sns.regplot, "moves", "actionsSolution", ci=68,  x_estimator=np.mean, fit_reg=False)
+    # # # g.map(sns.regplot, "moves", "actionsSolution", ci=None, robust=1)
+    # # g.add_legend();
+    # ax = sns.regplot(x="moves", y="actionsSolution", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="b", fit_reg=False)
+    # sns.regplot(x="moves", y="moves", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="silver", fit_reg=False, ax=ax)
+    # # print stats.spearmanr(alphaBetaBehvaior.actionsSolution.values, alphaBetaBehvaior.moves.values)
+    # print spearmanr_ci(alphaBetaBehvaior.actionsSolution.values, alphaBetaBehvaior.moves.values)
+    # print spearmanr_ci(alphaBetaBehvaior.solutionAndValidationCorrectPercent.values, alphaBetaBehvaior.moves.values)
+    # # print spearmanr_ci(alphaBetaBehvaior.solutionAndValidationCorrectPercent.values, alphaBetaBehvaior.actionsSolution.values)
+    # # ax3 = ax.twinx()
+    # # g.set(xscale="log", yscale="log")
+    # ax.set(xscale="log")
+    # ax.set(yscale="log")
+    # ax.set(xlim=(10, 200000))
+    # ax.set_xlabel('Board Complexity', fontsize=14)
+    # ax.set_ylabel('Search Size', fontsize=14)
+    # ax.tick_params(labelsize=12)
     #
     #
-    # ax.set(xlabel='Board', ylabel='Distance From Participants First Moves')
-    # # lw = ax.ax.lines[0].get_linewidth()
-    # # plt.setp(ax.ax.lines,linewidth=lw)
-    # # plt.legend(loc='best')
-    # # lw = ax.ax.lines[0].get_linewidth()
-    # # plt.setp(ax.ax.lines,linewidth=lw)
-    # # # plt.legend(loc='best')
-    # # lw = ax.ax.lines[0].get_linewidth()
-    # # plt.setp(ax.ax.lines,linewidth=lw)
-    # # change_width(ax, .35)
+    #
+    # # fig.legend(labels=['Participants Search Size','Algorithmic Search Size'], handles=[])
+    # legend_elements = [Line2D([0], [0], marker='o', color='w', label='Participants Search Size',
+    #                       markerfacecolor='b', markersize=9),
+    #                    Line2D([0], [0], marker='o', color='w', label='Alpha-Beta Search Size',
+    #                       markerfacecolor='silver', markersize=9)]
+    # fig.legend(handles=legend_elements, fontsize=11)
+    #
+    # ax.set(xlabel='Board Complexity', ylabel='Search Size')
+    # plt.tight_layout(pad=1)
     # plt.show()
+    # exit()
 
+    #
+    # # search size and correctness tests
+    # correct_participants = alphaBetaBehvaior.loc[alphaBetaBehvaior['solutionAndValidationCorrect'] == 1]
+    # wrong_participants = alphaBetaBehvaior.loc[alphaBetaBehvaior['solutionAndValidationCorrect'] == 0]
+    # print stats.mannwhitneyu(correct_participants['actionsSolution'].values, wrong_participants['actionsSolution'].values)
+    # print cohen_d(wrong_participants['actionsSolution'].values, correct_participants['actionsSolution'].values)
+    # exit()
+    #
+    # # ax2.set(ylim=(0, 1))
+    # # plt.ylim(0,100)
+    #
+    # print 1/0
+    # aggregations = {
+    #     'solutionAndValidationCorrect': 'mean',
+    #     'actionsSolution':'mean'
+    # }
+    # alpha_beta_shutter_pareto = alpha_beta_shutter.groupby(['max_moves','noise_sig','shutter_size','board']).agg(aggregations).reset_index()
+    # ---- complexity correctness & search size figures (pnas) end ---------
+
+
+
+    ### figure 3B pnas: wasserstein distance (together with correlation figure)----
+    # distances['scoring'] = distances['scoring'].map({'mcts':'mcts','density':'Density', 'linear':  'Linear','non-linear':'Non-linear', 'non-linear-interaction': 'Interaction','blocking':'Forcing'})
+    # distances = distances.loc[distances['scoring']!='mcts']
+    #
+    # plt.subplot(2,1,1)
+    # ax = sns.barplot(x="scoring", y="distance", ci=68, data=distances, order=['Density', 'Linear', 'Non-linear','Interaction','Forcing'])
+    # ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
+    #
+    # ax.set_xlabel('', fontsize=16)
+    # ax.set_ylabel('Distance', fontsize=16)
+    # ax.tick_params(labelsize=14)
+    #
+    # plt.tight_layout()
+    # plt.show()
+    # exit()
+    #  ---- pnas: Wasserstein distances stats
     # mcts = distances.loc[distances['scoring'] == 'mcts']
     # density = distances.loc[distances['scoring'] == 'density']
     # linear = distances.loc[distances['scoring'] == 'linear']
@@ -2718,37 +4548,72 @@ if __name__== "__main__":
     # nonlinearInteraction = distances.loc[distances['scoring'] == 'non-linear-interaction']
     # blocking = distances.loc[distances['scoring'] == 'blocking']
     # density = distances.loc[distances['scoring'] == 'density']
-    # print bootstrap_t_pvalue(blocking['distance'].values, mcts['distance'].values)
+    #
+    # print bs.bootstrap(density['distance'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(linear['distance'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(nonlinear['distance'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(nonlinearInteraction['distance'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(blocking['distance'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # #
+    # # # print 'blocking vs mcts'
+    # # # print bootstrap_t_pvalue(blocking['distance'].values, mcts['distance'].values)
+    # print 'blocking vs density'
     # print bootstrap_t_pvalue(blocking['distance'].values, density['distance'].values)
+    # print stats.mannwhitneyu(blocking['distance'].values, density['distance'].values)
+    # print 'blocking vs linear'
     # print bootstrap_t_pvalue(blocking['distance'].values, linear['distance'].values)
+    # print stats.mannwhitneyu(blocking['distance'].values, linear['distance'].values)
+    #
+    # print 'blocking vs nonlinear'
     # print bootstrap_t_pvalue(blocking['distance'].values, nonlinear['distance'].values)
+    # print stats.mannwhitneyu(blocking['distance'].values, nonlinear['distance'].values)
+    # print 'blocking vs interaction'
     # print bootstrap_t_pvalue(blocking['distance'].values, nonlinearInteraction['distance'].values)
-
-    # print bootstrap_t_pvalue(nonlinearInteraction['distance'].values, mcts['distance'].values)
+    # print stats.mannwhitneyu(blocking['distance'].values, nonlinearInteraction['distance'].values)
+    #
+    # #
+    # print 'interaction vs density'
+    # # # print bootstrap_t_pvalue(nonlinearInteraction['distance'].values, mcts['distance'].values)
     # print bootstrap_t_pvalue(nonlinearInteraction['distance'].values, density['distance'].values)
+    # print stats.mannwhitneyu(nonlinearInteraction['distance'].values, density['distance'].values)
+    # print 'interaction vs linear'
     # print bootstrap_t_pvalue(nonlinearInteraction['distance'].values, linear['distance'].values)
+    # print stats.mannwhitneyu(nonlinearInteraction['distance'].values, linear['distance'].values)
+    # print 'interaction vs non-linear'
     # print bootstrap_t_pvalue(nonlinearInteraction['distance'].values, nonlinear['distance'].values)
-
-    # print bootstrap_t_pvalue(nonlinear['distance'].values, mcts['distance'].values)
+    # print stats.mannwhitneyu(nonlinearInteraction['distance'].values, nonlinear['distance'].values)
+    # #
+    # print 'nonlinear vs density'
+    # # # print bootstrap_t_pvalue(nonlinear['distance'].values, mcts['distance'].values)
     # print bootstrap_t_pvalue(nonlinear['distance'].values, density['distance'].values)
+    # print stats.mannwhitneyu(nonlinear['distance'].values, density['distance'].values)
+    #
+    # print 'nonlinear vs linear'
     # print bootstrap_t_pvalue(nonlinear['distance'].values, linear['distance'].values)
-    # # #
-    # print bootstrap_t_pvalue(linear['distance'].values, mcts['distance'].values)
+    # print stats.mannwhitneyu(nonlinear['distance'].values, linear['distance'].values)
+    # # # #
+    # #
+    # print 'linear vs density'
+    # # # print bootstrap_t_pvalue(linear['distance'].values, mcts['distance'].values)
     # print bootstrap_t_pvalue(linear['distance'].values, density['distance'].values)
-
-    #heatmap distance----
-
-    # participant success rate figure-----
-    # ax = sns.factorplot(x="board", y="solutionAndValidationCorrectPercent", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=['o','^'], legend_out=False, legend=False)
+    # print stats.mannwhitneyu(linear['distance'].values, density['distance'].values)
+    # #
+    # exit()
+    #
+    # #heatmap distance----
+    #
+    # # ----participant success rate figure cogsci-----
+    # # ax = sns.factorplot(x="board", y="solutionAndValidationCorrectPercent", scale= 0.5, hue="condition", data=data, n_boot=1000, order=['6 MC', '10 MC', '6 HC', '10 HC', '10 DC'],  markers=['o','^'], legend_out=False, legend=False)
     # data['board'] = data['board'].map({'6 MC': 'MC6','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
     # ax = sns.barplot(x="board", y="solutionAndValidationCorrectPercent",  hue="condition", data=data, n_boot=1000, order=['MC6', 'MC10', 'HC6', 'HC10', 'DC10'])
-    #
-    # ax.set(xlabel='Board', ylabel='Percent Correct')
-    # # lw = ax.ax.lines[0].get_linewidth()
-    # # plt.setp(ax.ax.lines,linewidth=lw)
-    #
+    # #
+    # # ax.set(xlabel='Board', ylabel='Percent Correct')
+    # # # lw = ax.ax.lines[0].get_linewidth()
+    # # # plt.setp(ax.ax.lines,linewidth=lw)
+    # #
     # plt.legend(loc='best')
     # plt.show()
+
     # participant success rate figure end-----
 
     # # alpha-beta 50 moves success rate-----
@@ -2774,10 +4639,43 @@ if __name__== "__main__":
     # ax.axes[0][0].legend(loc=1)
     # ax = sns.factorplot(x="size_type", y="entropyNormalized",col="condition", hue="solutionAndValidationCorrect", data=dataEntropy, n_boot=1000, order=['6_easy', '10_easy', '6_hard', '10_hard', '10_medium'])
     # ax = sns.factorplot(x="solutionAndValidationCorrect", y="actionsSolution", data=data, n_boot=1000)
+
+
+    # ---- pnas solvers vs non-solvers time and search size
     # correct = data.loc[data['solutionAndValidationCorrect'] == 1]
     # wrong = data.loc[data['solutionAndValidationCorrect'] == 0]
+    # print 'time solution'
     # print bs.bootstrap(correct['timeMinutes'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(wrong['timeMinutes'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bootstrap_t_pvalue(wrong['timeMinutes'].values, correct['timeMinutes'].values)
+    #
+    # print stats.mannwhitneyu(correct['timeMinutes'].values, wrong['timeMinutes'].values)
+    # print rank_biserial_effect_size(correct['timeMinutes'].values, wrong['timeMinutes'].values)
+    #
+    # # sample_means_correct = bootstrap_mean(correct['timeMinutes'].values)
+    # # sample_means_wrong = bootstrap_mean(wrong['timeMinutes'].values)
+    # # print stats.mannwhitneyu(sample_means_correct, sample_means_wrong)
+    # # print rank_biserial_effect_size(sample_means_correct, sample_means_wrong)
+    #
+    #
+    # print 'actions solution'
+    #
+    #
+    #
+    #
+    # print bs.bootstrap(correct['actionsSolution'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(wrong['actionsSolution'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bootstrap_t_pvalue(wrong['actionsSolution'].values, correct['actionsSolution'].values)
+    # print stats.mannwhitneyu(correct['actionsSolution'].values, wrong['actionsSolution'].values)
+    # print rank_biserial_effect_size(correct['actionsSolution'].values, wrong['actionsSolution'].values)
+    # # sample_means_correct = bootstrap_mean(correct['actionsSolution'].values)
+    # # sample_means_wrong = bootstrap_mean(wrong['actionsSolution'].values)
+    # # print stats.mannwhitneyu(sample_means_correct, sample_means_wrong)
+    # # print rank_biserial_effect_size(sample_means_correct, sample_means_wrong)
+    # exit()
+    # ---- end pnas solvers vs non-solvers time and search size
+
+
     # print bootstrap_t_pvalue(wrong['timeMinutes'].values, correct['timeMinutes'].values)
 
     # print bs.bootstrap(correct['timePerMove'].values, stat_func=bs_stats.mean, is_pivotal=False)
@@ -2841,6 +4739,9 @@ if __name__== "__main__":
     # mcts_10_hard_full = mctsData.loc[mctsData['board'] == '10_hard_full']
     # mcts_10_hard_pruned = mctsData.loc[mctsData['board'] == '10_hard_pruned']
     #
+    # mcts_10_medium_full = mctsData.loc[mctsData['board'] == '10_medium_full']
+    # mcts_10_medium_pruned = mctsData.loc[mctsData['board'] == '10_medium_pruned']
+    #
     # print bs.bootstrap(mcts_6_easy_full['nodes'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(mcts_6_easy_pruned['nodes'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(mcts_10_easy_full['nodes'].values, stat_func=bs_stats.mean, is_pivotal=False)
@@ -2849,7 +4750,10 @@ if __name__== "__main__":
     # print bs.bootstrap(mcts_6_hard_pruned['nodes'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(mcts_10_hard_full['nodes'].values, stat_func=bs_stats.mean, is_pivotal=False)
     # print bs.bootstrap(mcts_10_hard_pruned['nodes'].values, stat_func=bs_stats.mean, is_pivotal=False)
-    # print bs.bootstrap_ab(mcts_6_easy_full['nodes'].values,easy_full_6['solutionAndValidationCorrect'].values, bs_stats.mean, bs_compare.difference)
+    # print bs.bootstrap(mcts_10_medium_full['nodes'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # print bs.bootstrap(mcts_10_medium_pruned['nodes'].values, stat_func=bs_stats.mean, is_pivotal=False)
+    # # print bs.bootstrap_ab(mcts_6_easy_full['nodes'].values,mcts_6_easy_full['solutionAndValidationCorrect'].values, bs_stats.mean, bs_compare.difference)
+    # exit()
     #mcts----
 
     # --- full vs truncated accuracy and num of actions

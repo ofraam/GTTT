@@ -1,0 +1,17 @@
+{
+  "configs": [
+    {
+      "heuristic": "paths",
+      "interaction": false,
+      "opponent": true,
+      "prune": false,
+      "exp": 1,
+      "potential": "square",
+      "neighborhood": 2,
+      "name": "paths_linear_new_square_opp",
+      "reduced_opponent": true,
+      "linear": true
+    }
+  ]
+}
+

@@ -36,6 +36,9 @@ class ActionNode(Node):
         if real_world:
             self.children[state].state.belief = state.belief
 
+        # if (self.children[state].state.prior_n != None) & (self.children[state].state.prior_q != None):
+        #     self.n = self.children[state].state.prior_n
+        #     self.q = self.children[state].state.prior_q
         return self.children[state]
 
     def __str__(self):
@@ -49,9 +52,28 @@ class StateNode(Node):
     def __init__(self, parent, state):
         super(StateNode, self).__init__(parent)
         self.state = state
+        if (self.state.prior_n != None) & (self.state.prior_q != None):
+            self.n = self.state.prior_n
+            self.q = self.state.prior_q
         self.reward = 0
-        for action in state.actions:
+        self.heuristic_vals = {}
+        board = state.board
+        player = state.player
+        forced_move = board.win_or_forced_move(player)
+        if forced_move:
+            moves = forced_move
+            heuristics = [100]
+            # print 'forced'
+        else:
+            moves, heuristics, missed_win = board.get_free_spaces_ranked_heuristic_model(player=player, shutter=False, noise=0, k=3, stochastic_order=True)
+        for i in range(len(moves)):
+        # for action in moves:
+            action = moves[i]
+            # score = heuristics[i]
+            # print moves
+        # for action in state.actions:
             self.children[action] = ActionNode(self, action)
+            # self.heuristic_vals[action] = score
 
     @property
     def untried_actions(self):

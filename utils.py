@@ -22,6 +22,8 @@ def convert_position_to_row_col(pos, dimension):
     row = int(math.ceil(row))
     return row, col
 
+
+
 def convert_position_to_int(row, col, dimension):
     return row * dimension + col + 1
 
@@ -259,6 +261,8 @@ def rand_max(iterable, key=None):
     max_l = []
 
     for item, value in zip(iterable, [key(i) for i in iterable]):
+        # print item
+        # print value
         if value == max_v:
             max_l.append(item)
         elif value > max_v:

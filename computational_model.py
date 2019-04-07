@@ -16,7 +16,7 @@ import csv
 class Game:
   ## MORE LIKE POOP METHODS ##
 
-  def __init__(self, num_spaces, winning_paths, board={}, whos_turn=c.COMPUTER, other_player=c.HUMAN, reduced_opponent=True, noise=c.NOISE_HUMAN, heuristic="paths", exp=1, interaction=False, opponent=False, neighborhood=2, prune = False, potential='square'):
+  def __init__(self, num_spaces, winning_paths, board={}, whos_turn=c.COMPUTER, other_player=c.HUMAN, reduced_opponent=True, noise=c.NOISE_HUMAN, heuristic="paths", exp=1, interaction=False, opponent=False, neighborhood=2, prune = False, potential='square', linear=False):
     ''' Initalizes a Game object '''
     self.num_spaces = num_spaces
     self.winning_paths = winning_paths
@@ -48,7 +48,7 @@ class Game:
     self.prev_move_x = None
     self.prev_move_x_depth = 0
     self.max_depth = None
-    self.max_moves = 35
+    self.max_moves = 200000
     self.heuristic = heuristic
     self.prune = prune
     self.exp = exp
@@ -57,6 +57,7 @@ class Game:
     self.opponent = opponent
     self.neighborhood_size = neighborhood
     self.reduced_opponent = reduced_opponent
+    self.linear = linear
 
 
   def make_move(self, space, player):
@@ -354,7 +355,7 @@ class Game:
     # or ((depth==self.max_depth-1) & (beta==c.LOSE_SCORE))
     if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0),exp=self.exp, interaction=self.interaction), None)  # Terminal (the space will be picked up via recursion)
+      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0),exp=self.exp, interaction=self.interaction, linear=self.linear), None)  # Terminal (the space will be picked up via recursion)
     else:
       self.node_count += 1
       max_child = (c.NEG_INF, None)
@@ -362,7 +363,7 @@ class Game:
       # for space in board.get_free_spaces_ranked_neighbors(self.whos_turn):
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
       # moves = board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)
-      moves = board.get_free_spaces_ranked_heuristic(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
+      moves = board.get_free_spaces_ranked_heuristic(player=c.COMPUTER,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, linear=self.linear)
       # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)[:5]:
@@ -392,7 +393,7 @@ class Game:
     #   print 'happened'
     if (board.is_terminal()) or (depth <= 0) or (self.node_count >= self.max_moves) or  ((depth==self.max_depth-2) & (beta==c.LOSE_SCORE)):
       # return (board.obj(c.WIN_DEPTH-depth), None) # Terminal (the space will be picked up via recursion)
-      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0),exp=self.exp, interaction=self.interaction),None)
+      return (board.obj_interaction(c.COMPUTER,remaining_turns_x=math.ceil(depth/2.0),exp=self.exp, interaction=self.interaction, linear=self.linear),None)
 
     # if board.obj_interaction(c.HUMAN,remaining_turns_x=(math.ceil(depth/2.0)))==-20000000:
     #   # print 'cutting'
@@ -407,7 +408,7 @@ class Game:
       # top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)
       # if (self.whos_turn==c.COMPUTER):
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
-      moves = board.get_free_spaces_ranked_heuristic(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
+      moves = board.get_free_spaces_ranked_heuristic(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, linear=self.linear)
 
       # top_moves = moves
       # print top_moves
@@ -553,7 +554,7 @@ def start_game(file_path, configuration = None):
   if configuration == None:
     game = Game(num_spaces, winning_paths)
   else:
-    game = Game(num_spaces, winning_paths, reduced_opponent=configuration['reduced_opponent'],heuristic=configuration['heuristic'], interaction=configuration['interaction'], neighborhood=configuration['neighborhood'], exp=configuration['exp'], opponent=configuration['opponent'], potential=configuration['potential'], prune=configuration['prune'])
+    game = Game(num_spaces, winning_paths, reduced_opponent=configuration['reduced_opponent'],heuristic=configuration['heuristic'], interaction=configuration['interaction'], neighborhood=configuration['neighborhood'], exp=configuration['exp'], opponent=configuration['opponent'], potential=configuration['potential'], prune=configuration['prune'],linear=configuration['linear'])
 
 
   return game
@@ -650,7 +651,7 @@ if __name__ == "__main__":
 
     results = []
     header = ['board','heuristic_name','heuristic','layers','interaction','exponent','potential','neighborhood','opponent','numberOfNodes','answer','correct','exploredNodes']
-    game_configs_file = "ab_config1.json"
+    game_configs_file = "ab_config_new_linear.json"
     configs = get_game_configs(game_configs_file)
     for conf in configs:
       data_matrices = {}
@@ -718,7 +719,7 @@ if __name__ == "__main__":
     for i in range(len(results)):
       print results[i]
 
-    output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_' + str(game.max_moves) + '.csv'
+    output_name = 'stats/test_' + game_configs_file[:-5] + '_cogsci_' + str(game.max_moves) + '.csv'
     write_results(output_name, results, header)
       #
       # print game.dist_between_spaces_on_path/game.count_between_spaces_on_path

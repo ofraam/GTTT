@@ -1059,7 +1059,7 @@ def compute_transition_probs_heuristic(heuristic, board, player, normalized=Fals
     if heuristic == 'density':
         return compute_scores_density_new(board, player=player, normalized=normalized, neighborhood_size=2)
     elif heuristic == 'linear':
-        return compute_paths_scores_for_matrix(board, player=player, normalized=normalized, o_weight=0.5, exp=1, block=False, interaction=False)
+        return compute_paths_scores_for_matrix(board, player=player, normalized=normalized, o_weight=0.5, exp=1, block=False, interaction=False, linear=True)
     elif heuristic == 'non-linear':
         return compute_paths_scores_for_matrix(board, player=player, normalized=normalized, o_weight=0.5, exp=2, block=False, interaction=False)
     elif heuristic == 'interaction':
@@ -1354,6 +1354,8 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                     curr_path = []
                     num_moves_user = 0
                     path_number = 0
+                    prob_path = {}
+
                     curr_user = ''
                     prev_x_move = None
                     user_move_count = 0.0
@@ -1362,6 +1364,7 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                     for heuristic in heuristics_list:
                         heuristics_log_likelihoods[heuristic] = []
                         heuristics_move_ranks[heuristic] = []
+                        prob_path[heuristic] = []
                     move_stack = []
 
                     i = 0
@@ -1369,9 +1372,9 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                         # print i
                         # i += 1
                         curr_data = {}
-                        # if row['userid'] not in cogsci_part_list:
-                        #     continue
-                        # if row['userid'] != 'bed50a1d':
+                        if row['userid'] not in cogsci_part_list:
+                            continue
+                        # if row['userid'] != '17e120dd':
                         #     continue
                         if curr_user == '':
                             curr_user = row['userid']
@@ -1418,6 +1421,8 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                             #     results_table.append(curr_data)
                             # reset all values for next user
                             curr_path = []
+                            prob_path = {}
+
                             num_moves_user = 0
                             path_number = 0
                             prev_x_move = None
@@ -1426,6 +1431,7 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                             for heuristic in heuristics_list:
                                 heuristics_log_likelihoods[heuristic] = []
                                 heuristics_move_ranks[heuristic] = []
+                                prob_path[heuristic] = []
                             curr_user = row['userid']
 
                             move_stack = []
@@ -1456,6 +1462,7 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                                 # print heuristic
                                 probs = compute_transition_probs_heuristic(heuristic, curr_move_matrix, player_type, normalized=True, prev_x_move=prev_x_move)
                                 prob_move = probs[rowPos][colPos]
+
                                 max_prob = np.max(probs)
                                 move_prob_ratio = prob_move/max_prob
 
@@ -1463,6 +1470,8 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
 
                                 if prob_move <= 0.0:
                                     prob_move = 0.0001
+
+
 
                                 curr_data['userid'] = curr_user
                                 curr_data['board_name'] = board_name
@@ -1474,12 +1483,23 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                                 curr_data['blocking_score'] = blocking_val
                                 curr_data['heuristic'] = heuristic
                                 curr_data['prob_move'] = prob_move
+
                                 curr_data['prob_move_to_best_ratio'] = move_prob_ratio
                                 curr_data['log_move'] = math.log(prob_move)
                                 curr_data['rank_move'] = move_rank
                                 curr_data['move_number'] = num_moves_user
-                                curr_data['move_number_in_path'] = len(curr_path)
+                                # curr_data['move_number_in_path'] = len(curr_path)
                                 curr_data['path_number'] = path_number
+                                path_copy = copy.deepcopy(curr_path)
+                                path_copy.append([rowPos, colPos, player])
+                                curr_data['move_number_in_path'] = len(curr_path)+1
+                                curr_data['path'] = copy.deepcopy(path_copy)
+                                if len(prob_path[heuristic]) == 0:
+                                    prob_path[heuristic].append(prob_move)
+                                else:
+                                    prob_path[heuristic].append(prob_path[heuristic][len(prob_path[heuristic])-1] * prob_move)
+                                curr_data['prob_path'] = prob_path[heuristic][len(prob_path[heuristic])-1]
+
                                 results_table.append(copy.deepcopy(curr_data))
 
 
@@ -1491,20 +1511,30 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                                 if len(curr_path) == 1:
                                     first_move = True
                                     path_number += 1
+
                             else:
                                 print 'weird'
+
+
+
 
                         elif row['key'] == 'reset':
                             curr_move_matrix = copy.deepcopy(initial_board)
                             curr_path = []
                             prev_x_move = None
                             move_stack = []
+                            prob_path = {}
+                            for h in heuristics_list:
+                                prob_path[h] = []
+
 
                         elif row['key'] == 'undo':
                             if len(move_stack) > 0:
                                 undo_move = move_stack.pop()
                                 curr_move_matrix[undo_move[0]][undo_move[1]] = 0
                                 curr_path = curr_path[:-1]
+                                for h in heuristics_list:
+                                    prob_path[h] = prob_path[h][:-1]
                                 prev_x_move = None
                                 if len(curr_path) > 0:
                                     if len(curr_path) % 2 == 0:  # last move is O move, get one before
@@ -1516,7 +1546,7 @@ def fit_heuristics_by_move(heuristics_list, output_file, win_scores=[100], block
                                 print 'problem undo'
 
             dataFile = open(output_file, 'ab')
-            fieldnames = ['userid','board_name','board_size','board_type','condition', 'player', 'blocking_score', 'win_score','heuristic','prob_move','prob_move_to_best_ratio', 'log_move','rank_move','move_number','move_number_in_path','path_number']
+            fieldnames = ['userid','board_name','board_size','board_type','condition', 'player', 'blocking_score', 'win_score','heuristic','prob_move','prob_move_to_best_ratio', 'log_move','rank_move','move_number','move_number_in_path','path_number','prob_path','path']
             # fieldnames.extend(heuristics_list)
             # fieldnames.extend(heuristic_rank_list)
             dataWriter = csv.DictWriter(dataFile, fieldnames=fieldnames, delimiter=',')
@@ -3521,7 +3551,10 @@ if __name__ == "__main__":
     # fit_heuristics_conf(['density','blocking','blocking_blind'], 'stats/test_conf_heuristics_soph_pval.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics_conf(['density','blocking'], 'stats/test_conf_heuristics_pval_densityBlocking.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics_conf(['density','blocking'], 'stats/test_conf_heuristics_blockDensity_DensWin.csv',win_scores=[100],blocking_vals=[10])
-    fit_heuristics_by_move(['density','linear','non-linear','interaction','blocking'], 'stats/heuristics_byMove_player_allData.csv',win_scores=[100],blocking_vals=[10])
+
+    # fit_heuristics_by_move(['density','linear','non-linear','interaction','blocking'], 'stats/heuristics_byMove_player_cogsci_withPaths.csv',win_scores=[100],blocking_vals=[10])
+
+    fit_heuristics_by_move(['linear'], 'stats/heuristics_byMove_player_cogsci_withPaths_linearFixed.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics(['blocking'], 'stats/test.csv',win_scores=win_scores, blocking_vals=blocking_vals)
     # fit_heuristics(['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'], 'stats/missing_parts_heuristics_25.csv',win_scores=win_scores,blocking_vals=blocking_vals)
     # fit_heuristics(['linear','non-linear','interaction','interaction_shutter_0','blocking_shutter_0','blocking','density'], 'stats/heuristic_fit_shutter_test_noBline.csv',win_scores=[100],blocking_vals=[10])

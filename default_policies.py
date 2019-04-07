@@ -1,5 +1,6 @@
 import random
 import config as c
+from utils import convert_ab_board_to_matrix, convert_position_to_row_col, convert_position_to_int
 
 
 def immediate_reward(state_node):
@@ -23,13 +24,14 @@ class RandomKStepRollOut(object):
         self.current_k = 0
 
         def stop_k_step(state):
+            # print 'here'
             self.current_k += 1
             return self.current_k > self.k or state.is_terminal()
 
         return _roll_out(state_node, stop_k_step)
 
 
-def random_terminal_roll_out(state_node):
+def random_terminal_roll_out(state_node, current_path=[]):
     """
     Estimate the reward with the sum of a rollout till a terminal state.
     Typical for terminal-only-reward situations such as games with no
@@ -41,27 +43,64 @@ def random_terminal_roll_out(state_node):
     def stop_terminal(state):
         return state.is_terminal()
 
-    return _roll_out(state_node, stop_terminal)
+    return _roll_out(state_node, stop_terminal, current_path)
 
 
-def _roll_out(state_node, stopping_criterion):
+def _roll_out(state_node, stopping_criterion, current_path=[]):
     reward = 0
     state = state_node.state
     parent = state_node.parent.parent.state
     action = state_node.parent.action
+    # print '--rollout--'
+    # print 'depth =' +str(state.depth)
+    # print action
+    # current_path = []
     while not stopping_criterion(state):
-        reward += state.reward(parent, action)
+        c.NUM_NODES_ROLLOUTS += 1
+        # reward += state.reward(parent, action)
 
         # action = random.choice(state_node.state.actions)
+        # print state.actions
         action = random.choice(state.actions)
-        if action not in state.actions:
-            print 'problem'
+        # print 'player =' +str(state.player)
+        # print action
         parent = state
-
-        if action not in parent.actions:
-            print 'problme'
+        pos = convert_position_to_row_col(action, c.DIMENSION)
+        pos_move = [pos[0], pos[1], state.player]
+        current_path.append(pos_move)
+        c.PATHS_DICT.append([str(current_path), convert_ab_board_to_matrix(state.board.board), str(pos[0])+'_'+str(pos[1]), 'rollout'])
         state = parent.perform(action)
-        c.NUM_NODES+=1.0
-        # print c.NUM_NODES
 
+    reward += state.reward(parent, action)
+    # print reward
     return reward
+
+    # reward = 0
+    # state = state_node.state
+    # if state_node.parent is None:
+    #     return state.reward(None, None)
+    # parent = state_node.parent.parent.state
+    # action = state_node.parent.action
+    # counter = 0
+    # # print '--rollout--'
+    # while not stopping_criterion(state):
+    #     reward += state.reward(parent, action)
+    #
+    #     # action = random.choice(state_node.state.actions)
+    #     # print state.actions
+    #     action = random.choice(state.actions)
+    #     # print action
+    #     if action not in state.actions:
+    #         print 'problem1'
+    #     # parent = state
+    #
+    #     if action not in parent.actions:
+    #         print 'problme2'
+    #     state = parent.perform(action)
+    #     c.NUM_NODES+=1.0
+    #     # counter += 1
+    #     # print c.NUM_NODES
+    # # print counter
+    # # print c.NUM_NODES
+    # reward += state.reward(parent, action)
+    # return reward

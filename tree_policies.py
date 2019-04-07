@@ -14,10 +14,13 @@ class UCB1(object):
                         # for action_node.n = 0
             return action_node.q
 
+        # return (action_node.q +
+        #         self.c * np.sqrt(2 * np.log(action_node.parent.n) /
+        #                          action_node.n))
+        # heuristic = action_node.parent.heuristic_vals[action_node.action]
         return (action_node.q +
                 self.c * np.sqrt(2 * np.log(action_node.parent.n) /
                                  action_node.n))
-
 
 def flat(_):
     """

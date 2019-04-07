@@ -7,6 +7,7 @@ from emd import emd
 # from pyemd import emd
 from scipy import stats
 # from cv2 import *
+from replay import write_matrices_to_file
 
 
 LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
@@ -245,7 +246,7 @@ def check_path_overlap(empty1, empty2):
     return False
 
 
-def compute_open_paths(row, col, board, exp=1, player = 'X'):
+def compute_open_paths(row, col, board, exp=1, player='X', linear=False):
     other_player = 'O'
     if player == 'O':
         other_player = 'X'
@@ -390,7 +391,10 @@ def compute_open_paths(row, col, board, exp=1, player = 'X'):
     score = 0.0
     for i in range(len(open_paths_data)):
         p1 = open_paths_data[i]
-        score += 1.0/math.pow((streak_size-p1[0]), exp)
+        if linear:
+            score += p1[0]
+        else:
+            score += 1.0/math.pow((streak_size-p1[0]), exp)
         for j in range(i+1, len(open_paths_data)):
             p2 = open_paths_data[j]
             if not(check_path_overlap(p1[1],p2[1])):
@@ -495,7 +499,7 @@ def compute_scores_open_paths(normalized=False, exp=1, lamb = 1):
     return data_matrices
 
 
-def compute_scores_open_paths_opponent(normalized=False, exp=1, lamb = 1, o_weight = 0.5):
+def compute_scores_open_paths_opponent(normalized=False, exp=1, lamb=1, o_weight=0.5, linear=False):
     data_matrices = {}
     for g in range(len(LOGFILE)):
         print LOGFILE[g]
@@ -519,8 +523,8 @@ def compute_scores_open_paths_opponent(normalized=False, exp=1, lamb = 1, o_weig
         for r in range(len(board_matrix)):
             for c in range(len(board_matrix[r])):
                 if board_matrix[r][c] == 0:  # only check if free
-                    x_potential = compute_open_paths(r, c, board_matrix,exp=exp)  # check open paths for win
-                    o_potential = compute_open_paths(r, c, board_matrix,exp=exp, player='O')  # check preventive paths
+                    x_potential = compute_open_paths(r, c, board_matrix,exp=exp, linear=linear)  # check open paths for win
+                    o_potential = compute_open_paths(r, c, board_matrix,exp=exp, player='O', linear=linear)  # check preventive paths
                     square_score = (1-o_weight)*x_potential + o_weight*o_potential  # check open paths for win
                     score_matrix[r][c] = square_score
                     sum_scores += square_score
@@ -1118,6 +1122,9 @@ def makeGaussian(size, fwhm = 3, center=None):
 
 
 if __name__ == "__main__":
+    data_matrices_linear_new = compute_scores_open_paths_opponent(True, linear=True)
+    write_matrices_to_file(data_matrices_linear_new,'data_matrices/cogsci/linear_new.json')
+    exit()
     # print emd(np.array([[0.0, 1.0],[0.0, 1.0]]),np.array([[5.0, 3.0],[5.0, 3.0]]))
     # first_histogram = np.array([0.0, 1.0])
     # second_histogram = np.array([5.0, 3.0])
@@ -1213,4 +1220,3 @@ if __name__ == "__main__":
     # compute_scores_density(True)
     # compute_scores_composite(True, exp=2, neighborhood_size=1)
     # compute_scores_open_paths(True, 2)
-    # compute_scores_open_paths(True)

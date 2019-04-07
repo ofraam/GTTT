@@ -8,7 +8,7 @@ MIN_MOVES = 3
 CHECK_WIN = False
 WIN_MOVES = []
 NUM_NODES = 0.0
-
+NUM_NODES_ROLLOUTS = 0.0
 SOLVED = 0.0
 SIM = 0
 
@@ -34,3 +34,7 @@ SCORES_DICT_ALL_BOARDS = {'6_easy': {}, '6_hard': {}, '10_easy': {}, '10_hard': 
 HITS = 0
 NO_HIT = 0
 PATH = "boardsFilled/"
+
+DIMENSION = 6
+PATHS_DICT = []
+NODE_LIMIT = 0

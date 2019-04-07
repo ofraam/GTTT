@@ -113,6 +113,7 @@ class Game:
       space = self.get_next_move(max_depth)
       if space is None:
         print 'darn'
+        print self.board.board
         raise Exception('space is None')
       # print self.node_count
       winning_player = self.make_move(space, self.whos_turn)
@@ -171,6 +172,8 @@ class Game:
       self.last_socre = score
       self.last_depth = max_depth
       # self.save_board_to_file(space, score)
+      if space == None:
+        print 'space is None'
       return space
 
     ######---------for human input------------------######
@@ -382,6 +385,8 @@ class Game:
       # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0), depth=depth)[:5]:
+      if len(moves) == 0:
+        print 'problem'
       for space in moves:
                 # if space in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,31,41,51,61,71,30,40,50,60,70,80,90,100]:
         #   continue
@@ -392,12 +397,14 @@ class Game:
         if score > max_child[0]:
           max_child = (score, space)
         if (max_child[0] >= beta):
+
           return max_child # Shouldn't help anyway
 
         # if max_child[1] is None:
         #     # print depth
         #     print 'max none_' +str(depth)
         if max_child[0] >= c.LOSE_SCORE:
+          # print max_child
           return max_child # Shouldn't help anyway
         alpha = max(alpha, score)
       return max_child
@@ -423,8 +430,6 @@ class Game:
       # top_moves = board.get_free_spaces_ranked_paths(player=c.HUMAN)
       # if (self.whos_turn==c.COMPUTER):
       # moves = board. get_free_spaces_ranked_neighbors(player=c.COMPUTER, remaining_turns_x=math.ceil(depth/2.0))
-      # TODO 6/8/2018: bring back next line
-      # moves = board.get_free_spaces_ranked_heuristic(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential)
       moves, nodes_computed, missed_win = board.get_free_spaces_ranked_heuristic_model(player=c.HUMAN,reduced_opponent=self.reduced_opponent, heuristic=self.heuristic, remaining_turns_x=math.ceil(depth/2.0), depth=depth, interaction=self.interaction, other_player=self.opponent, prune=self.prune, exp=self.exp, neighborhood=self.neighborhood_size, potential=self.potential, shutter=self.shutter, prev_move_x=prev_space_x, shutter_size=self.shutter_size, k=self.k, noise=self.noise_sig)
       self.nodes_computed_counter += nodes_computed
       if missed_win != -1:
@@ -433,6 +438,8 @@ class Game:
       # top_moves = moves
       # print top_moves
       # for space in board.get_free_spaces_ranked_paths(player=c.HUMAN, remaining_turns_x=math.ceil(depth/2.0), depth=depth):
+      if len(moves) == 0:
+        print 'problem'
       for space in moves:
 
         # if depth==8:
@@ -447,7 +454,7 @@ class Game:
         row = (float(space)/float(len(self.move_matrix)))-1
         row = math.ceil(row)
 
-        if (new_board.check_possible_win(remaining_turns_O=math.ceil(depth/2.0))):
+        if (new_board.check_possible_win(remaining_turns_O=math.ceil(depth/2.0))) | (min_child[1] is None):
 
           if prev_space_x!=None:
             self.node_count_x+=1
@@ -479,6 +486,7 @@ class Game:
           self.move_counter += 1
           # if (depth==self.max_depth):
           #   print str(space) + ':' + str(score)
+          # print score
           if score < min_child[0]:
             min_child = (score, space)
           # if min_child[0] <= alpha:
@@ -489,7 +497,8 @@ class Game:
           #   print 'min none_' +str(depth)
           beta = min(beta, score)
 
-
+      if min_child[1] is None:
+        print 'prob'
       return min_child
 
 
@@ -675,22 +684,24 @@ if __name__ == "__main__":
     game_configs_file = "ab_config_shutter.json"
     configs = get_game_configs(game_configs_file)
     # shutter_sizes = [0,1,2]
-    shutter_sizes = [0.5]
+    # shutter_sizes = [0.0,0.5,1.0,2.0]
+    shutter_sizes = [0.0,0.5,1.0,2.0]
     move_limit = 50000
     # move_limits = [1000, 2000]
-    node_limits = [30, 50]  #
-    noise_vals = [0.5, 1.0, 1.5]
+    node_limits = [30, 50, 100, 200]  #
+    noise_vals = [0.5, 1.0, 1.5, 2.0, 2.5]
+    # noise_vals = [0, 0.25, 0.75, 1.25, 1.75, 2.25]
     # node_limits = [50]  #
     # noise_vals = [0.5]
     # k = [3, 5, 10]
-    k = 5
+    k = 7
     write_header = True
     # with open('scores_pickle_no_shutter_new.pickle', 'rb') as handle:
     #     c.SCORES_DICT_ALL_BOARDS = pkl.load(handle)
 
     for conf in configs:
-      for i in range(500):
-        if i % 100 == 0:
+      for i in range(0,100):
+        if i % 10 == 0:
           print i
         for node_limit in node_limits:
           for noise in noise_vals:
@@ -712,7 +723,7 @@ if __name__ == "__main__":
 
                 else:
                   # if filename.startswith("10by10_easy"):
-                  if not(filename.startswith("10_easy")):
+                  if not(filename.startswith("10_medium")):
                     continue
                   file_path = "examples/board_10_5.txt"
                   # if filename.startswith('10_easy'):
@@ -722,7 +733,7 @@ if __name__ == "__main__":
                   # else:
                   #   c.SCORES_DICT = c.SCORES_DICT_ALL_BOARDS['10_hard']
                   # continue
-
+                # print filename
                 game = start_game(file_path, conf)
                 game.shutter_size = shutter_size
                 game.k = k
@@ -732,6 +743,7 @@ if __name__ == "__main__":
                 board_results = []
                 board_results.append(i)
                 board_results.append(filename[:-5])
+
                 board_results.append(game.shutter_size)
                 board_results.append(game.k)
                 board_results.append(game.noise_sig)
@@ -792,7 +804,7 @@ if __name__ == "__main__":
               # except Exception as e:
               #   print str(e)
               #   continue
-              output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_110818_10easy_shutter05.csv'
+              output_name = 'stats/' + game_configs_file[:-5] + '_cogsci_010918_k7_10medium_interaction.csv'
               dataFile = open(output_name, 'ab')
               fieldnames = header
               # fieldnames.extend(heuristics_list)
@@ -807,8 +819,8 @@ if __name__ == "__main__":
 
       print c.HITS
       print c.NO_HIT
-      with open('scores_pickle_no_shutter_new2.pickle', 'wb') as handle:
-          pkl.dump(c.SCORES_DICT_ALL_BOARDS, handle, protocol=pkl.HIGHEST_PROTOCOL)
+      # with open('scores_pickle_no_shutter_new2.pickle', 'wb') as handle:
+      #     pkl.dump(c.SCORES_DICT_ALL_BOARDS, handle, protocol=pkl.HIGHEST_PROTOCOL)
 
       # with open('scores_pickle_no_shutter.pickle', 'rb') as handle:
       #     b = pkl.load(handle)

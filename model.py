@@ -110,7 +110,7 @@ def add_noise_to_scores(score_matrix, mu=0.0, sigma=1.0):
                 score_matrix[r][j] += np.random.normal(mu, sigma)
 
 
-def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None, board_obj=None, pruned_squares=None, noise = 0):
+def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp=1, o_weight=0.5, interaction=True, block=False, shutter=False, shutter_size=0, prev_x_move=None, board_obj=None, pruned_squares=None, noise = 0, linear=False):
     """
     computes the score for each cell in each of the boards based in the layers approach (first filter cells by density)
     :param exp: parameter creates the non-linearity (i.e., 2 --> squared)
@@ -157,7 +157,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
 
     for r in range(len(board_matrix)):
         for c in range(len(board_matrix[r])):
-            if board_matrix[r][c] == 0:  # only check if free & passed threshold
+            if board_matrix[r][c] == 0:  # only check if free
                 if ([r, c] not in active_squares) & shutter & (len(active_squares) > 0):  # if there are available positions within shutter, and square is not in them, give score 0
                     square_score = 0
                     score_matrix[r][c] = square_score
@@ -167,13 +167,13 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
                     score_matrix[r][c] = prev_computed_scores[r][c]
                     continue
 
-                x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction)
+                x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction, linear=linear)
                 square_score_x = x_paths[0]
                 x_paths_data = []
                 for path in x_paths[1]:
                     x_paths_data.append(path[2])
                 paths_data[r][c] = copy.deepcopy(x_paths_data)
-                o_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player='O', player_turn=o_turn, exp=exp, interaction=interaction)
+                o_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player='O', player_turn=o_turn, exp=exp, interaction=interaction, linear=linear)
                 square_score_o = o_paths[0]
 
                 streak_size = 4
@@ -248,7 +248,7 @@ def compute_paths_scores_for_matrix(board_mat, player='X', normalized=False, exp
         normalize_matrix(score_matrix, False)
 
 
-    alpha_beta = True  # TODO: remove later
+    alpha_beta = False  # TODO: remove later
     if alpha_beta:
         return score_matrix, len(active_squares), winning_moves_alpha_beta
     return score_matrix
@@ -962,7 +962,7 @@ def compute_open_paths_data_interaction(row, col, board, exp=1, player = 'X', in
     return (score, open_paths_data, max_length_path)
 
 
-def compute_open_paths_data_interaction_new(row, col, board, exp=1, player='X', player_turn=True, interaction=True):
+def compute_open_paths_data_interaction_new(row, col, board, exp=1, player='X', player_turn=True, interaction=True, linear=False):
     other_player = 'O'
     if player == 'O':
         other_player = 'X'
@@ -1122,7 +1122,10 @@ def compute_open_paths_data_interaction_new(row, col, board, exp=1, player='X', 
         if streak_size == p1[0]:
             score = WIN_SCORE
         else:
-            score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
+            if linear:
+                score += p1[0]  # score for individual path
+            else:
+                score += 1.0/math.pow((streak_size-p1[0]), exp)  # score for individual path
         if interaction:
             for j in range(i+1, len(open_paths_data)):
                 p2 = open_paths_data[j]
@@ -2624,7 +2627,7 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
 
     for board in ['6_easy','6_hard','10_easy','10_hard','10_medium']:
         plt.rcParams.update({'font.size': 9})
-        fig_file_name = base_heatmap_name + '_' + board + '2603_2.png'
+        fig_file_name = base_heatmap_name + 'markov_' + board + '091518_smalltest.pdf'
         heatmaps = []
         full = board + '_full'
         pruned = board + '_pruned'
@@ -2633,7 +2636,7 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
             # fig, axes = plt.subplots(1, len(data), figsize=(16,8))  # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
             # fig, axes = plt.subplots(2, 4, figsize=(10,6))
         else:
-            fig, axes = plt.subplots(2, len(data), figsize=(12,12)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
+            fig, axes = plt.subplots(2, len(data), figsize=(8,8)) # this will create a 2X3 figure with 6 heatmaps, you can modify if you want fewer/more
             # fig, axes = plt.subplots(2, 4, figsize=(18,12))
 
         fig.suptitle(board)  # add subtitle to the figure based on board name
@@ -2691,18 +2694,21 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
                              verticalalignment='center',
                              color='white'
                         )
-                    elif(a[y,x]!=0):
-                        ax.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
-                                 horizontalalignment='center',
-                                 verticalalignment='center',
-                                 color='white'
-                         )
+                    # elif(a[y,x]!=0):
+                    #     ax.text(x + 0.5, y + 0.5, '%.2f' % a[y, x],
+                    #              horizontalalignment='center',
+                    #              verticalalignment='center',
+                    #              color='white'
+                    #      )
 
-            fig.colorbar(img, ax=ax)
+            cb = fig.colorbar(img, ax=ax)
             # plt.colorbar(img)
             ax.set_aspect('equal')
             # ax.tick_params(labelsize=8)
             ax.set_title(heatmaps[i][1])
+
+            ax.get_xaxis().set_visible(False)
+            ax.axes.get_yaxis().set_visible(False)
             i += 1
 
         plt.savefig(fig_file_name)
@@ -3123,7 +3129,8 @@ def likelihood(values_file, models_file_list):
                     sum_user_log_likelihoods += math.log(comm_prob)
                     num_moves += 1
                 num_users += 1
-                print board + ',' + model_name + ',' + values_file[:-5] + ',' + str(comm_prob) + ',' + str(math.log(comm_prob))
+                # print board + ',' + model_name + ',' + values_file[:-5] + ',' + str(comm_prob) + ',' + str(math.log(comm_prob))
+                print board + ',' + model_name + ',' + 'all' + ',' + str(comm_prob) + ',' + str(math.log(comm_prob))
 
 
             avg_likelihood_borad = sum_user_likelihoods/num_moves
@@ -3164,9 +3171,10 @@ def distancePredictionPeopleLOO():
         boardsMinus1 = copy.deepcopy(boards)
         del boardsMinus1[i]
         c.BOARDS_MINUS_1 = copy.deepcopy(boardsMinus1)
-        x0 = [0.25,0.25,0.25,0.25]
+        # x0 = [0.25,0.25,0.25,0.25]
+        x0 = [0.2,0.2,0.2,0.2, 0.2]
         b = (0.0,1.0)
-        bnds = (b,b,b,b)
+        bnds = (b,b,b,b,b)
         con1 = {'type':'eq','fun':constraint1}
         cons = [con1]
         res = minimize(distancePredictionPeople,x0,method='SLSQP',bounds = bnds, constraints=cons)
@@ -3184,12 +3192,12 @@ def distancePredictionPeopleLOO():
         linear = read_matrices_from_file(base_dir+'model_config_opp_linear_layers.json')
         non_linear = read_matrices_from_file(base_dir+'model_config_opp_non-linear_layers.json')
         non_linear_interaction = read_matrices_from_file(base_dir+'model_config_opp_non-linear_interaction_layers.json')
-        # blocking = read_matrices_from_file(base_dir+'model_config_blocking10_blocking_layers.json')
+        blocking = read_matrices_from_file(base_dir+'model_config_blocking10_blocking_layers.json')
         models.append(density[board])
         models.append(linear[board])
         models.append(non_linear[board])
         models.append(non_linear_interaction[board])
-        # models.append(blocking[board])
+        models.append(blocking[board])
         joint_matrix = copy.deepcopy(people)
 
         for row in range(len(joint_matrix)):
@@ -3214,15 +3222,16 @@ def distancePredictionPeople(population):
         people = people_all[board]
         models = []
         density = read_matrices_from_file(base_dir+'model_density_nbr=2.json')
-        linear = read_matrices_from_file(base_dir+'model_config_opp_linear_layers.json')
+        # linear = read_matrices_from_file(base_dir+'model_config_opp_linear_layers.json')
+        linear = read_matrices_from_file(base_dir+'linear_new.json')
         non_linear = read_matrices_from_file(base_dir+'model_config_opp_non-linear_layers.json')
         non_linear_interaction = read_matrices_from_file(base_dir+'model_config_opp_non-linear_interaction_layers.json')
-        # blocking = read_matrices_from_file(base_dir+'model_config_blocking10_blocking_layers.json')
+        blocking = read_matrices_from_file(base_dir+'model_config_blocking10_blocking_layers.json')
         models.append(density[board])
         models.append(linear[board])
         models.append(non_linear[board])
         models.append(non_linear_interaction[board])
-        # models.append(blocking[board])
+        models.append(blocking[board])
         joint_matrix = copy.deepcopy(people)
 
         for row in range(len(joint_matrix)):
@@ -3242,7 +3251,12 @@ def distancePredictionPeople(population):
 
 
 def constraint1(x):
-    return sum(x) == 1
+    # return sum(x) == 1
+    # if sum(x) == 1:
+    #     return 0
+    # else:
+    #     return 1
+    return sum(x) - 1
 
 def constraint2(x):
     for x_val in x:
@@ -3256,28 +3270,36 @@ def constraint2(x):
 if __name__ == "__main__":
     # distancePredictionPeople([0.1,0.1,0.3,0.3,0.2], '6_easy_full')
     # x0 = [0.2,0.2,0.2,0.2,0.2]
-    x0 = [0.25,0.25,0.25,0.25]
-    b = (0.0,1.0)
-    bnds = (b,b,b,b)
-    con1 = {'type':'eq','fun':constraint1}
-    cons = [con1]
-
+    # # x0 = [0.25,0.25,0.25,0.25]
+    # b = (0.0,1.0)
+    # bnds = (b,b,b,b,b)
+    # con1 = {'type':'eq','fun':constraint1}
+    # cons = [con1]
+    #
     # c.BOARDS_MINUS_1 = ['6_easy_full','6_hard_full','10_easy_full','10_hard_full','10_medium_full','6_easy_pruned','6_hard_pruned','10_easy_pruned','10_hard_pruned','10_medium_pruned']
-    # res = minimize(distancePredictionPeople,x0,method='SLSQP',bounds = bnds, constraints=cons)
+    # # res = minimize(distancePredictionPeople,x0,method='SLSQP',bounds = bnds, constraints=cons)
+    # res = minimize(distancePredictionPeople,x0,bounds = bnds, constraints=cons)
     # print res
     # print '---'
     # print res.x
-
+    #
+    # exit()
+    #
     # distancePredictionPeopleLOO()
-
+    # exit()
     # generate_uniform_dist_for_boards('model_config_opp_non-linear_interaction.json')
     # models_files = ['model_config_blocking50_blocking.json', 'avg_people_first_moves_all.json']
     # models_files = ['model_config_blocking10_blocking_layers.json', 'model_config_opp_non-linear_layers.json','model_config_opp_linear_layers.json', 'model_config_opp_non-linear_interaction_layers.json','model_density_nbr=2.json','avg_people_first_moves_all.json']
+    # models_files = ['model_config_opp_blocking_layers.json', 'model_config_opp_non-linear_layers.json','linear_new.json', 'model_config_opp_non-linear_interaction_layers.json','model_density_nbr=2.json','chance.json']
+    models_files = ['model_config_opp_blocking.json', 'model_config_opp_non-linear.json','linear_new.json', 'model_config_opp_non-linear_interaction.json','model_density_nbr=2.json','chance.json']
     # models_files = ['model_config_blocking10_blocking.json', 'model_config_opp_non-linear.json','model_config_opp_linear.json', 'model_config_opp_non-linear_interaction.json','model_density_nbr=2.json','chance.json']
-    models_files = ['first_pruned.json','model_config_blocking10_blocking_layers.json']
-    run_models_from_list(models_files, 'heatmaps/cogsci/markov')
-    # likelihood('data_matrices/cogsci/people_first_moves_values_byParticipant_wrong.json',models_files)
+    # models_files = ['first_pruned200818.json','model_config_blocking10_blocking_layers.json']
+    # models_files = ['model_config_blocking10_blocking.json','avg_people_first_moves_all.json']
+    # run_models_from_list(models_files, 'heatmaps/cogsci/')
 
+
+    likelihood('data_matrices/cogsci/people_first_moves_values_byParticipantall.json',models_files)
+    exit()
     # model_files = ['mcts.json','model_config_blocking10_blocking.json','avg_people_first_moves_all.json']
     # model_files = ['model_config_blocking10_blocking_layers.json','avg_people_first_moves_all.json']
     # run_models_from_list(model_files, 'heatmaps/cogsci/cogsci6MCblockingLayers')

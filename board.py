@@ -277,7 +277,14 @@ class Board:
     prev_move_x_row_col = None
     if prev_move_x != None:
       prev_move_x_row_col = convert_position_to_row_col(prev_move_x,math.sqrt(self.size))
-    probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
+
+    # probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=False, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
+
+    # probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=True, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
+    # probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=True, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
+    # probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=False, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
+
+    probs, nodes_computed, winning_moves = compute_paths_scores_for_matrix(board_matrix, player=player_type, normalized=True, o_weight=0.5, exp=2, block=False, interaction=False, board_obj=self, shutter=shutter, shutter_size=shutter_size, prev_x_move=prev_move_x_row_col, noise=noise)
 
     # note to self: now done within the heuristic computation
     # if (shutter) & (prev_move_x != None):
@@ -296,15 +303,17 @@ class Board:
       row, col = convert_position(space, math.sqrt(self.size))
       list_of_spaces_with_dist.append((space, probs[row][col]))
     sorted_list = sorted(list_of_spaces_with_dist, key=lambda x: x[1], reverse=True)
-
+    ranked_scores = []  # for mcts
     if stochastic_order:
       ranked_list = self.reorder_list(sorted_list)
-
     else:
       ranked_list = []
       for sp in sorted_list:
           ranked_list.append(sp[0])
+          ranked_scores.append(sp[1])
     missed_win = -1
+    if len(ranked_list) == 0:
+      return [],[],False
     top_move = ranked_list[0]
     top_move_row_col = convert_position_to_row_col(top_move, math.sqrt(self.size))
     if len(winning_moves) > 0:
@@ -313,8 +322,11 @@ class Board:
         if (win_move[0] == top_move_row_col[0]) & (win_move[1] == top_move_row_col[1]):
           missed_win = 0.0
           break
-
-    return ranked_list[ :k], nodes_computed, missed_win
+    if len(ranked_list) == 0:
+      print 'problem'
+    # return ranked_list[ :k], nodes_computed, missed_win
+    # for mcts
+    return ranked_list[ :k], ranked_scores, missed_win
 
 
   def weighted_choice(self,weights):
@@ -373,7 +385,7 @@ class Board:
     #   move_list
     # return reordered_list
 
-  def get_free_spaces_ranked_heuristic(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, k=10):
+  def get_free_spaces_ranked_heuristic(self, player, remaining_turns_x = None, depth = 0, heuristic = 'paths', interaction = True, exp = 2, neighborhood = 2, other_player=True, potential='full', prune = False, reduced_opponent = True, shutter=False, k=10, linear=False):
     ''' Return a list of unoccupied spaces. '''
     list_of_spaces = []
     list_of_occupied = []
@@ -389,9 +401,9 @@ class Board:
 
 
     # TODO: bring back (6/8/18, removed for shutter)
-    # forced_move = self.win_or_forced_move(player)
-    # if forced_move:
-    #   return forced_move
+    forced_move = self.win_or_forced_move(player)
+    if forced_move:
+      return forced_move
 
     for free_space in list_of_spaces:
       # if (free_space not in self.pruned_spaces_x):
@@ -399,11 +411,11 @@ class Board:
       if (free_space not in self.pruned_spaces_x) | (player == c.COMPUTER) | (not(prune)):
         if heuristic == 'paths':
           # list_of_spaces_with_dist.append((free_space,self.compute_square_score_paths_clean2(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
-          list_of_spaces_with_dist.append((free_space,self.compute_square_score_pathsJan31(free_space, player=player,reduced_opponent=reduced_opponent,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
+          list_of_spaces_with_dist.append((free_space,self.compute_square_score_pathsJan31(free_space, player=player,reduced_opponent=reduced_opponent,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential, linear=linear)))
           # list_of_spaces_with_dist2.append((free_space,self.compute_square_score_paths_potential(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential='full')))
         elif heuristic == 'block':
           # list_of_spaces_with_dist.append((free_space,self.compute_square_score_block_clean(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
-          list_of_spaces_with_dist.append((free_space,self.compute_square_score_blockJan31(free_space, player=player,reduced_opponent=reduced_opponent,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential)))
+          list_of_spaces_with_dist.append((free_space,self.compute_square_score_blockJan31(free_space, player=player,reduced_opponent=reduced_opponent,remaining_turns_x=remaining_turns_x,depth=depth, exp=exp, interaction=interaction, other_player=other_player, potential=potential, linear=linear)))
         else:
           list_of_spaces_with_dist.append((free_space,self.compute_square_score_density(free_space, player,remaining_turns_x=remaining_turns_x, neighborhood_size=neighborhood)))
 
@@ -1661,7 +1673,7 @@ class Board:
     return score
 
 
-  def compute_square_score_pathsJan31(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0, other_player = True, interaction = False, exp = 1, potential = "square", reduced_opponent = True):
+  def compute_square_score_pathsJan31(self, square, turns = 0, player = None, remaining_turns_x = None, depth = 0, other_player = True, interaction = False, exp = 1, potential = "square", reduced_opponent = True, linear=False):
     open_win_paths_computer = []
     open_win_paths_human = []
     max_length_path_X = 0
@@ -1700,7 +1712,7 @@ class Board:
           if (c.HUMAN_count+1) > max_length_path_X:
             max_length_path_X = c.HUMAN_count+1
         else:
-          open_win_paths_computer.append((free_on_path,c.COMPUTER_count, square in path, path))
+          open_win_paths_human.append((free_on_path,c.HUMAN_count+1, square in path, path))
           if (c.HUMAN_count) > max_length_path_X:
             max_length_path_X = c.HUMAN_count
 
@@ -1729,7 +1741,10 @@ class Board:
                 return c.WIN_SCORE
               else:
                 return c.OPPONENT_THREAT
-            score_o += 1.0/math.pow((streak_size-(path_length)), exp)  # score for individual path
+            if linear:
+              score_o += path_length  # score for individual path
+            else:
+              score_o += 1.0/math.pow((streak_size-(path_length)), exp)  # score for individual path
             if interaction:
               for j in range(i+1, len(open_win_paths_computer)):
                 p2 = open_win_paths_computer[j]
@@ -1764,7 +1779,10 @@ class Board:
               else:
                 return c.OPPONENT_THREAT
 
-            score_x += 1.0/math.pow((streak_size-path_length), exp)  # score for individual path
+            if linear:
+              score_x += path_length  # score for individual path
+            else:
+              score_x += 1.0/math.pow((streak_size-path_length), exp)  # score for individual path
             if interaction:
               for j in range(i+1, len(open_win_paths_human)):
                 p2 = open_win_paths_human[j]
@@ -1827,7 +1845,7 @@ class Board:
           if (c.HUMAN_count+1) > max_length_path_X:
             max_length_path_X = c.HUMAN_count+1
         else:
-          open_win_paths_computer.append((free_on_path,c.COMPUTER_count, square in path, path))
+          open_win_paths_human.append((free_on_path,c.HUMAN_count+1, square in path, path))
           if (c.HUMAN_count) > max_length_path_X:
             max_length_path_X = c.HUMAN_count
 
@@ -2444,7 +2462,7 @@ class Board:
       return 0
 
 
-  def obj_interaction(self, player, remaining_turns_x = 0, depth = 0, other_player = True, exp = 1, interaction = False, block = False):
+  def obj_interaction(self, player, remaining_turns_x = 0, depth = 0, other_player = True, exp = 1, interaction = False, block = False, linear=False):
     """ Heurisitc function to be used for the minimax search.
     If it is a winning board for the COMPUTER, returns WIN_SCORE.
     If it is a losing board for the COMPUTER, returns LOSE_SCORE.
@@ -2503,7 +2521,10 @@ class Board:
     score_X = 0
     for i in range(len(open_win_paths_computer)):
       p1 = open_win_paths_computer[i]
-      score_O += 1.0/math.pow((streak_size-p1[1]), exp)  # score for individual path
+      if linear:
+        score_O += p1[1]  # score for individual path
+      else:
+        score_O += 1.0/math.pow((streak_size-p1[1]), exp)  # score for individual path
       if interaction:
         for j in range(i+1, len(open_win_paths_computer)):
           p2 = open_win_paths_computer[j]
@@ -2517,7 +2538,10 @@ class Board:
 
     for i in range(len(open_win_paths_human)):
       p1 = open_win_paths_human[i]
-      score_X += 1.0/math.pow((streak_size-p1[1]), exp)  # score for individual path
+      if linear:
+        score_X +=p1[1]  # score for individual path
+      else:
+        score_X += 1.0/math.pow((streak_size-p1[1]), exp)  # score for individual path
       if interaction:
         for j in range(i+1, len(open_win_paths_human)):
           p2 = open_win_paths_human[j]
@@ -2626,3 +2650,36 @@ class Board:
       if self.board[space] == c.BLANK:
         return False
     return c.TIE
+
+  def is_terminal_mcts(self):
+    ''' Returns True if the board is terminal, False if not. '''
+    # First, check to see if the board is won
+    # objective_score = self.obj()
+    # if objective_score == c.WIN_SCORE:
+    #   return c.COMPUTER
+    # elif objective_score == c.LOSE_SCORE:
+    #   return c.HUMAN
+    for path in self.winning_paths:
+      len_path = len(path)
+      c.COMPUTER_count, c.HUMAN_count = 0, 0
+
+      for space in path:
+        if self.board[space] == c.COMPUTER:
+          c.COMPUTER_count += 1
+        elif self.board[space] == c.HUMAN:
+          c.HUMAN_count += 1
+
+      if c.COMPUTER_count == len_path:
+        # print path
+        # Player wins!
+        return True
+      elif c.HUMAN_count == len_path:
+        # print path
+        # Opponent wins :(
+        return True
+    # else:
+      # Then, check to see if there are any c.BLANK spaces
+    for space in self.board:
+      if self.board[space] == c.BLANK:
+        return False
+    return True
