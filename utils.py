@@ -274,6 +274,6 @@ def rand_max(iterable, key=None):
 if __name__== "__main__":
     row, col = convert_position_to_row_col(23, 10)
     num = convert_position_to_int(row, col, 10)
-    print row
-    print col
-    print num
+    print (row)
+    print (col)
+    print (num)

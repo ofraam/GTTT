@@ -12,6 +12,8 @@ import model
 import pandas as pd
 import ast
 from stats_analyses import *
+from __future__ import print_function
+
 
 LOGFILE = ['logs/6_hard_full_dec19.csv','logs/6_hard_pruned_dec19.csv','logs/10_hard_full_dec19.csv','logs/10_hard_pruned_dec19.csv', 'logs/6_easy_full_dec19.csv','logs/6_easy_pruned_dec19.csv','logs/10_easy_full_dec19.csv','logs/10_easy_pruned_dec19.csv','logs/10_medium_full_dec19.csv','logs/10_medium_pruned_dec19.csv']
 
@@ -68,8 +70,8 @@ def seperate_log(log_file):
             if log == curr_log:
                 curr_log_records.append(row)
             elif len(curr_log_records)>0:
-                dataFile = open('logs/'+curr_log+'_dec19.csv', 'wb')
-                print curr_log_records[0]
+                dataFile = open('logs/'+curr_log+'_07092019.csv', 'wb')
+                print(curr_log_records[0])
                 dataWriter = csv.DictWriter(dataFile, fieldnames=curr_log_records[0].keys(), delimiter=',')
                 dataWriter.writeheader()
                 for record in curr_log_records:
@@ -3530,6 +3532,8 @@ def simulate_game(num_simulations):
     data.to_csv('stats/paths_simulations_blocking_blocking_softmax_5.csv')
 
 if __name__ == "__main__":
+
+    print 'hello'
     # simulate_game(500)
     # heat_map_solution(normalized=True)
     # paths_stats(participants='all')
@@ -3554,7 +3558,7 @@ if __name__ == "__main__":
 
     # fit_heuristics_by_move(['density','linear','non-linear','interaction','blocking'], 'stats/heuristics_byMove_player_cogsci_withPaths.csv',win_scores=[100],blocking_vals=[10])
 
-    fit_heuristics_by_move(['linear'], 'stats/heuristics_byMove_player_cogsci_withPaths_linearFixed.csv',win_scores=[100],blocking_vals=[10])
+    # fit_heuristics_by_move(['linear'], 'stats/heuristics_byMove_player_cogsci_withPaths_linearFixed.csv',win_scores=[100],blocking_vals=[10])
     # fit_heuristics(['blocking'], 'stats/test.csv',win_scores=win_scores, blocking_vals=blocking_vals)
     # fit_heuristics(['density','linear','non-linear','interaction','blocking','interaction_blind','blocking_blind'], 'stats/missing_parts_heuristics_25.csv',win_scores=win_scores,blocking_vals=blocking_vals)
     # fit_heuristics(['linear','non-linear','interaction','interaction_shutter_0','blocking_shutter_0','blocking','density'], 'stats/heuristic_fit_shutter_test_noBline.csv',win_scores=[100],blocking_vals=[10])

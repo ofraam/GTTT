@@ -2,11 +2,11 @@ import copy
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-import replay as rp
-import computational_model as cm
+import replay_python3 as rp
+# import computational_model as cm
 import config
 import json
-from emd import emd
+# from emd import emd
 import random
 import bisect
 import os
@@ -1672,7 +1672,7 @@ the @exp parameter creates the non-linearity (i.e., 2 --> squared)
 def compute_scores_open_paths(normalized=False, exp=1, lamb = 1):
     data_matrices = {}
     for g in range(len(LOGFILE)):
-        print LOGFILE[g]
+        print(LOGFILE[g])
         board_matrix = copy.deepcopy(START_POSITION[g])
         for i in range(len(board_matrix)):
             for j in range(len(board_matrix[i])):
@@ -1730,7 +1730,7 @@ the @exp parameter creates the non-linearity (i.e., 2 --> squared)
 def compute_scores_open_paths_opponent(normalized=False, exp=1, lamb = 1, o_weight = 0.5):
     data_matrices = {}
     for g in range(len(LOGFILE)):
-        print LOGFILE[g]
+        # print LOGFILE[g]
         board_matrix = copy.deepcopy(START_POSITION[g])
         for i in range(len(board_matrix)):
             for j in range(len(board_matrix[i])):
@@ -2126,7 +2126,7 @@ def convert_matrix_to_board_obj(board_matrix):
     num_spaces = int(input_file.readline())
     winning_paths = []
     for line in input_file:
-        path = map(int, line.split())
+        path = list(map(int, line.split()))
         winning_paths.append(path)
 
     game_board = Board(num_spaces,winning_paths,board=board_dict)
@@ -2248,8 +2248,8 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                     if (density_score_matrix[r][c]!=-0.00001) & (density_score_matrix[r][c]!=-0.00002):
                     # if (score_matrix[r][c]>0):
                         if lamb is None:
-                            if (sum_scores < 0):
-                                print 'negative'
+                            # if (sum_scores < 0):
+                            #     print 'negative'
                             if (sum_scores == 0):
                                 density_score_matrix[r][c] = 1.0/counter
                             else:
@@ -2290,59 +2290,62 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
 
     for r in range(len(board_matrix)):
         for c in range(len(board_matrix[r])):
-            if (board_matrix[r][c] == 0) & (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free & passed threshold
-                # x_paths = compute_open_paths_data(r, c, board_matrix,exp=exp,interaction=interaction)  # check open paths for win
+            # print(board_matrix[r][c])
+            # print(density_score_matrix[r][c])
+            if (board_matrix[r][c] == 0):
+                if (density_score_matrix[r][c]>threshold*max_density_score):  # only check if free & passed threshold
+                    # x_paths = compute_open_paths_data(r, c, board_matrix,exp=exp,interaction=interaction)  # check open paths for win
 
 
-                x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction)
-                square_score_x = x_paths[0]
-                x_paths_data = []
-                for path in x_paths[1]:
-                    x_paths_data.append(path[2])
-                paths_data[r][c] = copy.deepcopy(x_paths_data)
-                # square_score_0 = compute_open_paths(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+                    x_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player_turn=x_turn,exp=exp,interaction=interaction)
+                    square_score_x = x_paths[0]
+                    x_paths_data = []
+                    for path in x_paths[1]:
+                        x_paths_data.append(path[2])
+                    paths_data[r][c] = copy.deepcopy(x_paths_data)
+                    # square_score_0 = compute_open_paths(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
 
-                # o_paths = compute_open_paths_data(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
-                o_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player = 'O', player_turn = o_turn,exp=exp,interaction=interaction)
-                square_score_o = o_paths[0]
+                    # o_paths = compute_open_paths_data(r, c, board_matrix, exp=exp, player = 'O', interaction=interaction)
+                    o_paths = compute_open_paths_data_interaction_new(r, c, board_matrix,player = 'O', player_turn = o_turn,exp=exp,interaction=interaction)
+                    square_score_o = o_paths[0]
 
 
-                streak_size = 4
-                if len(board_matrix)==10:
-                    streak_size = 5
+                    streak_size = 4
+                    if len(board_matrix)==10:
+                        streak_size = 5
 
-                if block & (x_paths[2] == (streak_size-1)) & x_turn:  # give score for blocking O
-                    # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
-                    square_score_o = INFINITY_O
-                    square_score_x += INFINITY_O
+                    if block & (x_paths[2] == (streak_size-1)) & x_turn:  # give score for blocking O
+                        # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
+                        square_score_o = INFINITY_O
+                        square_score_x += INFINITY_O
 
-                elif block & (o_paths[2] == (streak_size-1)) & o_turn:  # give score for blocking O
-                    # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
-                    square_score_x = INFINITY_O
-                    square_score_o += INFINITY_O
-                # if x_paths[2] == (streak_size-1):
-                #     square_score_o =0
-                if o_weight == 0.5:
-                    square_score = square_score_x + square_score_o
-                elif o_weight== 0:
-                    square_score = square_score_x
-                elif o_weight == 1.0:
-                    square_score = square_score_x
+                    elif block & (o_paths[2] == (streak_size-1)) & o_turn:  # give score for blocking O
+                        # square_score_o = compute_block_o_score(board_matrix,exp=exp, interaction=interaction,player='O')
+                        square_score_x = INFINITY_O
+                        square_score_o += INFINITY_O
+                    # if x_paths[2] == (streak_size-1):
+                    #     square_score_o =0
+                    if o_weight == 0.5:
+                        square_score = square_score_x + square_score_o
+                    elif o_weight== 0:
+                        square_score = square_score_x
+                    elif o_weight == 1.0:
+                        square_score = square_score_x
 
-                if square_score > WIN_SCORE:
-                    square_score = WIN_SCORE
-                # if player == 'O':
-                #     square_score = -1*square_score
-                if integrate:
-                    square_score = square_score*density_score_matrix[r][c]
-                score_matrix[r][c] = square_score
-                #TODO: remember to change if we want to:
-                if square_score > 0:
-                    sum_scores += square_score
-                 #TODO: remember to change if we want to:
-                # if lamb!=None:
-                #     score_matrix[r][c] = math.pow(math.e,lamb*square_score)
-                #     sum_scores_exp += math.pow(math.e,lamb*square_score)
+                    if square_score > WIN_SCORE:
+                        square_score = WIN_SCORE
+                    # if player == 'O':
+                    #     square_score = -1*square_score
+                    if integrate:
+                        square_score = square_score*density_score_matrix[r][c]
+                    score_matrix[r][c] = square_score
+                    #TODO: remember to change if we want to:
+                    if square_score > 0:
+                        sum_scores += square_score
+                     #TODO: remember to change if we want to:
+                    # if lamb!=None:
+                    #     score_matrix[r][c] = math.pow(math.e,lamb*square_score)
+                    #     sum_scores_exp += math.pow(math.e,lamb*square_score)
 
     # x_paths_data = []
     # for path in x_paths[1]:
@@ -2434,7 +2437,7 @@ def compute_scores_layers_for_matrix(board_mat, player='X', normalized=False, ex
                     else:
                         score_matrix[r][c] = np.exp(score_matrix[r][c])/sum_scores_exp
         if (np.sum(score_matrix) < 0.99) & (np.sum(score_matrix) > 0):
-            print 'why'
+            print (np.sum(score_matrix))
 
     return score_matrix
 
@@ -2528,7 +2531,7 @@ def run_models():
         fig.suptitle(board)  # add subtitle to the figure based on board name
 
         i = 0  # this will be used to index into the list of heatmaps
-        print board  # just printing the board name so I know if they finish, you can remove
+        print(board)  # just printing the board name so I know if they finish, you can remove
 
 
         # here you will append to the heatmap list any heatmap you want to present. For each heatmap you append a pair -
@@ -2641,7 +2644,7 @@ def run_models_from_list(models_file_list, base_heatmap_name, base_matrix_index 
 
         fig.suptitle(board)  # add subtitle to the figure based on board name
         i = 0  # this will be used to index into the list of heatmaps
-        print board  # just printing the board name so I know if they finish, you can remove
+        print(board)  # just printing the board name so I know if they finish, you can remove
 
         for j in range(len(data)):
             matrix_name_full = models_file_list[j][:-5]
@@ -2739,8 +2742,8 @@ def compute_distances_for_boards(models_file_list, base_matrix_index):
             if base_matrix_index != None:
                 dist_full = emd(data[j][full],data[base_matrix_index][full]) # earth mover distance for the full board
                 dist_pruned = emd(data[j][pruned],data[base_matrix_index][pruned]) # earth mover distance for the full board
-            print matrix_name_full + ',' + full+ ',' + str(round(dist_full, 3))
-            print matrix_name_pruned + ',' + pruned+ ',' + str(round(dist_pruned, 3))
+            print (matrix_name_full + ',' + full+ ',' + str(round(dist_full, 3)))
+            print (matrix_name_pruned + ',' + pruned+ ',' + str(round(dist_pruned, 3)))
 
 def compute_square_scores_dominance(board, score_matrix, n=1000):
     player = 'X'
@@ -3024,7 +3027,7 @@ def get_alpha_beta_scores():
 
             game = cm.start_game(file_path, conf)
 
-            print filename
+            print (filename)
 
             score_matrix = []
 
@@ -3130,7 +3133,7 @@ def likelihood(values_file, models_file_list):
                     num_moves += 1
                 num_users += 1
                 # print board + ',' + model_name + ',' + values_file[:-5] + ',' + str(comm_prob) + ',' + str(math.log(comm_prob))
-                print board + ',' + model_name + ',' + 'all' + ',' + str(comm_prob) + ',' + str(math.log(comm_prob))
+                print (board + ',' + model_name + ',' + 'all' + ',' + str(comm_prob) + ',' + str(math.log(comm_prob)))
 
 
             avg_likelihood_borad = sum_user_likelihoods/num_moves
@@ -3182,7 +3185,7 @@ def distancePredictionPeopleLOO():
         pop_str = ''
         for p in population:
             pop_str += str(p) + ','
-        print pop_str
+        print (pop_str)
 
         board = boards[i]
         dist = 0.0

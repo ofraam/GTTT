@@ -3,7 +3,7 @@ import math
 import copy
 from model import *
 from utils import *
-from replay import *
+from replay_python3 import *
 from board import *
 from bisect import bisect_right
 
@@ -230,7 +230,7 @@ class Board:
       else:
         list_of_occupied.append(space)
     if player is None:
-      print 'problem'
+      print('problem')
 
     forced_move = self.win_or_forced_move(player)
     if forced_move:
@@ -267,7 +267,7 @@ class Board:
       else:
         list_of_occupied.append(space)
     if player is None:
-      print 'problem'
+      print ('problem')
 
     board_matrix = convert_ab_board_to_matrix(self.board)
     player_type = 'X'
@@ -323,7 +323,7 @@ class Board:
           missed_win = 0.0
           break
     if len(ranked_list) == 0:
-      print 'problem'
+      print ('problem')
     # return ranked_list[ :k], nodes_computed, missed_win
     # for mcts
     return ranked_list[ :k], ranked_scores, missed_win
@@ -351,7 +351,7 @@ class Board:
     for i in range(len(a)):
         j = self.weighted_choice(w)
         if (i is None) | (j is None):
-          print 'problem'
+          print ('problem')
         r[i]=a[j]
         w[j] = 0
     return r
@@ -397,7 +397,7 @@ class Board:
       else:
         list_of_occupied.append(space)
     if player is None:
-      print 'problem'
+      print ('problem')
 
 
     # TODO: bring back (6/8/18, removed for shutter)
@@ -498,7 +498,7 @@ class Board:
       else:
         list_of_occupied.append(space)
     if player is None:
-      print 'problem'
+      print ('problem')
     for free_space in list_of_spaces:
       list_of_spaces_with_dist.append((free_space,self.compute_square_score_paths(free_space, player=player,remaining_turns_x=remaining_turns_x,depth=depth, exp=2, interaction=True, other_player=False, potential="square")))
 
@@ -576,6 +576,7 @@ class Board:
     # if player == c.COMPUTER:
     winning_moves = []
     for path in self.winning_paths:
+      # print(path)
       len_path = len(path)
       c.COMPUTER_count, c.HUMAN_count = 0, 0
       free_on_path = []
@@ -691,14 +692,14 @@ class Board:
           # print self.last_space
           # print c.WIN_SCORE-turns
           if (depth!=0):
-            print 'yup'
+            print ('yup')
           return c.WIN_SCORE
 
         elif c.HUMAN_count == len_path:
           # print path
           # Opponent wins :(
           if (depth!=0):
-            print 'yup'
+            print ('yup')
           return c.LOSE_SCORE
 
         elif c.HUMAN_count == 0:
@@ -888,7 +889,7 @@ class Board:
                 win_x = True
                 return  -1*c.LOSE_SCORE
               if (((streak_size-1)*(streak_size-1))-(path_length*path_length2)) == 0:
-                print 'boo'
+                print ('boo')
               top =0.0 + path_length*path_length2
               bottom = ((streak_size-1)*(streak_size-1))-(path_length*path_length2)
               score_x += math.pow(top/bottom, exp)
@@ -1068,7 +1069,7 @@ class Board:
                 win_x = True
                 return  -1*c.LOSE_SCORE
               if (((streak_size-1)*(streak_size-1))-(path_length*path_length2)) == 0:
-                print 'boo'
+                print ('boo')
               top =0.0 + path_length*path_length2
               bottom = ((streak_size-1)*(streak_size-1))-(path_length*path_length2)
               score_x += math.pow(top/bottom, exp)
