@@ -763,11 +763,14 @@ def check_participant_answer(userid):
         return 'wrong'
 
 def check_participant_answer_new(userid, df):
-    solution_correct = df.loc[df['key'] == 'solvedCorrect']['value']
-    validation = df.loc[df['key'] == 'validatedCorrect']['value']
-    solution_user = df.loc[df['key'] == 'best_move']['value']
-    if solution_correct:
-        if validation:
+    if df.loc[df['key'] == 'solvedCorrect']['value'].shape[0] == 0:
+        print(df.head())
+    solution_correct = df.loc[df['key'] == 'solvedCorrect']['value'].iloc[0]
+
+    validation = df.loc[df['key'] == 'validatedCorrect']['value'].iloc[0]
+    solution_user = df.loc[df['key'] == 'best_move']['value'].iloc[0]
+    if solution_correct == 'TRUE':
+        if validation == 'TRUE':
             return 'validatedCorrect', solution_user
         else:
             return 'solvedCorrect', solution_user
@@ -2041,7 +2044,7 @@ def moves_stats(output_file):
         curr_move_matrix = copy.deepcopy(move_matrix)
         curr_first_move_matrix = copy.deepcopy(move_matrix)
 
-
+        log_df = pd.read_csv(LOGFILE[g])
 
         with open(LOGFILE[g], 'rt',encoding="utf8") as csvfile:
             print(LOGFILE[g])
@@ -2053,6 +2056,8 @@ def moves_stats(output_file):
             board_name = LOGFILE[g]
             board_name=board_name[:-4]
             board_name = board_name[5:-6]
+
+
 
             log_reader = csv.DictReader(csvfile)
             move_number = 1
@@ -2078,17 +2083,21 @@ def moves_stats(output_file):
                 if curr_user == '':
                     curr_user = row['userid']
 
-                if curr_user not in valid_users:
-                    print('ignoring user: ', curr_user)
+                    if curr_user not in valid_users:
+                        # print('ignoring user: ', curr_user)
+                        curr_user = ''
+                        continue
+                df_user =  log_df.loc[log_df['userid'] == curr_user]
+                if (df_user.shape[0] == 0) or (df_user.loc[df_user['key'] == 'solvedCorrect']['value'].shape[0] == 0):
                     continue
-
+                participant_answer, participant_move = check_participant_answer_new(curr_user, df_user)
                 # print('prev_time=',prev_time)
                 if row['userid'] != curr_user:
                     curr_user = row['userid']
 
                     # check that user is in turk data
                     if curr_user not in valid_users:
-                        print('ignoring user: ', curr_user)
+                        # print('ignoring user: ', curr_user)
                         continue
 
                     # reset all values for next user
@@ -2100,7 +2109,10 @@ def moves_stats(output_file):
                     move_number = 1
                     curr_path = []
                     move_stack = []
-                    participant_answer = check_participant_answer_new(curr_user)
+                    df_user =  log_df.loc[log_df['userid'] == curr_user]
+                    if (df_user.shape[0] == 0) or (df_user.loc[df_user['key'] == 'solvedCorrect']['value'].shape[0] == 0):
+                        continue
+                    participant_answer, participant_move = check_participant_answer_new(curr_user, df_user)
                     initial_time = None
                     prev_x_score = 0
                     prev_o_score = None
@@ -2218,7 +2230,7 @@ def moves_stats(output_file):
                     curr_data['move_prob'] = move_prob
                     curr_data['path_prob'] = path_prob
                     curr_data['path_number'] = path_number
-
+                    curr_data['solution'] = participant_move
                     player_type = 'X'
                     if player == 1:
                         player_type = 'O'
@@ -2303,7 +2315,7 @@ def moves_stats(output_file):
                     curr_data['move_prob'] = move_prob
                     curr_data['path_prob'] = path_prob
                     curr_data['path_number'] = path_number
-
+                    curr_data['solution'] = participant_move
 
                     results_table.append(copy.deepcopy(curr_data))
 
@@ -2361,6 +2373,7 @@ def moves_stats(output_file):
                         curr_data['move_prob'] = move_prob
                         curr_data['path_prob'] = path_prob
                         curr_data['path_number'] = path_number
+                        curr_data['solution'] = participant_move
 
                         player_type = 'X'
                         if player == 1:
@@ -3621,4 +3634,4 @@ if __name__ == "__main__":
     # run_analysis()
     # replay()
 
-    moves_stats("dynamics_07072019_solution.csv")
+    moves_stats("logs/dynamics_07072019_solution.csv")
