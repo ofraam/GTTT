@@ -15,7 +15,8 @@ import ast
 
 
 # LOGFILE = ['logs/6_hard_full_07092019.csv','logs/6_hard_pruned_07092019.csv','logs/10_hard_full_07092019.csv','logs/10_hard_pruned_07092019.csv', 'logs/6_easy_full_07092019.csv','logs/6_easy_pruned_07092019.csv','logs/10_easy_full_07092019.csv','logs/10_easy_pruned_07092019.csv','logs/10_medium_full_07092019.csv','logs/10_medium_pruned_07092019.csv']
-LOGFILE = ['logs/10_hard_full_07092019.csv','logs/10_hard_pruned_07092019.csv', 'logs/6_easy_full_07092019.csv','logs/6_easy_pruned_07092019.csv','logs/10_easy_full_07092019.csv','logs/10_easy_pruned_07092019.csv','logs/10_medium_full_07092019.csv','logs/10_medium_pruned_07092019.csv']
+# LOGFILE = ['logs/10_hard_full_07092019.csv','logs/10_hard_pruned_07092019.csv', 'logs/6_easy_full_07092019.csv','logs/6_easy_pruned_07092019.csv','logs/10_easy_full_07092019.csv','logs/10_easy_pruned_07092019.csv','logs/10_medium_full_07092019.csv','logs/10_medium_pruned_07092019.csv']
+LOGFILE = ['logs/10_hard_full_11072019_oldServer.csv','logs/10_hard_pruned_11072019_oldServer.csv', 'logs/6_easy_full_11072019_oldServer.csv','logs/6_easy_pruned_11072019_oldServer.csv','logs/10_easy_full_11072019_oldServer.csv','logs/10_easy_pruned_11072019_oldServer.csv','logs/10_medium_full_11072019_oldServer.csv','logs/10_medium_pruned_11072019_oldServer.csv']
 
 # LOGFILE = ['logs/6_hard_verify_dec19.csv','logs/10_hard_verify_dec19.csv', 'logs/6_easy_verify_dec19.csv','logs/10_easy_verify_dec19.csv','logs/10_medium_verify_dec3.csv']
 
@@ -70,7 +71,7 @@ def seperate_log(log_file):
             if log == curr_log:
                 curr_log_records.append(row)
             elif len(curr_log_records)>0:
-                dataFile = open('logs/'+curr_log+'_07092019.csv', 'wt',newline='')
+                dataFile = open('logs/'+curr_log+'_11072019_oldServer.csv', 'wt',newline='')
                 print(curr_log_records[0])
                 dataWriter = csv.DictWriter(dataFile, fieldnames=curr_log_records[0].keys(), delimiter=',')
                 dataWriter.writeheader()
@@ -2048,6 +2049,7 @@ def moves_stats(output_file):
 
         with open(LOGFILE[g], 'rt',encoding="utf8") as csvfile:
             print(LOGFILE[g])
+
             cond = LOGFILE[g][5:-10].replace("_",",")
             cond = cond.split(',')
             board_size = cond[0]
@@ -2089,17 +2091,22 @@ def moves_stats(output_file):
                         continue
                 df_user =  log_df.loc[log_df['userid'] == curr_user]
                 if (df_user.shape[0] == 0) or (df_user.loc[df_user['key'] == 'solvedCorrect']['value'].shape[0] == 0):
+                    # print(curr_user)
+                    curr_user = ''
                     continue
                 participant_answer, participant_move = check_participant_answer_new(curr_user, df_user)
                 # print('prev_time=',prev_time)
                 if row['userid'] != curr_user:
-                    curr_user = row['userid']
+                    if row['userid']  in valid_users:
+                        df_user =  log_df.loc[log_df['userid'] == row['userid']]
+                        if (df_user.shape[0] > 0) and (df_user.loc[df_user['key'] == 'solvedCorrect']['value'].shape[0] > 0):
+                            curr_user = row['userid']
 
                     # check that user is in turk data
-                    if curr_user not in valid_users:
+                    else:
                         # print('ignoring user: ', curr_user)
                         continue
-
+                    print(curr_user)
                     # reset all values for next user
                     prev_time = None
                     prev_action = None
@@ -2110,8 +2117,8 @@ def moves_stats(output_file):
                     curr_path = []
                     move_stack = []
                     df_user =  log_df.loc[log_df['userid'] == curr_user]
-                    if (df_user.shape[0] == 0) or (df_user.loc[df_user['key'] == 'solvedCorrect']['value'].shape[0] == 0):
-                        continue
+                    # if (df_user.shape[0] == 0) or (df_user.loc[df_user['key'] == 'solvedCorrect']['value'].shape[0] == 0):
+                    #     continue
                     participant_answer, participant_move = check_participant_answer_new(curr_user, df_user)
                     initial_time = None
                     prev_x_score = 0
@@ -3616,7 +3623,7 @@ if __name__ == "__main__":
     # transition_probs('stats/state_scores_heuristics_180718_linearNoInteraction_', normalized=True)
     # transition_probs_o_blind('stats/state_scores_heuristics_o_blind_180718', normalized=True)
     # explore_exploit('stats/exploreExploitTimesPathLength0416.csv')
-    # seperate_log('logs/tttLogs07072019.csv')
+    # seperate_log('logs/tttLogsJuly2019_oldServer.csv')
     # # entropy_board()
     # # entropy_board(ignore=True)
     # # entropy_board_average()
@@ -3634,4 +3641,4 @@ if __name__ == "__main__":
     # run_analysis()
     # replay()
 
-    moves_stats("logs/dynamics_07072019_solution.csv")
+    moves_stats("logs/dynamics_07072019_solution_oldServer.csv")

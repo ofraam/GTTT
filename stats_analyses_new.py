@@ -1259,35 +1259,8 @@ def compute_blindness_player(player_moves_probs, player=2, include_forced=False)
 
 if __name__== "__main__":
     sns.set(style="whitegrid")
-    # states_cont = pd.read_csv("stats/states_continued.csv")
-    # states_cont_filtered = states_cont.loc[(states_cont['count'] > 4) & (states_cont['path_length'] <7) & (states_cont['path_length'] > 0)]
-    # s = states_cont_filtered['count']
-    # v = states_cont_filtered['probability']
-    # # s = np.float_(np.array(range(0,1201,1200/8)))
-    # # v = np.round(120*s/(171+s) + np.random.uniform(size=9), 2)
-    # p = Parameters()
-    # p.add('vmax', value=1., min=0.)
-    # p.add('km', value=1., min=0.)
-    #
-    # out = lmmin(residual, p, args=(s, v))
-    # sns.regplot(s,v, fit_reg = False)
-    # ss = np.float_(np.array(range(0,300,1)))
-    # y = out.params['vmax'].value * ss / (out.params['km'].value + ss)
-    #
-    # # y =  ss / (out.params['km'].value + ss)
-    # sns.regplot(ss,y, fit_reg = False, color='red')
-    # # plt.show()
-    # print out.params
-    # plt.show()
-    # print 1/0
-    # plot(s, v, 'bo')
-    # hold(True)
-    #
-    # ss = np.float_(np.array(range(0,1201,1200/100)))
-    # y = p['vmax'].value * ss / (p['km'].value + ss)
-    # plot(ss, y, 'r-')
-    # hold(False)
-    # compute_path_probabilities_participants();
+    compute_path_probabilitie
+    +/687s_participants();
 
     # print stats.wasserstein_distance([1,2,7], [3,1,6])
     # print stats.wasserstein_distance([0.1,0.2,0.7], [0.3,0.1,0.6])
@@ -1327,8 +1300,7 @@ if __name__== "__main__":
     # dynamics_filtered.to_csv('stats/dynamics_cogscidata_230718.csv')
 
     # dynamics_filtered = pd.read_csv('stats/dynamics_cogscidata_220718.csv')
-    # dynamics_list = dynamics_filtered['userid'].unique().tolist()
-    # print len(heuristics_part_list)
+    # dynamics_list = dynamics_filtered['userid'].unique().tolist(    #  print len(heuristics_part_list)
     # print len(dynamics_list)
     # for part in heuristics_part_list:
     #     if part not in dynamics_list:

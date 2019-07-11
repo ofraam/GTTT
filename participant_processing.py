@@ -44,15 +44,22 @@ def seperate_log(log_file):
 
 
 if __name__ == "__main__":
-    merged1 = pd.read_csv('experiments_files/merged_30052019.csv')
-    merged2 = pd.read_csv('experiments_files/merged_11042019.csv')
-    merged3 = pd.read_csv('experiments_files/merged_07042019.csv')
-    merged4 = pd.read_csv('experiments_files/merged_07072019.csv')
+    # merged1 = pd.read_csv('experiments_files/merged_30052019.csv')
+    # merged2 = pd.read_csv('experiments_files/merged_11042019.csv')
+    # merged3 = pd.read_csv('experiments_files/merged_07042019.csv')
+    # merged4 = pd.read_csv('experiments_files/merged_07072019.csv')
+    #
+    # frames = [merged1, merged2, merged3, merged4]
+    # turk_df = pd.concat(frames)
+    # turk_df.to_csv('experiments_files/merged_all_until_07072019.csv')
+    #
 
-    frames = [merged1, merged2, merged3, merged4]
+    dynamics1 = pd.read_csv('stats/dynamics_190718.csv')
+    dynamics2 = pd.read_csv('stats/dynamics_07072019_solution_test.csv')
+    dynamics3 = pd.read_csv('stats/dynamics_07072019_solution_oldServer.csv')
+    frames = [dynamics1, dynamics2, dynamics3]
     turk_df = pd.concat(frames)
-    turk_df.to_csv('experiments_files/merged_all_until_07072019.csv')
-
+    turk_df.to_csv('stats/dynamics_all_07072019.csv')
     exit()
     # turk1 = pd.read_csv('experiments_files/turk05072019.csv')
     # turk2 = pd.read_csv('experiments_files/turk06072019_1.csv')
