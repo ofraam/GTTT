@@ -1,7 +1,7 @@
 import numpy as np
-import bootstrapped.bootstrap as bs
-import bootstrapped.compare_functions as bs_compare
-import bootstrapped.stats_functions as bs_stats
+# import bootstrapped.bootstrap as bs
+# import bootstrapped.compare_functions as bs_compare
+# import bootstrapped.stats_functions as bs_stats
 import seaborn as sns
 from utils import *
 import pandas as pd
@@ -12,7 +12,7 @@ import copy
 import csv
 from sklearn.covariance import EllipticEnvelope
 from  sklearn.neighbors import LocalOutlierFactor
-from altair import Chart
+# from altair import Chart
 from IPython.display import display
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
@@ -21,8 +21,8 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.model_selection import GroupKFold
 from sklearn.metrics import roc_curve
 from scipy import interp
-from lmfit import minimize as lmmin
-from lmfit import Parameters
+# from lmfit import minimize as lmmin
+# from lmfit import Parameters
 from scipy.interpolate import griddata
 import glob
 
@@ -34,7 +34,7 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.model_selection import train_test_split
 import matplotlib.ticker as ticker
 # from patsy import
-from replay import *
+from replay_python3 import *
 
 
 # import Tkinter
@@ -55,6 +55,12 @@ START_POSITION = [[[0,2,0,0,1,0],[0,2,1,2,0,0],[0,1,0,0,0,0],[0,1,0,2,0,0],[0,1,
                 [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,0,1,1,0,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]],
                  [[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,1,0,0,2,0,0,0,0],[0,0,1,1,1,2,0,0,0,0],[0,0,0,0,2,2,2,1,2,0],[0,0,0,0,0,1,2,2,0,0],[0,0,0,1,0,2,0,0,0,0],[0,0,0,0,1,1,0,0,0,0],[0,0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,2,0,0,0]]
                   ]
+
+
+BOARD_NAMES = {'6_hard_full': '6 HC full','6_hard_pruned': '6 HC truncated','10_hard_full': '10 HC full',
+               '10_hard_pruned': '10 HC truncated', '6_easy_full':'6 MC full','6_easy_pruned': '6 MC truncated',
+               '10_easy_full': '10 MC full','10_easy_pruned': '10 MC truncated',
+               '10_medium_full': '10 DC full','10_medium_pruned': '10 DC truncated'}
 
 
 def rank_biserial_effect_size(x,y):
@@ -270,39 +276,39 @@ def change_width(ax, new_value) :
         patch.set_y(patch.get_y() + diff * .5)
 
 
-def get_user_stats(dynamics, exploreExploitData):
-    dataset = dynamics
-    all_data = []
-    curr_data = {}
-    for userid in dataset['userid'].unique():
-        user_data = dataset.loc[dataset['userid'] == userid]
-        exploreExploitData_user = exploreExploitData.loc[exploreExploitData['userid'] == userid]
-        curr_data['userid'] = userid
-
-        curr_data['num_resets'] = user_data[user_data['action'] == 'reset'].shape[0]
-        curr_data['num_restarts'] = user_data[(user_data['prev_action'] != '') & (user_data['move_number_in_path'] == 1)].shape[0]
-        curr_data['mean_score'] = user_data['score_heuristic_x'].mean()
-        curr_data['median_score'] = user_data['score_heuristic_x'].median()
-        curr_data['num_moves_win_score'] = user_data[(user_data['score_heuristic_x'] == 100) & (user_data['player'] == 1)].shape[0]
-        first_moves = user_data.loc[user_data['move_number_in_path'] == 1]
-        curr_data['num_unique_first_moves'] = len(first_moves['position'].unique())
-        curr_data['solved'] = user_data.iloc[0]['solved']
-        curr_data['board'] = user_data.iloc[0]['board_name']
-        curr_data['number_of_moves'] = user_data['move_number'].max()
-        curr_data['solution_time'] = user_data['time_rel_sec'].max()
-        curr_data['explore_time'] = None
-        curr_data['exploit_time'] = None
-        curr_data['avg_first_move_score'] = first_moves['score_heuristic_x'].mean()
-        curr_data['median_first_move_score'] = first_moves['score_heuristic_x'].median()
-        if exploreExploitData_user.shape[0]>0:
-            curr_data['explore_time'] = exploreExploitData_user.iloc[0]['explore_time']
-            curr_data['exploit_time'] = exploreExploitData_user.iloc[0]['exploit_time']
-        all_data.append(copy.deepcopy(curr_data))
-    dataFile = open('stats\user_stats1604.csv', 'wb')
-    dataWriter = csv.DictWriter(dataFile, fieldnames=curr_data.keys(), delimiter=',')
-    dataWriter.writeheader()
-    for record in all_data:
-        dataWriter.writerow(record)
+# def get_user_stats(dynamics, exploreExploitData):
+#     dataset = dynamics
+#     all_data = []
+#     curr_data = {}
+#     for userid in dataset['userid'].unique():
+#         user_data = dataset.loc[dataset['userid'] == userid]
+#         exploreExploitData_user = exploreExploitData.loc[exploreExploitData['userid'] == userid]
+#         curr_data['userid'] = userid
+#
+#         curr_data['num_resets'] = user_data[user_data['action'] == 'reset'].shape[0]
+#         curr_data['num_restarts'] = user_data[(user_data['prev_action'] != '') & (user_data['move_number_in_path'] == 1)].shape[0]
+#         curr_data['mean_score'] = user_data['score_heuristic_x'].mean()
+#         curr_data['median_score'] = user_data['score_heuristic_x'].median()
+#         curr_data['num_moves_win_score'] = user_data[(user_data['score_heuristic_x'] == 100) & (user_data['player'] == 1)].shape[0]
+#         first_moves = user_data.loc[user_data['move_number_in_path'] == 1]
+#         curr_data['num_unique_first_moves'] = len(first_moves['position'].unique())
+#         curr_data['solved'] = user_data.iloc[0]['solved']
+#         curr_data['board'] = user_data.iloc[0]['board_name']
+#         curr_data['number_of_moves'] = user_data['move_number'].max()
+#         curr_data['solution_time'] = user_data['time_rel_sec'].max()
+#         curr_data['explore_time'] = None
+#         curr_data['exploit_time'] = None
+#         curr_data['avg_first_move_score'] = first_moves['score_heuristic_x'].mean()
+#         curr_data['median_first_move_score'] = first_moves['score_heuristic_x'].median()
+#         if exploreExploitData_user.shape[0]>0:
+#             curr_data['explore_time'] = exploreExploitData_user.iloc[0]['explore_time']
+#             curr_data['exploit_time'] = exploreExploitData_user.iloc[0]['exploit_time']
+#         all_data.append(copy.deepcopy(curr_data))
+#     dataFile = open('stats\user_stats1604.csv', 'wb')
+#     dataWriter = csv.DictWriter(dataFile, fieldnames=curr_data.keys(), delimiter=',')
+#     dataWriter.writeheader()
+#     for record in all_data:
+#         dataWriter.writerow(record)
 
 def compare_start_move(dynamics):
     first_move = {'6hard':'0_3', '6easy':'3_5', '10hard':'2_4', '10easy':'4_9', '10medium':'3_2'}
@@ -1257,10 +1263,117 @@ def compute_blindness_player(player_moves_probs, player=2, include_forced=False)
     return player_moves_probs['prob_move'].mean(), player_moves_probs['prob_move'].median(), player_moves_probs['rank_move'].mean(), player_moves_probs['rank_move'].median(), player_moves_probs['prob_move_to_best_ratio'].mean(), player_moves_probs['prob_move_to_best_ratio'].median()
 
 
+'''
+NEW METHODS FOR ANALYSIS
+'''
+
+def search_size_correctness_figure(alpha_beta_df, behavioral_df):
+
+    # generate behavioral data with action counts
+    behavioral_clicks_df = behavioral_df.loc[((behavioral_df['action']=='click'))]
+    actions_counts_df = behavioral_clicks_df.groupby(['userid','solved','board_name', 'board_size','board_type','condition'], as_index=False)['action'].count()
+
+    cogsci_participants = pd.read_csv("stats/cogsci_participants.csv")
+
+
+    behavioral_agg_df = behavioral_clicks_df.groupby(['userid','board_size','board_type','condition','board_name','solved']).action.count().reset_index()
+    behavioral_agg_df['solutionAndValidationCorrectPercent'] = behavioral_agg_df['solved'].map({'wrong': 0, 'solvedCorrect':0, 'validatedCorrect': 100})
+    behavioral_agg_df['solutionAndValidationCorrect'] = behavioral_agg_df['solved'].map({'wrong': 0, 'solvedCorrect':0, 'validatedCorrect': 1})
+    behavioral_agg_df['solutionCorrect'] = behavioral_agg_df['solved'].map({'wrong': 0, 'solvedCorrect':1, 'validatedCorrect': 1})
+    # behavioral_agg_df.to_csv("stats/test_behavioral_agg.csv")
+    # exit()
+
+
+    behavioral_agg_df['type'] = behavioral_agg_df['board_type'].map({'hard': 'HC', 'easy': 'MC', 'medium': 'DC'})
+    behavioral_agg_df['actionsSolution'] = behavioral_agg_df['action']
+    behavioral_agg_df['size'] = behavioral_agg_df['board_size']
+    behavioral_agg_df['condition'] = behavioral_agg_df['condition'].map({'full': 'full', 'pruned': 'truncated'})
+    cogsci_part_list = cogsci_participants['userid'].unique().tolist()
+    # actions_counts_df = actions_counts_df.loc[actions_counts_df['userid'].isin(cogsci_part_list)]
+    # actions_counts_df.to_csv('stats/actions_df.csv')
+    for board_name in LOGFILE:
+        action_counts_board = actions_counts_df.loc[actions_counts_df['board_name'] == board_name]
+        print(board_name)
+        print('median', action_counts_board['action'].median())
+        print('mean', action_counts_board['action'].mean())
+    # exit()
+    alpha_beta_df['heuristic_name'] = alpha_beta_df['heuristic_name'].map({'density':'density', 'linear':  'linear','non-linear':'non-linear', 'non-linear-interaction': 'interaction','blocking':'blocking', 'participants':'participants'})
+    # alphaBetaFull['board'] = alphaBetaFull['board'].map({'6 MC full': 'MC6 full', '6 MC truncated': 'MC6 truncated','10 MC full': 'MC10 full','10 MC truncated':'MC10 truncated','6 HC full': 'HC6 full', '6 HC truncated':'HC6 truncated','10 HC full':'HC10 full','10 HC truncated':'HC10 truncated', '10 DC full': 'DC10 full','10 DC truncated':'DC10 truncated'})
+    alphaBetaInteraction = alpha_beta_df.loc[alpha_beta_df['heuristic_name'] == 'interaction']
+    # data['board'] = data['board'].map({'6 MC': 'MC6','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
+
+    alpha_beta_behavioral_df = pd.merge(alphaBetaInteraction, behavioral_agg_df, on=['size','type','condition'], how='left')
+    alpha_beta_behavioral_df.to_csv('stats/alpha_beta_behavioral070819.csv')
+
+    # ax = sns.regplot(x="moves", y="moves", data=moves_blocking,  x_estimator=np.mean, ci=68, color="r", fit_reg=False)
+    # ax.set(yscale="log")
+    # ax.set(xscale="log")
+    # plt.show()
+    plt.subplots(1,2, figsize=(8.6,4))
+    plt.subplot(1, 2, 2)
+    ax = sns.regplot(x="moves", y="solutionAndValidationCorrectPercent", x_estimator=np.mean, data=alpha_beta_behavioral_df, color="r", fit_reg=False,  ci=68)
+    ax.set(xscale="log")
+    ax.set(ylim=(0, 100))
+    ax.set(xlim=(10, 200000))
+    ax.set_xlabel('Board Complexity', fontsize=14)
+    ax.set_ylabel('Percent Correct', fontsize=14)
+    ax.tick_params(labelsize=12)
+    # ax.set(xlabel='Board Complexity', ylabel='Percent Correct')
+    # ax2 = ax.twinx()
+    fig = plt.subplot(1, 2, 1)
+    # alphaBetaBehvaior2 = pd.read_csv('stats/alpha_beta_participants_ab.csv')
+    # pal = {'participant':"silver", 'alpha-beta':"blue"}
+    # g = sns.FacetGrid(alphaBetaBehvaior2, hue='moves_type', palette=pal, size=5);
+    # g.map(sns.regplot, "moves", "actionsSolution", ci=68,  x_estimator=np.mean, fit_reg=False)
+    # # g.map(sns.regplot, "moves", "actionsSolution", ci=None, robust=1)
+    # g.add_legend();
+    ax = sns.regplot(x="moves", y="actionsSolution", data=alpha_beta_behavioral_df,  x_estimator=np.mean, ci=68, color="b", fit_reg=False)
+    sns.regplot(x="moves", y="moves", data=alpha_beta_behavioral_df,  x_estimator=np.mean, ci=68, color="silver", fit_reg=False, ax=ax)
+    # print stats.spearmanr(moves_blocking.actionsSolution.values, moves_blocking.moves.values)
+    # print(spearmanr_ci(moves_blocking.actionsSolution.values, alphaBetaBehvaior.moves.values))
+    # print(spearmanr_ci(moves_blocking.solutionAndValidationCorrectPercent.values, moves_blocking.moves.values))
+    # print spearmanr_ci(moves_blocking.solutionAndValidationCorrectPercent.values, moves_blocking.actionsSolution.values)
+    # ax3 = ax.twinx()
+    # g.set(xscale="log", yscale="log")
+    ax.set(xscale="log")
+    ax.set(yscale="log")
+    ax.set(xlim=(10, 200000))
+    ax.set_xlabel('Board Complexity', fontsize=14)
+    ax.set_ylabel('Search Size', fontsize=14)
+    ax.tick_params(labelsize=12)
+
+
+
+    # fig.legend(labels=['Participants Search Size','Algorithmic Search Size'], handles=[])
+    legend_elements = [Line2D([0], [0], marker='o', color='w', label='Participants Search Size',
+                          markerfacecolor='b', markersize=9),
+                       Line2D([0], [0], marker='o', color='w', label='Alpha-Beta Search Size',
+                          markerfacecolor='silver', markersize=9)]
+    fig.legend(handles=legend_elements, fontsize=11)
+
+    ax.set(xlabel='Board Complexity', ylabel='Search Size')
+    plt.tight_layout(pad=1)
+    plt.show()
+
+
+    # search size and correctness tests
+    # correct_participants = alphaBetaBehvaior.loc[alphaBetaBehvaior['solutionAndValidationCorrect'] == 1]
+    # wrong_participants = alphaBetaBehvaior.loc[alphaBetaBehvaior['solutionAndValidationCorrect'] == 0]
+    # print stats.mannwhitneyu(correct_participants['actionsSolution'].values, wrong_participants['actionsSolution'].values)
+    # print cohen_d(wrong_participants['actionsSolution'].values, correct_participants['actionsSolution'].values)
+    # exit()
+
+
 if __name__== "__main__":
-    sns.set(style="whitegrid")
-    compute_path_probabilitie
-    +/687s_participants();
+    # sns.set(style="whitegrid")
+
+    data = pd.read_csv("stats/dynamics_all_07072019.csv")
+
+    alphaBetaFull = pd.read_csv("stats/cogsciAlphaBeta100000.csv")
+    search_size_correctness_figure(alphaBetaFull, data)
+
+    exit()
+    compute_path_probabilities_participants();
 
     # print stats.wasserstein_distance([1,2,7], [3,1,6])
     # print stats.wasserstein_distance([0.1,0.2,0.7], [0.3,0.1,0.6])
@@ -1300,7 +1413,8 @@ if __name__== "__main__":
     # dynamics_filtered.to_csv('stats/dynamics_cogscidata_230718.csv')
 
     # dynamics_filtered = pd.read_csv('stats/dynamics_cogscidata_220718.csv')
-    # dynamics_list = dynamics_filtered['userid'].unique().tolist(    #  print len(heuristics_part_list)
+    # dynamics_list = dynamics_filtered['userid'].unique().tolist()
+    # print len(heuristics_part_list)
     # print len(dynamics_list)
     # for part in heuristics_part_list:
     #     if part not in dynamics_list:
@@ -3855,16 +3969,16 @@ if __name__== "__main__":
     full_ci = np.nanpercentile( np.asarray(mean_entropy_full), q=(100*0.05/2, 100*(1-0.05/2)))
     pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
 
-    print '--stats--'
+    print('--stats--')
     # bootstrap_t_pvalue(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all))
     # bootstrap_t_pvalue_after_sampling(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all), np.asmatrix(x_boot), np.asmatrix(y_boot))
-    print np.mean(mean_entropy_full)
-    print full_ci
-    print np.mean(mean_entropy_pruned)
-    print pruned_ci
-    print stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned)
-    print rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned)
-    print '--first--'
+    print(np.mean(mean_entropy_full))
+    print(full_ci)
+    print(np.mean(mean_entropy_pruned))
+    print(pruned_ci)
+    print(stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned))
+    print(rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned))
+    print('--first--')
 
     # plt.figure(figsize=(5,5))
     plt.subplot(1,2,1)
@@ -3884,16 +3998,16 @@ if __name__== "__main__":
     full_ci = np.nanpercentile( np.asarray(mean_entropy_full), q=(100*0.05/2, 100*(1-0.05/2)))
     pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
 
-    print '--stats--'
+    print ('--stats--')
     # bootstrap_t_pvalue(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all))
     # bootstrap_t_pvalue_after_sampling(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all), np.asmatrix(x_boot), np.asmatrix(y_boot))
-    print np.mean(mean_entropy_full)
-    print full_ci
-    print np.mean(mean_entropy_pruned)
-    print pruned_ci
-    print stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned)
-    print rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned)
-    print '--first--'
+    print (np.mean(mean_entropy_full))
+    print (full_ci)
+    print (np.mean(mean_entropy_pruned))
+    print (pruned_ci)
+    print (stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned))
+    print (rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned))
+    print ('--first--')
 
     # plt.figure(figsize=(5,5))
     plt.subplot(1,2,2)
@@ -3923,16 +4037,16 @@ if __name__== "__main__":
     states = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['solved'] != 'validatedCorrect')]
     # states = dynamics.loc[(dynamics['action'] == 'click')]
     # states = states.loc[(states['action'] == 'click') & (states['board_name'].isin(['10_medium_full', '10_medium_pruned']))]
-    print states.shape[0]
+    print (states.shape[0])
 
     states_pruned = states.loc[states['board_name'].isin(['6_easy_pruned','10_easy_pruned','10_hard_pruned','6_hard_pruned','10_medium_pruned'])]
     states_pruned_len0 = states.loc[((states['move_number_in_path'] == 1))]
 
     # states = states.loc[states['move_number_in_path'] < 4]  # checking just first two moves
-    print states.shape[0]
+    print (states.shape[0])
     board_states = states_pruned['board_state'].unique()
-    print 'this'
-    print len(board_states)
+    print ('this')
+    print (len(board_states))
     entropies_pruned = []
     entropies_full = []
     states_data = []
@@ -4014,17 +4128,17 @@ if __name__== "__main__":
     mean_pruned_all = np.mean(entropies_pruned)
     entropies_full_all = copy.deepcopy(entropies_full)
     entropies_pruned_all = copy.deepcopy(entropies_pruned)
-    print '--stats on full sample'
-    print 'full moves'
-    print counter_full
-    print 'truncated moves'
-    print counter_pruned
+    print ('--stats on full sample')
+    print ('full moves')
+    print (counter_full)
+    print ('truncated moves')
+    print (counter_pruned)
     # exit()
     # print entropies_full
     # print entropies_pruned
-    print stats.mannwhitneyu(entropies_full, entropies_pruned)
-    print rank_biserial_effect_size(entropies_full, entropies_pruned)
-    print '--stats on full sample end'
+    print (stats.mannwhitneyu(entropies_full, entropies_pruned))
+    print (rank_biserial_effect_size(entropies_full, entropies_pruned))
+    print ('--stats on full sample end')
     entropies_data['condition'] = entropies_data['condition'].map({'full': 'Full', 'pruned': 'Truncated'})
     plt.figure(figsize=(5,5))
     # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
@@ -4189,12 +4303,12 @@ if __name__== "__main__":
 
 
     # print entropies_data
-    print np.mean(entropies_full)
-    print np.mean(entropies_pruned)
-    print np.mean(entropies_pruned)
+    print (np.mean(entropies_full))
+    print (np.mean(entropies_pruned))
+    print (np.mean(entropies_pruned))
 
-    print np.std(entropies_full)
-    print np.std(entropies_pruned)
+    print (np.std(entropies_full))
+    print (np.std(entropies_pruned))
 
     entropies_full = np.asarray(entropies_full)
     # entropies_full = entropies_data.loc[entropies_data['condition']=='full']
@@ -4205,16 +4319,16 @@ if __name__== "__main__":
     full_ci = np.nanpercentile( np.asarray(mean_entropy_full), q=(100*0.05/2, 100*(1-0.05/2)))
     pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
 
-    print '--first non-solvers--'
+    print ('--first non-solvers--')
     # bootstrap_t_pvalue(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all))
     # bootstrap_t_pvalue_after_sampling(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all), np.asmatrix(x_boot), np.asmatrix(y_boot))
-    print np.mean(mean_entropy_full)
-    print full_ci
-    print np.mean(mean_entropy_pruned)
-    print pruned_ci
-    print stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned)
-    print rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned)
-    print '--first--'
+    print (np.mean(mean_entropy_full))
+    print (full_ci)
+    print (np.mean(mean_entropy_pruned))
+    print (pruned_ci)
+    print (stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned))
+    print (rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned))
+    print ('--first--')
     # # # print bs.bootstrap(entropies_full, stat_func=bs_stats.mean, is_pivotal=False)
     # # # print bs.bootstrap(entropies_pruned, stat_func=bs_stats.mean, is_pivotal=False)
     # # # print stats.mannwhitneyu(entropies_full, entropies_pruned)
@@ -4410,79 +4524,79 @@ if __name__== "__main__":
 
 
     # ----figure 2 pnas: complexity correctness & search size---------
-    # alphaBetaFull['heuristic_name'] = alphaBetaFull['heuristic_name'].map({'density':'density', 'linear':  'linear','non-linear':'non-linear', 'non-linear-interaction': 'interaction','blocking':'blocking', 'participants':'participants'})
-    # # alphaBetaFull['board'] = alphaBetaFull['board'].map({'6 MC full': 'MC6 full', '6 MC truncated': 'MC6 truncated','10 MC full': 'MC10 full','10 MC truncated':'MC10 truncated','6 HC full': 'HC6 full', '6 HC truncated':'HC6 truncated','10 HC full':'HC10 full','10 HC truncated':'HC10 truncated', '10 DC full': 'DC10 full','10 DC truncated':'DC10 truncated'})
-    # alphaBetaInteraction = alphaBetaFull.loc[alphaBetaFull['heuristic_name'] == 'interaction']
-    # # data['board'] = data['board'].map({'6 MC': 'MC6','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
-    #
-    # alphaBetaBehvaior = pd.merge(alphaBetaInteraction, data, on=['size','type','condition'], how='left')
-    # max_moves = float(alphaBetaBehvaior['moves'].max())
-    # moves_norm = []
-    # for index, row in alphaBetaBehvaior.iterrows():
-    #     moves_norm.append(float(row['actionsSolution'])/float(row['moves']))
-    # alphaBetaBehvaior['actions_normalized'] = moves_norm
-    # # alphaBetaBehvaior['moves_blocking'] = moves_norm
-    # # alphaBetaBehvaior['actionsSolution'] = alphaBetaBehvaior['actionsSolution'].apply(lambda x: np.round(float(x)/alphaBetaBehvaior['moves'],5))
-    # # alphaBetaBehvaior.to_csv('stats/alpha_beta_participants_normalized.csv')
-    #
-    # # ax = sns.regplot(x="moves", y="moves", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="r", fit_reg=False)
-    # # ax.set(yscale="log")
-    # # ax.set(xscale="log")
-    # # plt.show()
-    # plt.subplots(1,2, figsize=(8.6,4))
-    # plt.subplot(1, 2, 2)
-    # ax = sns.regplot(x="moves", y="solutionAndValidationCorrectPercent", x_estimator=np.mean, data=alphaBetaBehvaior, color="r", fit_reg=False,  ci=68)
-    # ax.set(xscale="log")
-    # ax.set(ylim=(0, 100))
-    # ax.set(xlim=(10, 200000))
-    # ax.set_xlabel('Board Complexity', fontsize=14)
-    # ax.set_ylabel('Percent Correct', fontsize=14)
-    # ax.tick_params(labelsize=12)
-    # # ax.set(xlabel='Board Complexity', ylabel='Percent Correct')
-    # # ax2 = ax.twinx()
-    # fig = plt.subplot(1, 2, 1)
-    # # alphaBetaBehvaior2 = pd.read_csv('stats/alpha_beta_participants_ab.csv')
-    # # pal = {'participant':"silver", 'alpha-beta':"blue"}
-    # # g = sns.FacetGrid(alphaBetaBehvaior2, hue='moves_type', palette=pal, size=5);
-    # # g.map(sns.regplot, "moves", "actionsSolution", ci=68,  x_estimator=np.mean, fit_reg=False)
-    # # # g.map(sns.regplot, "moves", "actionsSolution", ci=None, robust=1)
-    # # g.add_legend();
-    # ax = sns.regplot(x="moves", y="actionsSolution", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="b", fit_reg=False)
-    # sns.regplot(x="moves", y="moves", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="silver", fit_reg=False, ax=ax)
-    # # print stats.spearmanr(alphaBetaBehvaior.actionsSolution.values, alphaBetaBehvaior.moves.values)
-    # print spearmanr_ci(alphaBetaBehvaior.actionsSolution.values, alphaBetaBehvaior.moves.values)
-    # print spearmanr_ci(alphaBetaBehvaior.solutionAndValidationCorrectPercent.values, alphaBetaBehvaior.moves.values)
-    # # print spearmanr_ci(alphaBetaBehvaior.solutionAndValidationCorrectPercent.values, alphaBetaBehvaior.actionsSolution.values)
-    # # ax3 = ax.twinx()
-    # # g.set(xscale="log", yscale="log")
-    # ax.set(xscale="log")
-    # ax.set(yscale="log")
-    # ax.set(xlim=(10, 200000))
-    # ax.set_xlabel('Board Complexity', fontsize=14)
-    # ax.set_ylabel('Search Size', fontsize=14)
-    # ax.tick_params(labelsize=12)
-    #
-    #
-    #
-    # # fig.legend(labels=['Participants Search Size','Algorithmic Search Size'], handles=[])
-    # legend_elements = [Line2D([0], [0], marker='o', color='w', label='Participants Search Size',
-    #                       markerfacecolor='b', markersize=9),
-    #                    Line2D([0], [0], marker='o', color='w', label='Alpha-Beta Search Size',
-    #                       markerfacecolor='silver', markersize=9)]
-    # fig.legend(handles=legend_elements, fontsize=11)
-    #
-    # ax.set(xlabel='Board Complexity', ylabel='Search Size')
-    # plt.tight_layout(pad=1)
-    # plt.show()
-    # exit()
+    alphaBetaFull['heuristic_name'] = alphaBetaFull['heuristic_name'].map({'density':'density', 'linear':  'linear','non-linear':'non-linear', 'non-linear-interaction': 'interaction','blocking':'blocking', 'participants':'participants'})
+    # alphaBetaFull['board'] = alphaBetaFull['board'].map({'6 MC full': 'MC6 full', '6 MC truncated': 'MC6 truncated','10 MC full': 'MC10 full','10 MC truncated':'MC10 truncated','6 HC full': 'HC6 full', '6 HC truncated':'HC6 truncated','10 HC full':'HC10 full','10 HC truncated':'HC10 truncated', '10 DC full': 'DC10 full','10 DC truncated':'DC10 truncated'})
+    alphaBetaInteraction = alphaBetaFull.loc[alphaBetaFull['heuristic_name'] == 'interaction']
+    # data['board'] = data['board'].map({'6 MC': 'MC6','10 MC': 'MC10','6 HC': 'HC6','10 HC': 'HC10','10 DC': 'DC10'})
 
-    #
-    # # search size and correctness tests
-    # correct_participants = alphaBetaBehvaior.loc[alphaBetaBehvaior['solutionAndValidationCorrect'] == 1]
-    # wrong_participants = alphaBetaBehvaior.loc[alphaBetaBehvaior['solutionAndValidationCorrect'] == 0]
-    # print stats.mannwhitneyu(correct_participants['actionsSolution'].values, wrong_participants['actionsSolution'].values)
-    # print cohen_d(wrong_participants['actionsSolution'].values, correct_participants['actionsSolution'].values)
-    # exit()
+    alphaBetaBehvaior = pd.merge(alphaBetaInteraction, data, on=['size','type','condition'], how='left')
+    max_moves = float(alphaBetaBehvaior['moves'].max())
+    moves_norm = []
+    for index, row in alphaBetaBehvaior.iterrows():
+        moves_norm.append(float(row['actionsSolution'])/float(row['moves']))
+    alphaBetaBehvaior['actions_normalized'] = moves_norm
+    # alphaBetaBehvaior['moves_blocking'] = moves_norm
+    # alphaBetaBehvaior['actionsSolution'] = alphaBetaBehvaior['actionsSolution'].apply(lambda x: np.round(float(x)/alphaBetaBehvaior['moves'],5))
+    # alphaBetaBehvaior.to_csv('stats/alpha_beta_participants_normalized.csv')
+
+    # ax = sns.regplot(x="moves", y="moves", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="r", fit_reg=False)
+    # ax.set(yscale="log")
+    # ax.set(xscale="log")
+    # plt.show()
+    plt.subplots(1,2, figsize=(8.6,4))
+    plt.subplot(1, 2, 2)
+    ax = sns.regplot(x="moves", y="solutionAndValidationCorrectPercent", x_estimator=np.mean, data=alphaBetaBehvaior, color="r", fit_reg=False,  ci=68)
+    ax.set(xscale="log")
+    ax.set(ylim=(0, 100))
+    ax.set(xlim=(10, 200000))
+    ax.set_xlabel('Board Complexity', fontsize=14)
+    ax.set_ylabel('Percent Correct', fontsize=14)
+    ax.tick_params(labelsize=12)
+    # ax.set(xlabel='Board Complexity', ylabel='Percent Correct')
+    # ax2 = ax.twinx()
+    fig = plt.subplot(1, 2, 1)
+    # alphaBetaBehvaior2 = pd.read_csv('stats/alpha_beta_participants_ab.csv')
+    # pal = {'participant':"silver", 'alpha-beta':"blue"}
+    # g = sns.FacetGrid(alphaBetaBehvaior2, hue='moves_type', palette=pal, size=5);
+    # g.map(sns.regplot, "moves", "actionsSolution", ci=68,  x_estimator=np.mean, fit_reg=False)
+    # # g.map(sns.regplot, "moves", "actionsSolution", ci=None, robust=1)
+    # g.add_legend();
+    ax = sns.regplot(x="moves", y="actionsSolution", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="b", fit_reg=False)
+    sns.regplot(x="moves", y="moves", data=alphaBetaBehvaior,  x_estimator=np.mean, ci=68, color="silver", fit_reg=False, ax=ax)
+    # print stats.spearmanr(alphaBetaBehvaior.actionsSolution.values, alphaBetaBehvaior.moves.values)
+    print (spearmanr_ci(alphaBetaBehvaior.actionsSolution.values, alphaBetaBehvaior.moves.values))
+    print (spearmanr_ci(alphaBetaBehvaior.solutionAndValidationCorrectPercent.values, alphaBetaBehvaior.moves.values))
+    # print spearmanr_ci(alphaBetaBehvaior.solutionAndValidationCorrectPercent.values, alphaBetaBehvaior.actionsSolution.values)
+    # ax3 = ax.twinx()
+    # g.set(xscale="log", yscale="log")
+    ax.set(xscale="log")
+    ax.set(yscale="log")
+    ax.set(xlim=(10, 200000))
+    ax.set_xlabel('Board Complexity', fontsize=14)
+    ax.set_ylabel('Search Size', fontsize=14)
+    ax.tick_params(labelsize=12)
+
+
+
+    # fig.legend(labels=['Participants Search Size','Algorithmic Search Size'], handles=[])
+    legend_elements = [Line2D([0], [0], marker='o', color='w', label='Participants Search Size',
+                          markerfacecolor='b', markersize=9),
+                       Line2D([0], [0], marker='o', color='w', label='Alpha-Beta Search Size',
+                          markerfacecolor='silver', markersize=9)]
+    fig.legend(handles=legend_elements, fontsize=11)
+
+    ax.set(xlabel='Board Complexity', ylabel='Search Size')
+    plt.tight_layout(pad=1)
+    plt.show()
+    exit()
+
+
+    # search size and correctness tests
+    correct_participants = alphaBetaBehvaior.loc[alphaBetaBehvaior['solutionAndValidationCorrect'] == 1]
+    wrong_participants = alphaBetaBehvaior.loc[alphaBetaBehvaior['solutionAndValidationCorrect'] == 0]
+    print (stats.mannwhitneyu(correct_participants['actionsSolution'].values, wrong_participants['actionsSolution'].values))
+    print (cohen_d(wrong_participants['actionsSolution'].values, correct_participants['actionsSolution'].values))
+    exit()
     #
     # # ax2.set(ylim=(0, 1))
     # # plt.ylim(0,100)
