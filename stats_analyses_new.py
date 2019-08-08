@@ -440,7 +440,7 @@ def add_aperture_values(dynamics):
 
     dynamics['shutter'] = aperture_values
     dynamics['open_path'] = open_path_values
-    dynamics.to_csv('stats/moves_hueristic_scores_shutter230718.csv')
+    dynamics.to_csv('stats/moves_shutter08082019.csv')
 
 
 def fit_heuristic_user_moves(transitions,dynamics):
@@ -1268,6 +1268,9 @@ NEW METHODS FOR ANALYSIS
 '''
 
 def search_size_correctness_figure(alpha_beta_df, behavioral_df):
+    '''
+    Figure 2 PNAS
+    '''
 
     # generate behavioral data with action counts
     behavioral_clicks_df = behavioral_df.loc[((behavioral_df['action']=='click'))]
@@ -1364,13 +1367,187 @@ def search_size_correctness_figure(alpha_beta_df, behavioral_df):
     # exit()
 
 
+def entropies_full_truncated(dynamics):
+    '''
+    fig 4C pnas
+    '''
+    # states = dynamics.loc[(dynamics['action'] == 'click') & (dynamics['solved'] == 'validatedCorrect')]
+    # states = dynamics.loc[(dynamics['action'] == 'click')]
+    # # states = states.loc[(states['action'] == 'click') & (states['board_name'].isin(['10_medium_full', '10_medium_pruned']))]
+    # print(states.shape[0])
+    #
+    # states_pruned = states.loc[states['board_name'].isin(['6_easy_pruned','10_easy_pruned','10_hard_pruned','6_hard_pruned','10_medium_pruned'])]
+    # states_pruned_len0 = states_pruned.loc[((states['move_number_in_path'] == 1))]
+    #
+    # states = states.loc[states['move_number_in_path'] < 4]  # checking just first two moves
+    # # print states.shape[0]
+    # board_states = states_pruned_len0['board_state'].unique()
+    #
+    # print(len(board_states))
+    # print(board_states)
+    # # exit()
+    # counter_full = 0.0
+    # counter_pruned = 0.0
+    # mean_entropy_full = []
+    # mean_entropy_pruned = []
+    # mean_entropies = []
+    # mean_conditions = []
+    # for i in range(1000):
+    #     entropies_pruned = []
+    #     entropies_full = []
+    #     states_data = []
+    #     boards = []
+    #     solved = []
+    #     conditions = []
+    #     # heuristics = []
+    #     entropies = []
+    #     for s in board_states:
+    #         moves_s_all = states.loc[(states['board_state'] == s)]
+    #
+    #
+    #         moves_s = moves_s_all.sample(frac=1, replace=True)
+    #         if (len(moves_s['path'].unique()) > 1):
+    #             check = True
+    #             for p in moves_s['path'].unique():
+    #                 m_p = moves_s.loc[moves_s['path'] == p]
+    #                 if m_p.shape[0] < 5:
+    #                     check = False
+    #                     break
+    #             if check:
+    #                 pk = []
+    #                 moves_pruned = moves_s.loc[moves_s['condition'] == 'pruned']
+    #                 if moves_pruned.shape[0]== 0:
+    #                     continue
+    #                 # moves_pruned = moves_pruned.sample(frac=0.25)
+    #                 counter_pruned += moves_pruned.shape[0]
+    #                 mp = moves_pruned['position'].unique()
+    #                 total = moves_pruned.shape[0] + 0.0
+    #                 for m in mp:
+    #                     count = moves_pruned[moves_pruned['position'] == m].shape[0]
+    #                     pk.append(float(count)/float(total))
+    #                 ent = stats.entropy(pk)
+    #                 entropies_pruned.append(ent)
+    #                 states_data.append(s)
+    #                 boards.append(moves_pruned['board_name'].unique()[0])
+    #                 solvers = moves_pruned[moves_pruned['solved'] != 'validatedCorrect'].shape[0]
+    #                 if total > 0:
+    #                     solved.append(float(solvers)/total)
+    #                 else:
+    #                     solved.append(0.0)
+    #                 conditions.append('pruned')
+    #                 entropies.append(float(ent))
+    #
+    #                 pk = []
+    #                 moves_full = moves_s.loc[moves_s['condition'] == 'full']
+    #                 if moves_full.shape[0]== 0:
+    #                     continue
+    #                 counter_full += moves_full.shape[0]
+    #                 mf = moves_full['position'].unique()
+    #                 total = moves_full.shape[0] + 0.0
+    #                 for m in mf:
+    #                     count = moves_full[moves_full['position'] == m].shape[0]
+    #                     pk.append(float(count)/float(total))
+    #                 ent = stats.entropy(pk)
+    #                 entropies_full.append(ent)
+    #                 states_data.append(s)
+    #                 solvers = moves_full[moves_full['solved'] == 'validatedCorrect'].shape[0]
+    #                 if total > 0:
+    #                     solved.append(float(solvers)/total)
+    #                 else:
+    #                     solved.append(0.0)
+    #                 boards.append(moves_full['board_name'].unique()[0])
+    #                 conditions.append('full')
+    #                 entropies.append(float(ent))
+    #     mean_entropies.append(np.mean(entropies_full))
+    #     mean_conditions.append('Full')
+    #     mean_entropies.append(np.mean(entropies_pruned))
+    #     mean_conditions.append('Truncated')
+    #     mean_entropy_full.append(np.mean(entropies_full))
+    #     mean_entropy_pruned.append(np.mean(entropies_pruned))
+    #
+    # entropies_data = {'condition': mean_conditions, 'entropy': mean_entropies}
+    # entropies_data = pd.DataFrame(entropies_data)
+    # print('lengths:')
+    # print(len(mean_entropy_full))
+    # print (len(mean_entropy_pruned))
+    # entropies_data.to_csv('stats/entropies_first_states_07082019_1000.csv')
+    #
+    # exit()
+    entropies_data = pd.read_csv('stats/entropies_first_states_07082019_1000.csv')
+    mean_entropy_full = entropies_data.loc[entropies_data['condition'] == 'Full']
+    mean_entropy_full = mean_entropy_full['entropy'].values
+    mean_entropy_pruned = entropies_data.loc[entropies_data['condition'] == 'Truncated']
+    mean_entropy_pruned = mean_entropy_pruned['entropy'].values
+    full_ci = np.nanpercentile( np.asarray(mean_entropy_full), q=(100*0.05/2, 100*(1-0.05/2)))
+    pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
+
+    print('--stats--')
+    # bootstrap_t_pvalue(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all))
+    # bootstrap_t_pvalue_after_sampling(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all), np.asmatrix(x_boot), np.asmatrix(y_boot))
+    print(np.mean(mean_entropy_full))
+    print(full_ci)
+    print(np.mean(mean_entropy_pruned))
+    print(pruned_ci)
+    print(stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned))
+    print(rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned))
+    print('--first--')
+
+    # plt.figure(figsize=(5,5))
+    plt.subplot(1,2,1)
+    # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
+    # ax = sns.barplot(x='condition', y='entropy',ci='custom', data=entropies_data)
+    ax = sns.barplot(x='condition', y='entropy',ci=None, data=entropies_data)
+    ax.set_xlabel('Condition', fontsize=14)
+    # ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+    ax.set_ylabel('Entropy (solvers)', fontsize=14)
+
+    ax.tick_params(labelsize=14)
+
+    entropies_data = pd.read_csv('stats/entropies_all_states_070119_non-solvers_1000.csv')
+    mean_entropy_full = entropies_data.loc[entropies_data['condition'] == 'Full']
+    mean_entropy_full = mean_entropy_full['entropy'].values
+    mean_entropy_pruned = entropies_data.loc[entropies_data['condition'] == 'Truncated']
+    mean_entropy_pruned = mean_entropy_pruned['entropy'].values
+    full_ci = np.nanpercentile( np.asarray(mean_entropy_full), q=(100*0.05/2, 100*(1-0.05/2)))
+    pruned_ci = np.nanpercentile( np.asarray(mean_entropy_pruned), q=(100*0.05/2, 100*(1-0.05/2)))
+
+    print ('--stats--')
+    # bootstrap_t_pvalue(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all))
+    # bootstrap_t_pvalue_after_sampling(np.asarray(entropies_full_all), np.asarray(entropies_pruned_all), np.asmatrix(x_boot), np.asmatrix(y_boot))
+    print (np.mean(mean_entropy_full))
+    print (full_ci)
+    print (np.mean(mean_entropy_pruned))
+    print (pruned_ci)
+    print (stats.mannwhitneyu(mean_entropy_full, mean_entropy_pruned))
+    print (rank_biserial_effect_size(mean_entropy_full, mean_entropy_pruned))
+    print ('--first--')
+
+    # plt.figure(figsize=(5,5))
+    plt.subplot(1,2,2)
+    # ax = sns.barplot(x='condition', y='entropy',  n_boot=1000, ci='sd', data=df_means_all)
+    # ax = sns.barplot(x='condition', y='entropy',ci='custom', data=entropies_data)
+    ax = sns.barplot(x='condition', y='entropy',ci=None, data=entropies_data)
+    ax.set_xlabel('Condition', fontsize=14)
+    # ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+    ax.set_ylabel('Entropy (non-solvers)', fontsize=14)
+
+    ax.tick_params(labelsize=14)
+    # plt.title("non-solvers first moves")
+    plt.tight_layout(pad=1.5)
+    plt.show()
+
 if __name__== "__main__":
     # sns.set(style="whitegrid")
 
-    data = pd.read_csv("stats/dynamics_all_07072019.csv")
 
+
+    data = pd.read_csv("stats/dynamics_all_07072019.csv")
+    add_aperture_values(data)
+    exit()
     alphaBetaFull = pd.read_csv("stats/cogsciAlphaBeta100000.csv")
-    search_size_correctness_figure(alphaBetaFull, data)
+    # search_size_correctness_figure(alphaBetaFull, data)
+
+    entropies_full_truncated(data)
 
     exit()
     compute_path_probabilities_participants();
